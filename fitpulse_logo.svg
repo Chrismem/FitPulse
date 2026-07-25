@@ -1,0 +1,31 @@
+<svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .wordmark { font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 700; }
+    </style>
+  </defs>
+
+  <!-- Icon group -->
+  <g transform="translate(20,30)">
+    <!-- Pulse line leading into heart shape -->
+    <path d="M0,70 L25,70 L40,40 L55,100 L70,55 L85,70
+             C85,70 95,50 110,50
+             C125,50 130,65 130,75
+             C130,95 110,110 100,120
+             C90,110 70,95 70,75
+             C70,68 73,62 78,58"
+          fill="none" stroke="#0FB5AE" stroke-width="7"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Heart fill accent -->
+    <path d="M100,120 C90,110 70,95 70,75 C70,60 82,52 92,58
+             C97,61 100,66 100,72
+             C100,66 103,61 108,58
+             C118,52 130,60 130,75
+             C130,95 110,110 100,120 Z"
+          fill="#FF6B4A" opacity="0.15"/>
+    <circle cx="100" cy="72" r="6" fill="#FF6B4A"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="180" y="120" class="wordmark" font-size="56" fill="#0FB5AE">Fit<tspan fill="#FF6B4A">pulse</tspan></text>
+</svg>
