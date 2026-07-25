@@ -12,3 +12,27 @@ This app is built for:
 Our goal is to help users locate nearby fitness centers, connect with like-minded communities, and track daily habits. 
 
 We hope you enjoy exploring the application. Thanks!
+
+Our current and planned features include:
+- Smart Location Finder
+- List of fitness communities
+- Habit trackers (personalized)
+
+To install the app:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd FitPulse
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the application:
+   ```bash
+   npm start
+   ```
