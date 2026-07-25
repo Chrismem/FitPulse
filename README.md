@@ -39,4 +39,3 @@ To install the app:
    ```bash
    python main.py
    ```
-   ```
