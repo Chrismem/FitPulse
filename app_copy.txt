@@ -1,0 +1,6 @@
+Welcome Message ("Welcome to Fit pluse where your journey begins")
+Success Message ("One search away from achieving what you were born to do") 
+Error Message: ("It appears there's a mistake with the search that is stopping you from your achievement. Please try again.")
+Headline 1 : ("Every pulse counts. Every goal matters.")
+Headline 2 : ("Begin with comfort to live with comfort")
+Headline 3 : ("Your progress starts today so make it count")
