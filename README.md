@@ -24,15 +24,19 @@ To install the app:
    ```bash
    git clone https://github.com
    ```
+
 2. Navigate to the project directory:
    ```bash
    cd FitPulse
    ```
+
 3. Install dependencies:
    ```bash
-   npm install
+   pip install -r requirements.txt
    ```
+
 4. Start the application:
    ```bash
-   npm start
+   python main.py
+   ```
    ```
