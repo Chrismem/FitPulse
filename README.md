@@ -22,7 +22,7 @@ To install the app:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com
+   git clone https://github.com/Chrismem/FitPulse
    ```
 
 2. Navigate to the project directory:
