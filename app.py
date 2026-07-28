@@ -149,6 +149,34 @@ st.markdown(
         color: #1B1B1B;
     }
 
+    /* --- HABIT TRACKING CARD: made fully clickable ---
+       Streamlit's st.button lives inside a wrapper div. Here we take
+       that wrapper and stretch it (position:absolute, inset:0) over
+       the entire card, then make the actual button invisible but
+       still clickable. Net effect: click anywhere on the card and
+       it behaves like clicking a button. */
+    .st-key-habit_tracking_card {
+        position: relative;
+        cursor: pointer;
+    }
+    .st-key-habit_tracking_card:hover .fitpulse-feature-card {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 22px rgba(0,0,0,0.14);
+        border-top-color: #1565C0;
+    }
+    .st-key-habit_tracking_card div[data-testid="stButton"] {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+    }
+    .st-key-habit_tracking_card div[data-testid="stButton"] button {
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+        border: none;
+    }
+
     /* --- HABIT TRACKER: streak badge --- */
     .fitpulse-streak-badge {
         display: inline-block;
@@ -373,14 +401,10 @@ with st.sidebar:
     )
     st.caption("Tip: use the same name each time so your progress is saved.")
 
-    st.markdown("---")
     if st.session_state.page == "habits":
+        st.markdown("---")
         if st.button("🏠 Back to Home", use_container_width=True):
             st.session_state.page = "home"
-            st.rerun()
-    else:
-        if st.button("✅ Open Habit Tracker", use_container_width=True):
-            st.session_state.page = "habits"
             st.rerun()
 
 username = st.session_state.username.strip() or "Guest"
@@ -419,25 +443,41 @@ def render_home():
 
     for col, (icon, title, text) in zip(feature_cols, features):
         with col:
-            st.markdown(
-                f"""
-                <div class="fitpulse-feature-card">
-                    <div class="icon">{icon}</div>
-                    <h4>{title}</h4>
-                    <p>{text}</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-            # The Habit Tracking card is the only one wired up so far —
-            # clicking this button switches st.session_state.page to
-            # "habits" and reruns the app, which swaps in the tracker
-            # view below without leaving this browser tab.
             if title == "Habit Tracking":
-                st.write("")
-                if st.button("Open Tracker →", key="open_habit_tracker", use_container_width=True):
-                    st.session_state.page = "habits"
-                    st.rerun()
+                # The Habit Tracking card is the only one wired up so far.
+                # We put the card's HTML and a real st.button inside the
+                # same keyed container, then use CSS (see SECTION 2) to
+                # stretch that button invisibly over the whole card. The
+                # result: clicking anywhere on the card fires the button,
+                # which switches st.session_state.page to "habits" and
+                # reruns the app — swapping in the tracker view without
+                # ever leaving this browser tab.
+                with st.container(key="habit_tracking_card"):
+                    st.markdown(
+                        f"""
+                        <div class="fitpulse-feature-card">
+                            <div class="icon">{icon}</div>
+                            <h4>{title}</h4>
+                            <p>{text}</p>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+                    card_clicked = st.button("Open Habit Tracker", key="habit_card_click")
+                    if card_clicked:
+                        st.session_state.page = "habits"
+                        st.rerun()
+            else:
+                st.markdown(
+                    f"""
+                    <div class="fitpulse-feature-card">
+                        <div class="icon">{icon}</div>
+                        <h4>{title}</h4>
+                        <p>{text}</p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
     st.write("")  # small spacer
     st.divider()
