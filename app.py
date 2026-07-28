@@ -149,32 +149,44 @@ st.markdown(
         color: #1B1B1B;
     }
 
-    /* --- HABIT TRACKING CARD: made fully clickable ---
-       Streamlit's st.button lives inside a wrapper div. Here we take
-       that wrapper and stretch it (position:absolute, inset:0) over
-       the entire card, then make the actual button invisible but
-       still clickable. Net effect: click anywhere on the card and
-       it behaves like clicking a button. */
-    .st-key-habit_tracking_card {
-        position: relative;
-        cursor: pointer;
-    }
-    .st-key-habit_tracking_card:hover .fitpulse-feature-card {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 22px rgba(0,0,0,0.14);
-        border-top-color: #1565C0;
-    }
-    .st-key-habit_tracking_card div[data-testid="stButton"] {
-        position: absolute;
-        inset: 0;
-        z-index: 5;
-    }
-    .st-key-habit_tracking_card div[data-testid="stButton"] button {
+    /* --- HABIT TRACKING CARD: the button itself IS the card ---
+       Instead of overlaying an invisible button on top of decorative
+       HTML (which was unreliable to click), we style the real
+       st.button directly so it looks exactly like the other feature
+       cards. Since there's only one real element here, clicking
+       anywhere on it always works. */
+    .st-key-habit_tracking_card button {
+        background-color: #FFFFFF !important;
+        border: 1px solid #E0E0E0 !important;
+        border-top: 4px solid #2E7D32 !important;
+        border-radius: 14px !important;
+        padding: 22px 18px !important;
         width: 100%;
-        height: 100%;
-        opacity: 0;
-        cursor: pointer;
-        border: none;
+        min-height: 175px;
+        box-shadow: none !important;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-top-color 0.15s ease;
+    }
+    .st-key-habit_tracking_card button:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 22px rgba(0,0,0,0.14) !important;
+        border-top-color: #1565C0 !important;
+    }
+    .st-key-habit_tracking_card button:active {
+        transform: translateY(-1px);
+    }
+    .st-key-habit_tracking_card button p {
+        margin: 6px 0 0 0;
+        color: #444;
+        font-size: 14px;
+        white-space: pre-line;
+    }
+    .st-key-habit_tracking_card button p:first-of-type {
+        font-size: 34px;
+        margin-top: 0;
+    }
+    .st-key-habit_tracking_card button p strong {
+        color: #1565C0;
+        font-size: 17px;
     }
 
     /* --- HABIT TRACKER: streak badge --- */
@@ -445,25 +457,19 @@ def render_home():
         with col:
             if title == "Habit Tracking":
                 # The Habit Tracking card is the only one wired up so far.
-                # We put the card's HTML and a real st.button inside the
-                # same keyed container, then use CSS (see SECTION 2) to
-                # stretch that button invisibly over the whole card. The
-                # result: clicking anywhere on the card fires the button,
-                # which switches st.session_state.page to "habits" and
-                # reruns the app — swapping in the tracker view without
-                # ever leaving this browser tab.
+                # It's rendered as ONE real st.button styled (via CSS in
+                # SECTION 2) to look like the other cards, instead of
+                # decorative HTML with an invisible button on top — that
+                # overlay approach was unreliable to click. With a single
+                # real button, clicking anywhere on it always works, and
+                # it switches st.session_state.page to "habits" + reruns
+                # the app, swapping in the tracker view in this same tab.
                 with st.container(key="habit_tracking_card"):
-                    st.markdown(
-                        f"""
-                        <div class="fitpulse-feature-card">
-                            <div class="icon">{icon}</div>
-                            <h4>{title}</h4>
-                            <p>{text}</p>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
+                    card_clicked = st.button(
+                        f"{icon}\n\n**{title}**\n\n{text}",
+                        key="habit_card_click",
+                        use_container_width=True,
                     )
-                    card_clicked = st.button("Open Habit Tracker", key="habit_card_click")
                     if card_clicked:
                         st.session_state.page = "habits"
                         st.rerun()
