@@ -1,9 +1,9 @@
 """
-FitPulse - Sprint 2
+FitPulse - Sprint 3
 --------------------
 A simple Streamlit app that helps people find fitness centers
-near them within a chosen radius (default 10 miles), and now
-includes a working Habit Tracking feature.
+near them within a chosen radius (default 10 miles), track daily
+fitness habits, and connect with friends on the app.
 
 This is a beginner-friendly, high-school STEM project file.
 No secret API keys or external geocoding services are used.
@@ -15,18 +15,19 @@ a big bold hero banner up top, a row of feature cards, then the
 search tool, inspired by real gym landing pages (big headline,
 strong colors, card-based feature grid).
 
-NEW IN SPRINT 2 - HABIT TRACKING:
-Clicking the "Habit Tracking" feature card switches the app into
-a "Habit Tracker" view. This is NOT a new browser tab or a page
-reload — it's done with Streamlit's `st.session_state`, which lets
-us remember which "view" we're on and redraw the page accordingly.
-Think of it like flipping to a different tab inside the same app
-window, rather than opening a whole new website.
+HABIT TRACKING & COMMUNITY:
+Clicking the "Habit Tracking" or "Communities" feature card
+switches the app into that view. This is NOT a new browser tab or
+a page reload — it's done with Streamlit's `st.session_state`,
+which lets us remember which "view" we're on and redraw the page
+accordingly. Think of it like flipping to a different tab inside
+the same app window, rather than opening a whole new website.
 
-Habit data (habits + daily logs) is saved to a small JSON file
-(habit_data.json) next to this script, keyed by the user's name.
-That means progress is remembered even if you close and reopen
-the app (as long as it's running on the same machine/server).
+Habit data is saved to habit_data.json, and friends/chat data is
+saved to community_data.json, both next to this script, keyed by
+the user's name. That means progress is remembered even if you
+close and reopen the app (as long as it's running on the same
+machine/server).
 """
 
 import math
@@ -149,13 +150,15 @@ st.markdown(
         color: #1B1B1B;
     }
 
-    /* --- HABIT TRACKING CARD: the button itself IS the card ---
+    /* --- CLICKABLE FEATURE CARDS: the button itself IS the card ---
        Instead of overlaying an invisible button on top of decorative
        HTML (which was unreliable to click), we style the real
        st.button directly so it looks exactly like the other feature
        cards. Since there's only one real element here, clicking
-       anywhere on it always works. */
-    .st-key-habit_tracking_card button {
+       anywhere on it always works. Both Habit Tracking and
+       Communities use this same pattern. */
+    .st-key-habit_tracking_card button,
+    .st-key-community_card button {
         background-color: #FFFFFF !important;
         border: 1px solid #E0E0E0 !important;
         border-top: 4px solid #2E7D32 !important;
@@ -166,27 +169,38 @@ st.markdown(
         box-shadow: none !important;
         transition: transform 0.15s ease, box-shadow 0.15s ease, border-top-color 0.15s ease;
     }
-    .st-key-habit_tracking_card button:hover {
+    .st-key-habit_tracking_card button:hover,
+    .st-key-community_card button:hover {
         transform: translateY(-4px);
         box-shadow: 0 10px 22px rgba(0,0,0,0.14) !important;
         border-top-color: #1565C0 !important;
     }
-    .st-key-habit_tracking_card button:active {
+    .st-key-habit_tracking_card button:active,
+    .st-key-community_card button:active {
         transform: translateY(-1px);
     }
-    .st-key-habit_tracking_card button p {
+    .st-key-habit_tracking_card button p,
+    .st-key-community_card button p {
         margin: 6px 0 0 0;
         color: #444;
         font-size: 14px;
         white-space: pre-line;
     }
-    .st-key-habit_tracking_card button p:first-of-type {
+    .st-key-habit_tracking_card button p:first-of-type,
+    .st-key-community_card button p:first-of-type {
         font-size: 34px;
         margin-top: 0;
     }
-    .st-key-habit_tracking_card button p strong {
+    .st-key-habit_tracking_card button p strong,
+    .st-key-community_card button p strong {
         color: #1565C0;
         font-size: 17px;
+    }
+
+    /* --- COMMUNITY: chat bubbles reuse the same result-card style --- */
+    .fitpulse-friend-name {
+        font-weight: 700;
+        color: #1565C0;
     }
 
     /* --- HABIT TRACKER: streak badge --- */
@@ -387,6 +401,104 @@ def logged_today(logs):
 
 
 # ------------------------------------------------------------------
+# SECTION 5B: COMMUNITY DATA HELPERS (friends + chat)
+# Just like habit data, community data (who's on the app, who's
+# friends with who, and chat messages) is saved to a small JSON
+# file on disk so it's remembered between visits.
+#
+# Data shape:
+# {
+#   "users": ["Alex", "Sam", ...],                 <- everyone who's opened the app
+#   "friends": {"Alex": ["Sam"], "Sam": ["Alex"]},  <- friendships are mutual
+#   "messages": {
+#     "Alex::Sam": [                                <- key is names sorted + joined
+#       {"sender": "Alex", "text": "hey!", "time": "2026-07-28 09:15"},
+#       ...
+#     ]
+#   }
+# }
+# ------------------------------------------------------------------
+COMMUNITY_FILE = "community_data.json"
+
+
+def load_community_data():
+    """Read the whole community_data.json file into a Python dict."""
+    if os.path.exists(COMMUNITY_FILE):
+        try:
+            with open(COMMUNITY_FILE, "r") as f:
+                data = json.load(f)
+                data.setdefault("users", [])
+                data.setdefault("friends", {})
+                data.setdefault("messages", {})
+                return data
+        except (json.JSONDecodeError, IOError):
+            pass
+    return {"users": [], "friends": {}, "messages": {}}
+
+
+def save_community_data(data):
+    """Write the whole community data dict back to community_data.json."""
+    with open(COMMUNITY_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+
+
+def register_user(name):
+    """Add a name to the discoverable users list, if it isn't already there."""
+    data = load_community_data()
+    if name and name not in data["users"]:
+        data["users"].append(name)
+        save_community_data(data)
+
+
+def get_all_users():
+    """Return every name that has ever used FitPulse (for Discover People)."""
+    return load_community_data()["users"]
+
+
+def get_friends(name):
+    """Return a person's current friends list."""
+    return load_community_data()["friends"].get(name, [])
+
+
+def add_friend(name, friend_name):
+    """Add a friendship between two people (mutual, both directions)."""
+    data = load_community_data()
+    data["friends"].setdefault(name, [])
+    data["friends"].setdefault(friend_name, [])
+    if friend_name not in data["friends"][name]:
+        data["friends"][name].append(friend_name)
+    if name not in data["friends"][friend_name]:
+        data["friends"][friend_name].append(name)
+    save_community_data(data)
+
+
+def chat_key(name_a, name_b):
+    """Build a stable, order-independent key for a pair of chatters."""
+    return "::".join(sorted([name_a, name_b]))
+
+
+def get_messages(name_a, name_b):
+    """Return the chat history between two people, oldest first."""
+    data = load_community_data()
+    return data["messages"].get(chat_key(name_a, name_b), [])
+
+
+def send_message(sender, recipient, text):
+    """Append a new chat message between two people."""
+    data = load_community_data()
+    key = chat_key(sender, recipient)
+    data["messages"].setdefault(key, [])
+    data["messages"][key].append(
+        {
+            "sender": sender,
+            "text": text,
+            "time": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        }
+    )
+    save_community_data(data)
+
+
+# ------------------------------------------------------------------
 # SECTION 6: SESSION STATE (controls which "view" we're on)
 # st.session_state persists across reruns of the same browser tab.
 # We use it as a simple router: "home" or "habits". Switching this
@@ -413,13 +525,15 @@ with st.sidebar:
     )
     st.caption("Tip: use the same name each time so your progress is saved.")
 
-    if st.session_state.page == "habits":
+    if st.session_state.page in ("habits", "community"):
         st.markdown("---")
         if st.button("🏠 Back to Home", use_container_width=True):
             st.session_state.page = "home"
             st.rerun()
 
 username = st.session_state.username.strip() or "Guest"
+# Make sure this person shows up for others in "Discover People".
+register_user(username)
 
 
 # ------------------------------------------------------------------
@@ -444,34 +558,37 @@ def render_home():
     )
 
     # --- Feature card grid ---
-    feature_cols = st.columns(4)
+    feature_cols = st.columns(3)
 
     features = [
         ("📍", "Gym Finder", "Locate fitness centers within your chosen radius."),
-        ("👥", "Group Workouts", "Join group sessions and train with others."),
-        ("🌐", "Communities", "Connect with people who share your goals."),
+        ("🌐", "Communities", "Add friends and chat with people on FitPulse."),
         ("✅", "Habit Tracking", "Build and track healthy daily habits."),
     ]
 
+    # Cards that actually navigate somewhere: title -> (container key,
+    # button key, page to switch to). Each is rendered as ONE real
+    # st.button styled (via CSS in SECTION 2) to look like a feature
+    # card, instead of decorative HTML with an invisible button on top
+    # — that overlay approach was unreliable to click. With a single
+    # real button, clicking anywhere on the card always works.
+    CLICKABLE_CARDS = {
+        "Communities": ("community_card", "community_card_click", "community"),
+        "Habit Tracking": ("habit_tracking_card", "habit_card_click", "habits"),
+    }
+
     for col, (icon, title, text) in zip(feature_cols, features):
         with col:
-            if title == "Habit Tracking":
-                # The Habit Tracking card is the only one wired up so far.
-                # It's rendered as ONE real st.button styled (via CSS in
-                # SECTION 2) to look like the other cards, instead of
-                # decorative HTML with an invisible button on top — that
-                # overlay approach was unreliable to click. With a single
-                # real button, clicking anywhere on it always works, and
-                # it switches st.session_state.page to "habits" + reruns
-                # the app, swapping in the tracker view in this same tab.
-                with st.container(key="habit_tracking_card"):
+            if title in CLICKABLE_CARDS:
+                container_key, button_key, target_page = CLICKABLE_CARDS[title]
+                with st.container(key=container_key):
                     card_clicked = st.button(
                         f"{icon}\n\n**{title}**\n\n{text}",
-                        key="habit_card_click",
+                        key=button_key,
                         use_container_width=True,
                     )
                     if card_clicked:
-                        st.session_state.page = "habits"
+                        st.session_state.page = target_page
                         st.rerun()
             else:
                 st.markdown(
@@ -557,8 +674,6 @@ def render_home():
     st.write(
         """
     - 🤝 **Workout Sharing** — share your progress with friends
-    - 👥 **Group Workouts** — join a workout session with others
-    - 🌐 **Fitness Communities** — connect with people who share your goals
     - 😴 **Sleep Tracking** — monitor your rest and recovery
     """
     )
@@ -575,6 +690,130 @@ def render_home():
     )
 
     st.caption("FitPulse — Sprint 2 Demo | Built with Python + Streamlit")
+
+
+# ------------------------------------------------------------------
+# SECTION 8B: COMMUNITY PAGE
+# This is the page users land on after clicking the Communities card.
+# It has two tabs:
+#   1. "My Friends"      — pick a friend and chat with them
+#   2. "Discover People"  — search everyone who's used FitPulse and
+#                           add them as a friend
+# Friends and chat messages are saved to community_data.json, so
+# they're remembered between visits (as long as the app runs on the
+# same machine/server).
+# ------------------------------------------------------------------
+def render_community():
+    st.markdown(
+        '<div class="fitpulse-section-header">🌐 Community</div>',
+        unsafe_allow_html=True,
+    )
+    st.write(f"Connect with other FitPulse members, **{username}**.")
+
+    if st.button("🏠 Back to Home", key="back_home_community"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    st.divider()
+
+    friends_tab, discover_tab = st.tabs(["👥 My Friends", "🔍 Discover People"])
+
+    # --- TAB 1: My Friends (pick a friend, chat with them) ---
+    with friends_tab:
+        friends = get_friends(username)
+
+        if not friends:
+            st.info(
+                "You haven't added any friends yet. Head over to **Discover People** "
+                "to search for someone and add them."
+            )
+        else:
+            if (
+                "chat_partner" not in st.session_state
+                or st.session_state.chat_partner not in friends
+            ):
+                st.session_state.chat_partner = friends[0]
+
+            list_col, chat_col = st.columns([1, 2])
+
+            with list_col:
+                st.markdown("**Your friends**")
+                for friend in friends:
+                    is_active = friend == st.session_state.chat_partner
+                    label = f"{'💬 ' if is_active else '👤 '}{friend}"
+                    if st.button(
+                        label,
+                        key=f"select_friend_{friend}",
+                        use_container_width=True,
+                        type="primary" if is_active else "secondary",
+                    ):
+                        st.session_state.chat_partner = friend
+                        st.rerun()
+
+            with chat_col:
+                partner = st.session_state.chat_partner
+                st.markdown(f"**Chat with <span class='fitpulse-friend-name'>{partner}</span>**", unsafe_allow_html=True)
+
+                messages = get_messages(username, partner)
+                with st.container(height=320, border=True):
+                    if not messages:
+                        st.caption("No messages yet — say hi! 👋")
+                    for msg in messages:
+                        role = "user" if msg["sender"] == username else "assistant"
+                        with st.chat_message(role):
+                            st.write(msg["text"])
+                            st.caption(msg["time"])
+
+                new_message = st.chat_input(f"Message {partner}...")
+                if new_message:
+                    send_message(username, partner, new_message)
+                    st.rerun()
+
+    # --- TAB 2: Discover People (search + add friends) ---
+    with discover_tab:
+        st.markdown("**Find people on FitPulse**")
+        search_query = st.text_input(
+            "Search by name", placeholder="Type a name to search...", key="discover_search"
+        )
+
+        current_friends = get_friends(username)
+        all_people = [name for name in get_all_users() if name != username]
+
+        if search_query.strip():
+            matches = [
+                name for name in all_people
+                if search_query.strip().lower() in name.lower()
+            ]
+        else:
+            matches = all_people
+
+        if not matches:
+            st.info(
+                "No one found yet. Try a different search, or have a friend open "
+                "FitPulse and set their name so you can find them here."
+            )
+        else:
+            for person in matches:
+                person_col, action_col = st.columns([3, 1])
+                with person_col:
+                    st.markdown(f"🧑 **{person}**")
+                with action_col:
+                    if person in current_friends:
+                        st.button(
+                            "✅ Friends",
+                            key=f"already_friend_{person}",
+                            disabled=True,
+                            use_container_width=True,
+                        )
+                    else:
+                        if st.button(
+                            "➕ Add",
+                            key=f"add_friend_{person}",
+                            use_container_width=True,
+                        ):
+                            add_friend(username, person)
+                            st.success(f"You and {person} are now friends! 🎉")
+                            st.rerun()
 
 
 # ------------------------------------------------------------------
@@ -755,5 +994,7 @@ def render_habit_tracker():
 # ------------------------------------------------------------------
 if st.session_state.page == "habits":
     render_habit_tracker()
+elif st.session_state.page == "community":
+    render_community()
 else:
     render_home()
