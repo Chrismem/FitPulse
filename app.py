@@ -1,8 +1,9 @@
 """
-FitPulse - Sprint 1
+FitPulse - Sprint 2
 --------------------
 A simple Streamlit app that helps people find fitness centers
-near them within a chosen radius (default 10 miles).
+near them within a chosen radius (default 10 miles), and now
+includes a working Habit Tracking feature.
 
 This is a beginner-friendly, high-school STEM project file.
 No secret API keys or external geocoding services are used.
@@ -13,9 +14,27 @@ LAYOUT NOTE: this version uses a "gym website" style layout —
 a big bold hero banner up top, a row of feature cards, then the
 search tool, inspired by real gym landing pages (big headline,
 strong colors, card-based feature grid).
+
+NEW IN SPRINT 2 - HABIT TRACKING:
+Clicking the "Habit Tracking" feature card switches the app into
+a "Habit Tracker" view. This is NOT a new browser tab or a page
+reload — it's done with Streamlit's `st.session_state`, which lets
+us remember which "view" we're on and redraw the page accordingly.
+Think of it like flipping to a different tab inside the same app
+window, rather than opening a whole new website.
+
+Habit data (habits + daily logs) is saved to a small JSON file
+(habit_data.json) next to this script, keyed by the user's name.
+That means progress is remembered even if you close and reopen
+the app (as long as it's running on the same machine/server).
 """
 
 import math
+import json
+import os
+from datetime import date, datetime, time as time_cls, timedelta
+
+import pandas as pd
 import streamlit as st
 
 # ------------------------------------------------------------------
@@ -35,6 +54,7 @@ st.set_page_config(
 #   - a bold gradient hero banner with a big headline
 #   - rounded feature cards with a hover lift effect
 #   - a colorful bottom call-to-action banner
+#   - habit tracker cards/badges that match the same brand
 # It's all optional styling — the app still works without it.
 # ------------------------------------------------------------------
 st.markdown(
@@ -129,6 +149,18 @@ st.markdown(
         color: #1B1B1B;
     }
 
+    /* --- HABIT TRACKER: streak badge --- */
+    .fitpulse-streak-badge {
+        display: inline-block;
+        background-color: #1565C0;
+        color: white;
+        border-radius: 999px;
+        padding: 4px 14px;
+        font-size: 14px;
+        font-weight: 700;
+        margin-left: 8px;
+    }
+
     /* --- BOTTOM CTA BANNER --- */
     .fitpulse-cta-banner {
         background-color: #0D3B14;
@@ -174,10 +206,10 @@ st.markdown(
 )
 
 # ------------------------------------------------------------------
-# SECTION 3: SAMPLE DATA
+# SECTION 3: SAMPLE DATA (gym finder)
 # In a real product, this list would come from a database or a
-# maps API. For our Sprint 1 demo, we use sample fitness centers
-# with made-up coordinates so the distance math actually works.
+# maps API. For our demo, we use sample fitness centers with
+# made-up coordinates so the distance math actually works.
 # ------------------------------------------------------------------
 FITNESS_CENTERS = [
     {"name": "Green Street Gym", "address": "12 Green St", "lat": 40.7128, "lon": -74.0060},
@@ -225,154 +257,457 @@ def distance_in_miles(lat1, lon1, lat2, lon2):
 
 
 # ------------------------------------------------------------------
-# SECTION 5: HERO BANNER
-# This is the big, bold "gym website" style header — a full-width
-# gradient banner with a headline and short pitch, similar to the
-# hero section on real gym homepages.
+# SECTION 5: HABIT TRACKER DATA HELPERS
+# We store habit data in a small JSON file on disk, keyed by
+# username, so progress is remembered between visits. This keeps
+# things simple for a class project (no external database needed).
+#
+# Data shape:
+# {
+#   "Alex": {
+#     "habits": {
+#       "Daily 1-Mile Run": {
+#         "goal_distance": 1.0,
+#         "frequency": "Daily",
+#         "reminder_time": "07:00",
+#         "logs": [
+#           {"date": "2026-07-27", "distance": 1.0,
+#            "duration_min": 9.5, "speed_mph": 6.32},
+#           ...
+#         ]
+#       }
+#     }
+#   }
+# }
 # ------------------------------------------------------------------
-st.markdown(
+DATA_FILE = "habit_data.json"
+
+
+def load_all_data():
+    """Read the whole habit_data.json file into a Python dict."""
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, "r") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            return {}
+    return {}
+
+
+def save_all_data(all_data):
+    """Write the whole habit data dict back to habit_data.json."""
+    with open(DATA_FILE, "w") as f:
+        json.dump(all_data, f, indent=2)
+
+
+def get_user_data(username):
+    """Get (or create) the habit data for one user."""
+    all_data = load_all_data()
+    return all_data.get(username, {"habits": {}})
+
+
+def save_user_data(username, user_data):
+    """Save one user's habit data back into the shared file."""
+    all_data = load_all_data()
+    all_data[username] = user_data
+    save_all_data(all_data)
+
+
+def compute_streak(logs):
+    """Count consecutive days (ending today) that have a log entry."""
+    if not logs:
+        return 0
+    log_dates = {entry["date"] for entry in logs}
+    streak = 0
+    current_day = date.today()
+    while current_day.strftime("%Y-%m-%d") in log_dates:
+        streak += 1
+        current_day -= timedelta(days=1)
+    return streak
+
+
+def compute_habit_stats(logs):
+    """Return total runs, total distance, and average speed for a habit."""
+    if not logs:
+        return {"total_runs": 0, "total_distance": 0.0, "avg_speed": 0.0}
+    total_runs = len(logs)
+    total_distance = sum(entry["distance"] for entry in logs)
+    avg_speed = sum(entry["speed_mph"] for entry in logs) / total_runs
+    return {
+        "total_runs": total_runs,
+        "total_distance": round(total_distance, 2),
+        "avg_speed": round(avg_speed, 2),
+    }
+
+
+def logged_today(logs):
+    """Check whether there's already a log entry for today."""
+    today_str = date.today().strftime("%Y-%m-%d")
+    return any(entry["date"] == today_str for entry in logs)
+
+
+# ------------------------------------------------------------------
+# SECTION 6: SESSION STATE (controls which "view" we're on)
+# st.session_state persists across reruns of the same browser tab.
+# We use it as a simple router: "home" or "habits". Switching this
+# value + calling st.rerun() redraws the page in place — no new
+# browser tab, no page reload, just a different view of the same app.
+# ------------------------------------------------------------------
+if "page" not in st.session_state:
+    st.session_state.page = "home"
+
+if "username" not in st.session_state:
+    st.session_state.username = "Guest"
+
+
+# ------------------------------------------------------------------
+# SECTION 7: SIDEBAR (user profile + navigation)
+# ------------------------------------------------------------------
+with st.sidebar:
+    st.markdown("### 👤 Your Profile")
+    st.session_state.username = st.text_input(
+        "Your name",
+        value=st.session_state.username,
+        help="Habits and progress are saved per name, so each person on this "
+        "computer can track their own habits separately.",
+    )
+    st.caption("Tip: use the same name each time so your progress is saved.")
+
+    st.markdown("---")
+    if st.session_state.page == "habits":
+        if st.button("🏠 Back to Home", use_container_width=True):
+            st.session_state.page = "home"
+            st.rerun()
+    else:
+        if st.button("✅ Open Habit Tracker", use_container_width=True):
+            st.session_state.page = "habits"
+            st.rerun()
+
+username = st.session_state.username.strip() or "Guest"
+
+
+# ------------------------------------------------------------------
+# SECTION 8: HOME PAGE (hero, feature cards, gym finder)
+# ------------------------------------------------------------------
+def render_home():
+    # --- Hero banner ---
+    st.markdown(
+        """
+        <div class="fitpulse-hero">
+            <div class="fitpulse-hero-badge">Free &nbsp;•&nbsp; No Membership Required</div>
+            <h1>💪 FITPULSE</h1>
+            <p>Stay active. Build healthy habits. Connect with your community.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.write(
+        "Welcome to **FitPulse**! 🎉 We help you find fitness centers near you, "
+        "so staying active is easier and more affordable. Let's find a gym close to you!"
+    )
+
+    # --- Feature card grid ---
+    feature_cols = st.columns(4)
+
+    features = [
+        ("📍", "Gym Finder", "Locate fitness centers within your chosen radius."),
+        ("👥", "Group Workouts", "Join group sessions and train with others."),
+        ("🌐", "Communities", "Connect with people who share your goals."),
+        ("✅", "Habit Tracking", "Build and track healthy daily habits."),
+    ]
+
+    for col, (icon, title, text) in zip(feature_cols, features):
+        with col:
+            st.markdown(
+                f"""
+                <div class="fitpulse-feature-card">
+                    <div class="icon">{icon}</div>
+                    <h4>{title}</h4>
+                    <p>{text}</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            # The Habit Tracking card is the only one wired up so far —
+            # clicking this button switches st.session_state.page to
+            # "habits" and reruns the app, which swaps in the tracker
+            # view below without leaving this browser tab.
+            if title == "Habit Tracking":
+                st.write("")
+                if st.button("Open Tracker →", key="open_habit_tracker", use_container_width=True):
+                    st.session_state.page = "habits"
+                    st.rerun()
+
+    st.write("")  # small spacer
+    st.divider()
+
+    # --- Location input + search ---
+    st.markdown(
+        '<div class="fitpulse-section-header">📍 Find a Fitness Center Near You</div>',
+        unsafe_allow_html=True,
+    )
+
+    search_col1, search_col2 = st.columns(2)
+
+    with search_col1:
+        location_choice = st.selectbox(
+            "Choose your location:",
+            options=list(SAMPLE_LOCATIONS.keys()),
+            help="In a future version, you'll be able to type any address.",
+        )
+
+    with search_col2:
+        radius_miles = st.slider(
+            "Search radius (miles):",
+            min_value=1,
+            max_value=25,
+            value=10,
+            help="FitPulse's Sprint 1 goal is a 10-mile search radius.",
+        )
+
+    search_clicked = st.button("🔎 Find Nearby Gyms", use_container_width=True)
+
+    # --- Search results ---
+    if search_clicked:
+        user_lat, user_lon = SAMPLE_LOCATIONS[location_choice]
+
+        nearby_gyms = []
+        for gym in FITNESS_CENTERS:
+            dist = distance_in_miles(user_lat, user_lon, gym["lat"], gym["lon"])
+            if dist <= radius_miles:
+                nearby_gyms.append((gym, dist))
+
+        nearby_gyms.sort(key=lambda pair: pair[1])
+
+        if nearby_gyms:
+            st.success(f"✅ Found {len(nearby_gyms)} fitness center(s) near {location_choice}!")
+            result_cols = st.columns(2)
+            for index, (gym, dist) in enumerate(nearby_gyms):
+                with result_cols[index % 2]:
+                    st.markdown(
+                        f"""
+                        <div class="fitpulse-card">
+                        <b>🏋️ {gym['name']}</b><br>
+                        📍 {gym['address']}<br>
+                        📏 {dist:.1f} miles away
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+        else:
+            st.error(
+                "❌ No fitness centers found in that radius. "
+                "Try increasing your search radius or choosing a different location."
+            )
+
+    st.divider()
+
+    # --- Future features ---
+    st.markdown(
+        '<div class="fitpulse-section-header">🚀 Coming Soon to FitPulse</div>',
+        unsafe_allow_html=True,
+    )
+    st.write(
+        """
+    - 🤝 **Workout Sharing** — share your progress with friends
+    - 👥 **Group Workouts** — join a workout session with others
+    - 🌐 **Fitness Communities** — connect with people who share your goals
+    - 😴 **Sleep Tracking** — monitor your rest and recovery
     """
-    <div class="fitpulse-hero">
-        <div class="fitpulse-hero-badge">Free &nbsp;•&nbsp; No Membership Required</div>
-        <h1>💪 FITPULSE</h1>
-        <p>Stay active. Build healthy habits. Connect with your community.</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+    )
 
-st.write(
-    "Welcome to **FitPulse**! 🎉 We help you find fitness centers near you, "
-    "so staying active is easier and more affordable. Let's find a gym close to you!"
-)
+    # --- Bottom CTA banner ---
+    st.markdown(
+        """
+        <div class="fitpulse-cta-banner">
+            <h3>Ready to make a change? 🚀</h3>
+            <p>FitPulse is free to use — start by finding a gym near you above.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.caption("FitPulse — Sprint 2 Demo | Built with Python + Streamlit")
+
 
 # ------------------------------------------------------------------
-# SECTION 6: FEATURE CARD GRID
-# A row of highlight cards, similar to the "Why Choose Us" feature
-# grid seen on real gym websites.
+# SECTION 9: HABIT TRACKER PAGE
+# This is the new page users land on after clicking the Habit
+# Tracking card. It lets a user:
+#   1. Create a habit (e.g. "Daily 1-Mile Run") with a goal + reminder
+#   2. Log each day's run (distance + time), and see speed calculated
+#   3. See progress: current streak, totals, and charts over time
 # ------------------------------------------------------------------
-feature_cols = st.columns(4)
+def render_habit_tracker():
+    st.markdown(
+        '<div class="fitpulse-section-header">🏋️ Habit Tracker</div>',
+        unsafe_allow_html=True,
+    )
+    st.write(f"Tracking healthy habits for **{username}**. Every log is saved automatically.")
 
-features = [
-    ("📍", "Gym Finder", "Locate fitness centers within your chosen radius."),
-    ("👥", "Group Workouts", "Join group sessions and train with others."),
-    ("🌐", "Communities", "Connect with people who share your goals."),
-    ("✅", "Habit Tracking", "Build and track healthy daily habits."),
-]
+    if st.button("🏠 Back to Home", key="back_home_top"):
+        st.session_state.page = "home"
+        st.rerun()
 
-for col, (icon, title, text) in zip(feature_cols, features):
-    with col:
+    user_data = get_user_data(username)
+    habits = user_data["habits"]
+
+    # --- Add a new habit ---
+    with st.expander("➕ Add a New Habit", expanded=(len(habits) == 0)):
+        with st.form("add_habit_form", clear_on_submit=True):
+            habit_name = st.text_input(
+                "Habit name", placeholder="e.g., Daily 1-Mile Run"
+            )
+            col_a, col_b, col_c = st.columns(3)
+            with col_a:
+                goal_distance = st.number_input(
+                    "Goal distance (miles)", min_value=0.0, value=1.0, step=0.1
+                )
+            with col_b:
+                frequency = st.selectbox("Frequency", ["Daily", "Weekdays", "Weekly"])
+            with col_c:
+                reminder_time = st.time_input("Reminder time", value=time_cls(7, 0))
+
+            submitted = st.form_submit_button("Create Habit")
+            if submitted:
+                clean_name = habit_name.strip()
+                if not clean_name:
+                    st.warning("Please enter a habit name.")
+                elif clean_name in habits:
+                    st.warning("You already have a habit with that name.")
+                else:
+                    habits[clean_name] = {
+                        "goal_distance": goal_distance,
+                        "frequency": frequency,
+                        "reminder_time": reminder_time.strftime("%H:%M"),
+                        "logs": [],
+                    }
+                    save_user_data(username, user_data)
+                    st.success(f"Habit '{clean_name}' created! Scroll down to log your first entry.")
+                    st.rerun()
+
+    if not habits:
+        st.info("You don't have any habits yet — add one above to get started, "
+                 "for example **Daily 1-Mile Run**.")
+        return
+
+    st.divider()
+
+    # --- Show every habit ---
+    for habit_name, habit in habits.items():
+        logs = habit["logs"]
+        stats = compute_habit_stats(logs)
+        streak = compute_streak(logs)
+        already_logged = logged_today(logs)
+
+        st.markdown(f"### 🏃 {habit_name}")
         st.markdown(
-            f"""
-            <div class="fitpulse-feature-card">
-                <div class="icon">{icon}</div>
-                <h4>{title}</h4>
-                <p>{text}</p>
-            </div>
-            """,
+            f'Goal: **{habit["goal_distance"]} mi**, {habit["frequency"].lower()} '
+            f'&nbsp; <span class="fitpulse-streak-badge">🔥 {streak}-day streak</span>',
             unsafe_allow_html=True,
         )
 
-st.write("")  # small spacer
-st.divider()
+        # Reminder banner: only nag if today's entry is missing and
+        # the reminder time has already passed.
+        reminder_hour, reminder_minute = (int(x) for x in habit["reminder_time"].split(":"))
+        reminder_dt = time_cls(reminder_hour, reminder_minute)
+        if not already_logged and datetime.now().time() >= reminder_dt:
+            st.warning(
+                f"⏰ Reminder: you haven't logged **{habit_name}** yet today "
+                f"(reminder set for {habit['reminder_time']})."
+            )
+        elif not already_logged:
+            st.info(f"⏰ Today's reminder is set for {habit['reminder_time']}. No log yet today.")
+        else:
+            st.success("✅ Already logged today. Nice work!")
 
-# ------------------------------------------------------------------
-# SECTION 7: LOCATION INPUT + SEARCH
-# ------------------------------------------------------------------
-st.markdown(
-    '<div class="fitpulse-section-header">📍 Find a Fitness Center Near You</div>',
-    unsafe_allow_html=True,
-)
+        # Quick stats
+        stat_cols = st.columns(4)
+        stat_cols[0].metric("Total runs", stats["total_runs"])
+        stat_cols[1].metric("Total distance", f"{stats['total_distance']} mi")
+        stat_cols[2].metric("Avg speed", f"{stats['avg_speed']} mph")
+        stat_cols[3].metric("Current streak", f"{streak} days")
 
-search_col1, search_col2 = st.columns(2)
-
-with search_col1:
-    location_choice = st.selectbox(
-        "Choose your location:",
-        options=list(SAMPLE_LOCATIONS.keys()),
-        help="In a future version, you'll be able to type any address.",
-    )
-
-with search_col2:
-    radius_miles = st.slider(
-        "Search radius (miles):",
-        min_value=1,
-        max_value=25,
-        value=10,
-        help="FitPulse's Sprint 1 goal is a 10-mile search radius.",
-    )
-
-search_clicked = st.button("🔎 Find Nearby Gyms", use_container_width=True)
-
-# ------------------------------------------------------------------
-# SECTION 8: SEARCH RESULTS
-# ------------------------------------------------------------------
-if search_clicked:
-    user_lat, user_lon = SAMPLE_LOCATIONS[location_choice]
-
-    # Calculate distance to every gym in our sample list
-    nearby_gyms = []
-    for gym in FITNESS_CENTERS:
-        dist = distance_in_miles(user_lat, user_lon, gym["lat"], gym["lon"])
-        if dist <= radius_miles:
-            nearby_gyms.append((gym, dist))
-
-    # Sort so the closest gym shows up first
-    nearby_gyms.sort(key=lambda pair: pair[1])
-
-    if nearby_gyms:
-        st.success(f"✅ Found {len(nearby_gyms)} fitness center(s) near {location_choice}!")
-        result_cols = st.columns(2)
-        for index, (gym, dist) in enumerate(nearby_gyms):
-            with result_cols[index % 2]:
-                st.markdown(
-                    f"""
-                    <div class="fitpulse-card">
-                    <b>🏋️ {gym['name']}</b><br>
-                    📍 {gym['address']}<br>
-                    📏 {dist:.1f} miles away
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
+        # Log today's run
+        with st.form(f"log_form_{habit_name}"):
+            log_col1, log_col2 = st.columns(2)
+            with log_col1:
+                run_distance = st.number_input(
+                    "Distance run today (miles)",
+                    min_value=0.0,
+                    value=float(habit["goal_distance"]),
+                    step=0.1,
+                    key=f"dist_{habit_name}",
                 )
-    else:
-        st.error(
-            "❌ No fitness centers found in that radius. "
-            "Try increasing your search radius or choosing a different location."
-        )
+            with log_col2:
+                run_duration = st.number_input(
+                    "Time it took (minutes)",
+                    min_value=0.1,
+                    value=9.0,
+                    step=0.5,
+                    key=f"dur_{habit_name}",
+                )
+            log_submitted = st.form_submit_button("✅ Log Today's Run")
+            if log_submitted:
+                speed_mph = run_distance / (run_duration / 60)
+                today_str = date.today().strftime("%Y-%m-%d")
+                # Replace any existing entry for today so re-logging updates it
+                logs[:] = [entry for entry in logs if entry["date"] != today_str]
+                logs.append(
+                    {
+                        "date": today_str,
+                        "distance": round(run_distance, 2),
+                        "duration_min": round(run_duration, 2),
+                        "speed_mph": round(speed_mph, 2),
+                    }
+                )
+                save_user_data(username, user_data)
+                st.success(
+                    f"Logged {run_distance} mi in {run_duration} min "
+                    f"({speed_mph:.1f} mph). Great job! 💪"
+                )
+                st.rerun()
 
-st.divider()
+        # Progress charts + history table
+        if logs:
+            df = pd.DataFrame(logs).sort_values("date")
+            df_indexed = df.set_index("date")
+
+            chart_col1, chart_col2 = st.columns(2)
+            with chart_col1:
+                st.caption("Distance per day (miles)")
+                st.line_chart(df_indexed[["distance"]])
+            with chart_col2:
+                st.caption("Speed per day (mph)")
+                st.line_chart(df_indexed[["speed_mph"]])
+
+            with st.expander("📜 View full log history"):
+                st.dataframe(
+                    df.rename(
+                        columns={
+                            "date": "Date",
+                            "distance": "Distance (mi)",
+                            "duration_min": "Duration (min)",
+                            "speed_mph": "Speed (mph)",
+                        }
+                    ).sort_values("Date", ascending=False),
+                    use_container_width=True,
+                    hide_index=True,
+                )
+
+        if st.button(f"🗑️ Delete '{habit_name}'", key=f"delete_{habit_name}"):
+            del habits[habit_name]
+            save_user_data(username, user_data)
+            st.rerun()
+
+        st.divider()
+
 
 # ------------------------------------------------------------------
-# SECTION 9: FUTURE FEATURES
+# SECTION 10: ROUTER — draw whichever page we're on
 # ------------------------------------------------------------------
-st.markdown(
-    '<div class="fitpulse-section-header">🚀 Coming Soon to FitPulse</div>',
-    unsafe_allow_html=True,
-)
-st.write(
-    """
-- 🤝 **Workout Sharing** — share your progress with friends
-- 👥 **Group Workouts** — join a workout session with others
-- 🌐 **Fitness Communities** — connect with people who share your goals
-- 😴 **Sleep Tracking** — monitor your rest and recovery
-- ✅ **Healthy Habit Tracking** — build and track daily habits
-"""
-)
-
-# ------------------------------------------------------------------
-# SECTION 10: BOTTOM CALL-TO-ACTION BANNER
-# A bold closing banner, similar to the "Ready to make a change?"
-# sections seen on real gym websites.
-# ------------------------------------------------------------------
-st.markdown(
-    """
-    <div class="fitpulse-cta-banner">
-        <h3>Ready to make a change? 🚀</h3>
-        <p>FitPulse is free to use — start by finding a gym near you above.</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-st.caption("FitPulse — Sprint 1 Demo | Built with Python + Streamlit")
+if st.session_state.page == "habits":
+    render_habit_tracker()
+else:
+    render_home()
