@@ -673,7 +673,7 @@ with st.sidebar:
     )
     st.caption("Tip: use the same name each time so your progress is saved.")
 
-    if st.session_state.page in ("habits", "community", "gym_finder"):
+    if st.session_state.page in ("habits", "community", "gym_finder", "signup", "login"):
         st.markdown("---")
         if st.button("🏠 Back to Home", use_container_width=True):
             st.session_state.page = "home"
@@ -931,149 +931,108 @@ def render_community():
     st.divider()
     
     # --- GUEST USER POPUP CHECK ---
-    # If the user is a "Guest", show a modal asking them to sign up or login
-    # before they can access the community messaging features
+    # If the user is a "Guest", show a card asking them to sign up or log in
+    # before they can access the community messaging features.
+    #
+    # NOTE: the old version of this used a position:fixed full-screen
+    # overlay for the "modal" look. That overlay floated on top of
+    # everything else on the page, including the real Sign Up / Log In
+    # buttons underneath it — so the buttons were basically unclickable.
+    # This version keeps the same "popup card" idea, but builds it as a
+    # normal in-page card (using the same real-button-styled-as-a-card
+    # trick used elsewhere in this file), so the two buttons are always
+    # visible and always clickable.
     if username == "Guest":
         st.markdown(
             """
             <style>
-            .guest-popup-overlay {
-                display: flex;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-                justify-content: center;
-                align-items: center;
-                z-index: 999;
-            }
-            
-            .guest-popup-modal {
-                background-color: #FFFFFF;
-                border: 2px solid #E8E8E8;
+            .st-key-guest_gate_card {
+                background-color: #F7F5EF;
+                border: 1px solid #D9D4C7;
                 border-radius: 16px;
-                padding: 48px 40px;
-                max-width: 480px;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+                padding: 40px 40px 28px 40px;
                 text-align: center;
-                animation: slideIn 0.3s ease-out;
+                box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
             }
-            
-            @keyframes slideIn {
-                from {
-                    transform: translateY(-50px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateY(0);
-                    opacity: 1;
-                }
-            }
-            
-            .guest-popup-modal h2 {
-                color: #1A1A1A;
-                margin-top: 0;
-                font-size: 28px;
-                font-weight: 700;
-            }
-            
-            .guest-popup-modal p {
-                color: #4A4A4A;
-                font-size: 16px;
-                line-height: 1.6;
-                margin: 16px 0;
-            }
-            
-            .guest-popup-buttons {
-                display: flex;
-                gap: 14px;
-                margin-top: 36px;
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-            
-            .guest-popup-btn {
-                padding: 14px 40px;
-                border: 2px solid #CCCCCC;
-                border-radius: 8px;
-                font-size: 15px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                text-decoration: none;
-                display: inline-block;
-                font-family: inherit;
-                background-color: white;
-            }
-            
-            .guest-popup-btn-signup {
-                background-color: #81C784;
-                color: white;
-                border-color: #81C784;
-            }
-            
-            .guest-popup-btn-signup:hover {
-                background-color: #66BB6A;
-                border-color: #66BB6A;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(129, 199, 132, 0.3);
-            }
-            
-            .guest-popup-btn-login {
-                background-color: white;
-                color: #4A4A4A;
-                border-color: #CCCCCC;
-            }
-            
-            .guest-popup-btn-login:hover {
-                background-color: #F5F5F5;
-                border-color: #999999;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            }
-            
-            .guest-popup-icon {
+            .guest-gate-icon {
                 font-size: 48px;
-                margin-bottom: 16px;
+                margin-bottom: 10px;
+            }
+            .guest-gate-title {
+                color: #2E2E2A;
+                font-size: 26px;
+                font-weight: 700;
+                margin: 0 0 12px 0;
+            }
+            .guest-gate-text {
+                color: #5A5A52;
+                font-size: 15.5px;
+                line-height: 1.6;
+                margin: 0 auto 8px auto;
+                max-width: 420px;
+            }
+
+            /* Sign Up button: earthy, muted green */
+            .st-key-guest_signup_btn button {
+                background-color: #7C9473 !important;
+                border: 1px solid #7C9473 !important;
+                color: white !important;
+                font-weight: 700 !important;
+            }
+            .st-key-guest_signup_btn button:hover {
+                background-color: #66805C !important;
+                border-color: #66805C !important;
+            }
+
+            /* Log In button: earthy, warm gray */
+            .st-key-guest_login_btn button {
+                background-color: #8C887E !important;
+                border: 1px solid #8C887E !important;
+                color: white !important;
+                font-weight: 700 !important;
+            }
+            .st-key-guest_login_btn button:hover {
+                background-color: #75716A !important;
+                border-color: #75716A !important;
             }
             </style>
-            
-            <div class="guest-popup-overlay">
-                <div class="guest-popup-modal">
-                    <div class="guest-popup-icon">👤</div>
-                    <h2>Sign in to Chat</h2>
-                    <p>
-                        To communicate with other FitPulse members and speak under your name,
-                        you'll need to create an account or log in.
-                    </p>
-                    <div id="guest-popup-buttons-container" class="guest-popup-buttons"></div>
-                    <p style="margin-top: 28px; font-size: 13px; color: #888;">
-                        <em>You can continue browsing as a guest, but messaging is limited.</em>
-                    </p>
-                </div>
-            </div>
             """,
             unsafe_allow_html=True,
         )
-        
-        # Create two columns for the buttons
-        btn_col1, btn_col2 = st.columns(2)
-        with btn_col1:
-            if st.button("✏️ Sign Up", use_container_width=True, key="guest_signup_btn"):
-                st.session_state.page = "signup"
-                st.rerun()
-        with btn_col2:
-            if st.button("🔑 Log In", use_container_width=True, key="guest_login_btn"):
-                # Redirect to login (empty for now, user will fill in)
-                pass
-        
-        # Show an info message below the popup
-        st.info(
-            "🔒 **Guest Mode**: To send messages and speak under your name, please create an account or log in."
-        )
-        
+
+        gate_col1, gate_col2, gate_col3 = st.columns([1, 2, 1])
+        with gate_col2:
+            with st.container(key="guest_gate_card"):
+                st.markdown(
+                    """
+                    <div class="guest-gate-icon">👤</div>
+                    <div class="guest-gate-title">Sign in to Chat</div>
+                    <p class="guest-gate-text">
+                        To communicate with other FitPulse members and speak
+                        under your name, you'll need to create an account or
+                        log in.
+                    </p>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+                btn_col1, btn_col2 = st.columns(2)
+                with btn_col1:
+                    if st.button("✏️ Sign Up", use_container_width=True, key="guest_signup_btn"):
+                        st.session_state.page = "signup"
+                        st.rerun()
+                with btn_col2:
+                    if st.button("🔑 Log In", use_container_width=True, key="guest_login_btn"):
+                        st.session_state.page = "login"
+                        st.rerun()
+
+                st.markdown(
+                    '<p style="margin-top: 20px; font-size: 13px; color: #8A8A80;">'
+                    "<em>You can continue browsing as a guest, but messaging is limited.</em>"
+                    "</p>",
+                    unsafe_allow_html=True,
+                )
+
         # Stop rendering the rest of the community features
         return
 
@@ -1351,99 +1310,276 @@ def render_habit_tracker():
 
 
 # ------------------------------------------------------------------
-# SECTION 9A: SIGNUP PAGE
+# SECTION 9A: SHARED AUTH PAGE STYLE (Sign Up + Log In)
+# Both pages use the same "split card" look from the reference design:
+# a plain white form panel on one side, and a colored info panel with
+# a "Welcome" message on the other. Instead of orange, this version
+# uses a neutral, earthy green so it fits FitPulse's outdoorsy/fitness
+# feel without shouting for attention. Each panel is a real
+# st.container(key=...), styled via the same "real element, styled
+# with CSS" trick used for the feature cards earlier in this file.
+# ------------------------------------------------------------------
+def render_auth_style():
+    st.markdown(
+        """
+        <style>
+        /* Remove the gap between the two columns and wrap them in one
+           rounded, shadowed card so the two halves look like a single
+           connected panel instead of two separate boxes. */
+        .st-key-auth_card_outer [data-testid="stHorizontalBlock"] {
+            gap: 0rem !important;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 34px rgba(0, 0, 0, 0.10);
+            border: 1px solid #D9D4C7;
+        }
+        .st-key-auth_form_panel {
+            background-color: #FFFFFF;
+            padding: 44px 40px;
+            min-height: 480px;
+        }
+        .st-key-auth_info_panel {
+            background: linear-gradient(150deg, #93AC86 0%, #55704C 100%);
+            padding: 44px 40px;
+            min-height: 480px;
+            display: flex;
+            align-items: center;
+        }
+        .auth-info-inner h2 {
+            color: white;
+            font-size: 30px;
+            font-weight: 800;
+            margin: 0 0 14px 0;
+        }
+        .auth-info-inner p {
+            color: white;
+            font-size: 15px;
+            line-height: 1.7;
+            opacity: 0.95;
+            margin: 0;
+        }
+        .auth-form-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #2E2E2A;
+            margin: 0 0 22px 0;
+        }
+
+        /* Sign Up submit button: earthy, muted green */
+        .st-key-signup_submit_btn button {
+            background-color: #7C9473 !important;
+            border-color: #7C9473 !important;
+            color: white !important;
+            font-weight: 700 !important;
+        }
+        .st-key-signup_submit_btn button:hover {
+            background-color: #66805C !important;
+            border-color: #66805C !important;
+        }
+
+        /* Log In submit button: earthy, warm gray */
+        .st-key-login_submit_btn button {
+            background-color: #8C887E !important;
+            border-color: #8C887E !important;
+            color: white !important;
+            font-weight: 700 !important;
+        }
+        .st-key-login_submit_btn button:hover {
+            background-color: #75716A !important;
+            border-color: #75716A !important;
+        }
+
+        /* The small "switch to the other page" buttons underneath
+           each form, styled to look like plain text links. */
+        .st-key-goto_login_btn button,
+        .st-key-goto_signup_btn button {
+            background: none !important;
+            border: none !important;
+            color: #55704C !important;
+            font-weight: 700 !important;
+            text-decoration: underline;
+            box-shadow: none !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ------------------------------------------------------------------
+# SECTION 9B: SIGNUP PAGE
 # This page appears when a guest user clicks "Sign Up" from the
-# community tab. They enter their name, email, and phone number.
+# community popup. They enter their name, email, phone number, and
+# a password.
 # ------------------------------------------------------------------
 def render_signup():
     st.markdown(
         '<div class="fitpulse-section-header">📝 Create Your Account</div>',
         unsafe_allow_html=True,
     )
-    
-    # Back button
+
     if st.button("🏠 Back to Home", key="back_home_signup"):
         st.session_state.page = "home"
         st.rerun()
-    
+
     st.divider()
-    
-    # Centered signup form
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
-    with col2:
-        st.markdown(
-            """
-            <div style="text-align: center; margin-bottom: 32px;">
-                <h2 style="color: #1A1A1A; margin: 0 0 8px 0;">Join FitPulse Today</h2>
-                <p style="color: #666; margin: 0;">Get started by creating your account</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        
-        with st.form("signup_form", clear_on_submit=True):
-            # Full Name
-            full_name = st.text_input(
-                "📛 Full Name",
-                placeholder="e.g., John Doe",
-                help="This is the name other users will see in the community."
-            )
-            
-            # Email
-            email = st.text_input(
-                "📧 Email Address",
-                placeholder="e.g., john@example.com",
-                help="We'll use this to contact you about your account."
-            )
-            
-            # Phone Number
-            phone = st.text_input(
-                "📱 Phone Number",
-                placeholder="e.g., (555) 123-4567",
-                help="Optional: helps us reach you if needed."
-            )
-            
-            st.markdown("---")
-            
-            submitted = st.form_submit_button("✅ Create Account", use_container_width=True)
-            
-            if submitted:
-                # Validation
-                if not full_name.strip():
-                    st.error("❌ Please enter your full name.")
-                elif not email.strip():
-                    st.error("❌ Please enter your email address.")
-                elif "@" not in email:
-                    st.error("❌ Please enter a valid email address.")
-                else:
-                    # Show success message
-                    st.success("✅ Account created successfully!")
-                    st.info(
-                        f"Welcome to FitPulse, **{full_name}**! 🎉\n\n"
-                        "Your account is now active. You can now:\n"
-                        "- Add friends and chat\n"
-                        "- Track your fitness habits\n"
-                        "- Discover local gyms\n\n"
-                        "*Redirecting you back to the app...*"
+    render_auth_style()
+
+    outer_left, outer_mid, outer_right = st.columns([1, 5, 1])
+    with outer_mid:
+        with st.container(key="auth_card_outer"):
+            form_col, info_col = st.columns([3, 2])
+
+            with form_col:
+                with st.container(key="auth_form_panel"):
+                    st.markdown(
+                        '<div class="auth-form-title">Sign Up</div>',
+                        unsafe_allow_html=True,
                     )
-                    st.session_state.username = full_name.strip()
-                    st.session_state.page = "home"
-                    import time
-                    time.sleep(2)
-                    st.rerun()
-        
-        st.markdown(
-            """
-            <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #E8E8E8;">
-                <p style="color: #888; font-size: 14px; margin: 0;">
-                    Already have an account? 
-                    <span style="color: #81C784; font-weight: 600;">Log in here</span>
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+
+                    with st.form("signup_form", clear_on_submit=True):
+                        full_name = st.text_input("Name", placeholder="e.g., John Doe")
+                        email = st.text_input("E-mail", placeholder="e.g., john@example.com")
+                        phone = st.text_input("Phone Number", placeholder="e.g., (555) 123-4567")
+                        password = st.text_input("Password", type="password")
+                        confirm_password = st.text_input("Confirm Password", type="password")
+
+                        submitted = st.form_submit_button(
+                            "Create Account",
+                            use_container_width=True,
+                            key="signup_submit_btn",
+                        )
+
+                        if submitted:
+                            if not full_name.strip():
+                                st.error("❌ Please enter your name.")
+                            elif not email.strip() or "@" not in email:
+                                st.error("❌ Please enter a valid email address.")
+                            elif not phone.strip():
+                                st.error("❌ Please enter your phone number.")
+                            elif not password:
+                                st.error("❌ Please choose a password.")
+                            elif password != confirm_password:
+                                st.error("❌ Passwords don't match.")
+                            else:
+                                st.success("✅ Account created successfully!")
+                                st.info(
+                                    f"Welcome to FitPulse, **{full_name}**! 🎉\n\n"
+                                    "*Redirecting you back to the app...*"
+                                )
+                                st.session_state.username = full_name.strip()
+                                st.session_state.page = "home"
+                                import time
+                                time.sleep(2)
+                                st.rerun()
+
+                    st.markdown(
+                        '<p style="text-align:center; font-size:13.5px; color:#767268; '
+                        'margin: 10px 0 4px 0;">Already have an account?</p>',
+                        unsafe_allow_html=True,
+                    )
+                    if st.button("Log In Instead", key="goto_login_btn", use_container_width=True):
+                        st.session_state.page = "login"
+                        st.rerun()
+
+            with info_col:
+                with st.container(key="auth_info_panel"):
+                    st.markdown(
+                        """
+                        <div class="auth-info-inner">
+                            <h2>Welcome!</h2>
+                            <p>
+                                Join FitPulse to track your fitness habits,
+                                find gyms nearby, and connect with friends
+                                who are working toward the same goals.
+                            </p>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+
+# ------------------------------------------------------------------
+# SECTION 9C: LOGIN PAGE
+# This page appears when a guest user clicks "Log In" from the
+# community popup, or from the "Log In Instead" link on the signup
+# page. This is a beginner demo project with no real account
+# database, so logging in simply takes you back to the app.
+# ------------------------------------------------------------------
+def render_login():
+    st.markdown(
+        '<div class="fitpulse-section-header">🔑 Log In</div>',
+        unsafe_allow_html=True,
+    )
+
+    if st.button("🏠 Back to Home", key="back_home_login"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    st.divider()
+    render_auth_style()
+
+    outer_left, outer_mid, outer_right = st.columns([1, 5, 1])
+    with outer_mid:
+        with st.container(key="auth_card_outer"):
+            info_col, form_col = st.columns([2, 3])
+
+            with info_col:
+                with st.container(key="auth_info_panel"):
+                    st.markdown(
+                        """
+                        <div class="auth-info-inner">
+                            <h2>Welcome Back!</h2>
+                            <p>
+                                Log in to pick up where you left off — your
+                                habits, gym searches, and friends are all
+                                waiting for you.
+                            </p>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+            with form_col:
+                with st.container(key="auth_form_panel"):
+                    st.markdown(
+                        '<div class="auth-form-title">Log In</div>',
+                        unsafe_allow_html=True,
+                    )
+
+                    with st.form("login_form", clear_on_submit=False):
+                        phone_or_email = st.text_input(
+                            "Phone Number or E-mail",
+                            placeholder="e.g., (555) 123-4567 or john@example.com",
+                        )
+                        password = st.text_input("Password", type="password")
+
+                        submitted = st.form_submit_button(
+                            "Log In",
+                            use_container_width=True,
+                            key="login_submit_btn",
+                        )
+
+                        if submitted:
+                            if not phone_or_email.strip():
+                                st.error("❌ Please enter your phone number or email.")
+                            elif not password:
+                                st.error("❌ Please enter your password.")
+                            else:
+                                st.success("✅ Logged in! Redirecting you back to the app...")
+                                st.session_state.page = "home"
+                                import time
+                                time.sleep(1)
+                                st.rerun()
+
+                    st.markdown(
+                        '<p style="text-align:center; font-size:13.5px; color:#767268; '
+                        'margin: 10px 0 4px 0;">Don\'t have an account?</p>',
+                        unsafe_allow_html=True,
+                    )
+                    if st.button("Sign Up Instead", key="goto_signup_btn", use_container_width=True):
+                        st.session_state.page = "signup"
+                        st.rerun()
 
 
 # ------------------------------------------------------------------
@@ -1457,5 +1593,7 @@ elif st.session_state.page == "gym_finder":
     render_gym_finder()
 elif st.session_state.page == "signup":
     render_signup()
+elif st.session_state.page == "login":
+    render_login()
 else:
     render_home()
