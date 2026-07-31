@@ -221,11 +221,16 @@ st.markdown(
         margin-left: 8px;
     }
 
-    /* --- BOTTOM CTA BANNER --- */
+    /* --- BOTTOM CTA BANNER: now a real photo instead of a flat color,
+       so the bottom of the page has some life to it. The gradient
+       overlay keeps the white text readable over any photo. --- */
     .fitpulse-cta-banner {
-        background-color: #2A2A26;
+        background:
+            linear-gradient(135deg, rgba(28,28,26,0.82), rgba(85,112,76,0.72)),
+            url("https://images.unsplash.com/photo-1590333748338-d629e4564ad9?w=1400&q=70&auto=format&fit=crop")
+            center / cover no-repeat;
         border-radius: 14px;
-        padding: 32px;
+        padding: 40px 32px;
         text-align: center;
         color: white;
         margin-top: 24px;
@@ -234,6 +239,71 @@ st.markdown(
     .fitpulse-cta-banner h3 {
         font-size: 26px;
         margin: 0 0 8px 0;
+    }
+
+    /* --- COMMUNITY PHOTO GALLERY ---
+       A few real, free-to-use photos of people working out (Unsplash,
+       free license) so the site feels less like an empty template and
+       more like an actual community of people staying active. Each
+       photo gets a subtle earthy-green duotone wash (via the ::after
+       overlay) so they all feel like they belong to the same neutral
+       palette instead of clashing with it, plus a soft caption. */
+    .fitpulse-photo-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin: 20px 0 8px 0;
+    }
+    .fitpulse-photo-card {
+        position: relative;
+        border-radius: 14px;
+        overflow: hidden;
+        height: 190px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .fitpulse-photo-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
+    }
+    .fitpulse-photo-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        filter: saturate(0.9) contrast(1.02);
+    }
+    .fitpulse-photo-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            to top,
+            rgba(42, 42, 38, 0.75) 0%,
+            rgba(42, 42, 38, 0.05) 55%,
+            rgba(124, 148, 115, 0.18) 100%
+        );
+    }
+    .fitpulse-photo-caption {
+        position: absolute;
+        left: 14px;
+        bottom: 10px;
+        z-index: 2;
+        color: white;
+        font-weight: 700;
+        font-size: 14.5px;
+        letter-spacing: 0.3px;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Stack the photo grid to 2 columns on narrower screens */
+    @media (max-width: 700px) {
+        .fitpulse-photo-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .fitpulse-photo-card {
+            height: 150px;
+        }
     }
 
     /* ================================================================
@@ -770,6 +840,39 @@ def render_home():
     - 😴 **Sleep Tracking** — monitor your rest and recovery
     """
     )
+
+    # --- Photo gallery: real people, working out, staying active ---
+    # A handful of free-to-use (Unsplash License) photos so the page
+    # feels lived-in instead of just icons and text — a little glimpse
+    # of the kind of community FitPulse is for.
+    st.markdown(
+        '<div class="fitpulse-section-header">📸 Our Community in Motion</div>',
+        unsafe_allow_html=True,
+    )
+    gallery_photos = [
+        (
+            "https://images.unsplash.com/photo-1547226238-e53e98a8e59d?w=700&q=70&auto=format&fit=crop",
+            "Gym Sessions",
+        ),
+        (
+            "https://images.unsplash.com/photo-1518644961665-ed172691aaa1?w=700&q=70&auto=format&fit=crop",
+            "Wellness & Stretching",
+        ),
+        (
+            "https://images.unsplash.com/photo-1577221084712-45b0445d2b00?w=700&q=70&auto=format&fit=crop",
+            "Strength Training",
+        ),
+        (
+            "https://images.unsplash.com/photo-1590333748338-d629e4564ad9?w=700&q=70&auto=format&fit=crop",
+            "Cardio & Running",
+        ),
+    ]
+    gallery_html = '<div class="fitpulse-photo-grid">' + "".join(
+        f'<div class="fitpulse-photo-card"><img src="{url}" alt="{caption}">'
+        f'<div class="fitpulse-photo-caption">{caption}</div></div>'
+        for url, caption in gallery_photos
+    ) + "</div>"
+    st.markdown(gallery_html, unsafe_allow_html=True)
 
     # --- Bottom CTA banner ---
     st.markdown(
