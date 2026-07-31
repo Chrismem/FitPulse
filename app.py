@@ -944,18 +944,19 @@ def render_community():
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background-color: rgba(0, 0, 0, 0.6);
+                background-color: rgba(0, 0, 0, 0.5);
                 justify-content: center;
                 align-items: center;
                 z-index: 999;
             }
             
             .guest-popup-modal {
-                background-color: white;
+                background-color: #FFFFFF;
+                border: 2px solid #E8E8E8;
                 border-radius: 16px;
-                padding: 40px;
-                max-width: 450px;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                padding: 48px 40px;
+                max-width: 480px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
                 text-align: center;
                 animation: slideIn 0.3s ease-out;
             }
@@ -972,13 +973,14 @@ def render_community():
             }
             
             .guest-popup-modal h2 {
-                color: #1565C0;
+                color: #1A1A1A;
                 margin-top: 0;
                 font-size: 28px;
+                font-weight: 700;
             }
             
             .guest-popup-modal p {
-                color: #555;
+                color: #4A4A4A;
                 font-size: 16px;
                 line-height: 1.6;
                 margin: 16px 0;
@@ -986,14 +988,15 @@ def render_community():
             
             .guest-popup-buttons {
                 display: flex;
-                gap: 12px;
-                margin-top: 32px;
+                gap: 14px;
+                margin-top: 36px;
                 justify-content: center;
+                flex-wrap: wrap;
             }
             
             .guest-popup-btn {
-                padding: 12px 32px;
-                border: none;
+                padding: 14px 40px;
+                border: 2px solid #CCCCCC;
                 border-radius: 8px;
                 font-size: 15px;
                 font-weight: 600;
@@ -1001,38 +1004,34 @@ def render_community():
                 transition: all 0.2s ease;
                 text-decoration: none;
                 display: inline-block;
+                font-family: inherit;
+                background-color: white;
             }
             
             .guest-popup-btn-signup {
-                background-color: #2E7D32;
+                background-color: #81C784;
                 color: white;
+                border-color: #81C784;
             }
             
             .guest-popup-btn-signup:hover {
-                background-color: #1b5e20;
+                background-color: #66BB6A;
+                border-color: #66BB6A;
                 transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+                box-shadow: 0 4px 12px rgba(129, 199, 132, 0.3);
             }
             
             .guest-popup-btn-login {
-                background-color: #1565C0;
-                color: white;
+                background-color: white;
+                color: #4A4A4A;
+                border-color: #CCCCCC;
             }
             
             .guest-popup-btn-login:hover {
-                background-color: #0d47a1;
+                background-color: #F5F5F5;
+                border-color: #999999;
                 transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
-            }
-            
-            .guest-popup-btn-continue {
-                background-color: #E0E0E0;
-                color: #555;
-                font-size: 13px;
-            }
-            
-            .guest-popup-btn-continue:hover {
-                background-color: #BDBDBD;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             }
             
             .guest-popup-icon {
@@ -1049,11 +1048,8 @@ def render_community():
                         To communicate with other FitPulse members and speak under your name,
                         you'll need to create an account or log in.
                     </p>
-                    <div class="guest-popup-buttons">
-                        <a href="" class="guest-popup-btn guest-popup-btn-signup" target="_blank">Sign Up</a>
-                        <a href="" class="guest-popup-btn guest-popup-btn-login" target="_blank">Log In</a>
-                    </div>
-                    <p style="margin-top: 24px; font-size: 12px; color: #999;">
+                    <div id="guest-popup-buttons-container" class="guest-popup-buttons"></div>
+                    <p style="margin-top: 28px; font-size: 13px; color: #888;">
                         <em>You can continue browsing as a guest, but messaging is limited.</em>
                     </p>
                 </div>
@@ -1062,10 +1058,20 @@ def render_community():
             unsafe_allow_html=True,
         )
         
+        # Create two columns for the buttons
+        btn_col1, btn_col2 = st.columns(2)
+        with btn_col1:
+            if st.button("✏️ Sign Up", use_container_width=True, key="guest_signup_btn"):
+                st.session_state.page = "signup"
+                st.rerun()
+        with btn_col2:
+            if st.button("🔑 Log In", use_container_width=True, key="guest_login_btn"):
+                # Redirect to login (empty for now, user will fill in)
+                pass
+        
         # Show an info message below the popup
         st.info(
-            "🔒 **Guest Mode**: To send messages and speak under your name, please create an account or log in. "
-            "Sign up or login links are shown above."
+            "🔒 **Guest Mode**: To send messages and speak under your name, please create an account or log in."
         )
         
         # Stop rendering the rest of the community features
@@ -1345,6 +1351,102 @@ def render_habit_tracker():
 
 
 # ------------------------------------------------------------------
+# SECTION 9A: SIGNUP PAGE
+# This page appears when a guest user clicks "Sign Up" from the
+# community tab. They enter their name, email, and phone number.
+# ------------------------------------------------------------------
+def render_signup():
+    st.markdown(
+        '<div class="fitpulse-section-header">📝 Create Your Account</div>',
+        unsafe_allow_html=True,
+    )
+    
+    # Back button
+    if st.button("🏠 Back to Home", key="back_home_signup"):
+        st.session_state.page = "home"
+        st.rerun()
+    
+    st.divider()
+    
+    # Centered signup form
+    col1, col2, col3 = st.columns([1, 2, 1])
+    
+    with col2:
+        st.markdown(
+            """
+            <div style="text-align: center; margin-bottom: 32px;">
+                <h2 style="color: #1A1A1A; margin: 0 0 8px 0;">Join FitPulse Today</h2>
+                <p style="color: #666; margin: 0;">Get started by creating your account</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        with st.form("signup_form", clear_on_submit=True):
+            # Full Name
+            full_name = st.text_input(
+                "📛 Full Name",
+                placeholder="e.g., John Doe",
+                help="This is the name other users will see in the community."
+            )
+            
+            # Email
+            email = st.text_input(
+                "📧 Email Address",
+                placeholder="e.g., john@example.com",
+                help="We'll use this to contact you about your account."
+            )
+            
+            # Phone Number
+            phone = st.text_input(
+                "📱 Phone Number",
+                placeholder="e.g., (555) 123-4567",
+                help="Optional: helps us reach you if needed."
+            )
+            
+            st.markdown("---")
+            
+            submitted = st.form_submit_button("✅ Create Account", use_container_width=True)
+            
+            if submitted:
+                # Validation
+                if not full_name.strip():
+                    st.error("❌ Please enter your full name.")
+                elif not email.strip():
+                    st.error("❌ Please enter your email address.")
+                elif "@" not in email:
+                    st.error("❌ Please enter a valid email address.")
+                else:
+                    # Show success message
+                    st.success("✅ Account created successfully!")
+                    st.info(
+                        f"Welcome to FitPulse, **{full_name}**! 🎉\n\n"
+                        "Your account is now active. You can now:\n"
+                        "- Add friends and chat\n"
+                        "- Track your fitness habits\n"
+                        "- Discover local gyms\n\n"
+                        "*Redirecting you back to the app...*"
+                    )
+                    st.session_state.username = full_name.strip()
+                    st.session_state.page = "home"
+                    import time
+                    time.sleep(2)
+                    st.rerun()
+        
+        st.markdown(
+            """
+            <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #E8E8E8;">
+                <p style="color: #888; font-size: 14px; margin: 0;">
+                    Already have an account? 
+                    <span style="color: #81C784; font-weight: 600;">Log in here</span>
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+# ------------------------------------------------------------------
 # SECTION 10: ROUTER — draw whichever page we're on
 # ------------------------------------------------------------------
 if st.session_state.page == "habits":
@@ -1353,5 +1455,7 @@ elif st.session_state.page == "community":
     render_community()
 elif st.session_state.page == "gym_finder":
     render_gym_finder()
+elif st.session_state.page == "signup":
+    render_signup()
 else:
     render_home()
