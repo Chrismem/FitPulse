@@ -158,7 +158,8 @@ st.markdown(
        anywhere on it always works. Both Habit Tracking and
        Communities use this same pattern. */
     .st-key-habit_tracking_card button,
-    .st-key-community_card button {
+    .st-key-community_card button,
+    .st-key-gym_finder_card button {
         background-color: #FFFFFF !important;
         border: 1px solid #E0E0E0 !important;
         border-top: 4px solid #2E7D32 !important;
@@ -170,29 +171,34 @@ st.markdown(
         transition: transform 0.15s ease, box-shadow 0.15s ease, border-top-color 0.15s ease;
     }
     .st-key-habit_tracking_card button:hover,
-    .st-key-community_card button:hover {
+    .st-key-community_card button:hover,
+    .st-key-gym_finder_card button:hover {
         transform: translateY(-4px);
         box-shadow: 0 10px 22px rgba(0,0,0,0.14) !important;
         border-top-color: #1565C0 !important;
     }
     .st-key-habit_tracking_card button:active,
-    .st-key-community_card button:active {
+    .st-key-community_card button:active,
+    .st-key-gym_finder_card button:active {
         transform: translateY(-1px);
     }
     .st-key-habit_tracking_card button p,
-    .st-key-community_card button p {
+    .st-key-community_card button p,
+    .st-key-gym_finder_card button p {
         margin: 6px 0 0 0;
         color: #444;
         font-size: 14px;
         white-space: pre-line;
     }
     .st-key-habit_tracking_card button p:first-of-type,
-    .st-key-community_card button p:first-of-type {
+    .st-key-community_card button p:first-of-type,
+    .st-key-gym_finder_card button p:first-of-type {
         font-size: 34px;
         margin-top: 0;
     }
     .st-key-habit_tracking_card button p strong,
-    .st-key-community_card button p strong {
+    .st-key-community_card button p strong,
+    .st-key-gym_finder_card button p strong {
         color: #1565C0;
         font-size: 17px;
     }
@@ -228,6 +234,141 @@ st.markdown(
     .fitpulse-cta-banner h3 {
         font-size: 26px;
         margin: 0 0 8px 0;
+    }
+
+    /* ================================================================
+       GYM FINDER PAGE — modernized, standalone locator experience.
+       A punchier gradient hero, a "glass" toolbar for the search
+       controls, and animated result cards with star ratings and
+       amenity pills (instead of plain text lines).
+       ================================================================ */
+    .fitpulse-locator-hero {
+        background: linear-gradient(120deg, #0F2027 0%, #1565C0 55%, #2E7D32 100%);
+        border-radius: 20px;
+        padding: 40px 36px;
+        color: white;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .fitpulse-locator-hero::after {
+        content: "📍";
+        position: absolute;
+        right: -10px;
+        bottom: -30px;
+        font-size: 150px;
+        opacity: 0.12;
+        transform: rotate(-12deg);
+    }
+    .fitpulse-locator-hero h1 {
+        font-size: 36px;
+        font-weight: 900;
+        margin: 0 0 6px 0;
+    }
+    .fitpulse-locator-hero p {
+        font-size: 16px;
+        opacity: 0.92;
+        margin: 0;
+        max-width: 640px;
+    }
+
+    /* Glassy toolbar wrapping the location/radius/sort controls */
+    .fitpulse-locator-toolbar {
+        background: rgba(21, 101, 192, 0.06);
+        border: 1px solid rgba(21, 101, 192, 0.18);
+        border-radius: 16px;
+        padding: 20px 22px 6px 22px;
+        margin-bottom: 20px;
+    }
+
+    /* Modern result cards: soft shadow, gradient top accent, lift on hover */
+    .fitpulse-gym-card {
+        background: #FFFFFF;
+        border-radius: 16px;
+        padding: 18px 20px;
+        margin-bottom: 16px;
+        border: 1px solid #EAEAEA;
+        border-top: none;
+        position: relative;
+        box-shadow: 0 2px 10px rgba(15, 32, 39, 0.06);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .fitpulse-gym-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 5px;
+        border-radius: 16px 16px 0 0;
+        background: linear-gradient(90deg, #1565C0, #2E7D32);
+    }
+    .fitpulse-gym-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 14px 28px rgba(15, 32, 39, 0.14);
+    }
+    .fitpulse-gym-card .gym-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .fitpulse-gym-card h4 {
+        margin: 0;
+        color: #0F2027;
+        font-size: 18px;
+    }
+    .fitpulse-gym-card .gym-address {
+        color: #666;
+        font-size: 13.5px;
+        margin: 4px 0 10px 0;
+    }
+    .fitpulse-distance-badge {
+        display: inline-block;
+        background: linear-gradient(90deg, #1565C0, #2E7D32);
+        color: white;
+        font-size: 12.5px;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+    .fitpulse-rating-stars {
+        color: #F5A623;
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+    .fitpulse-rating-number {
+        color: #444;
+        font-size: 13px;
+        margin-left: 4px;
+    }
+    .fitpulse-pill-row {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .fitpulse-pill {
+        background-color: #E8F1FC;
+        color: #1565C0;
+        border: 1px solid rgba(21, 101, 192, 0.25);
+        border-radius: 999px;
+        padding: 3px 11px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .fitpulse-closest-tag {
+        position: absolute;
+        top: -10px;
+        right: 16px;
+        background: #0D3B14;
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 999px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
     /* --- Mobile responsiveness ---
@@ -266,13 +407,20 @@ st.markdown(
 # made-up coordinates so the distance math actually works.
 # ------------------------------------------------------------------
 FITNESS_CENTERS = [
-    {"name": "Green Street Gym", "address": "12 Green St", "lat": 40.7128, "lon": -74.0060},
-    {"name": "Pulse Fitness Center", "address": "88 Pulse Ave", "lat": 40.7357, "lon": -74.1724},
-    {"name": "Riverside Athletic Club", "address": "5 Riverside Dr", "lat": 40.8000, "lon": -73.9500},
-    {"name": "Uptown CrossFit Box", "address": "200 Uptown Blvd", "lat": 40.8448, "lon": -73.8648},
-    {"name": "Downtown YMCA", "address": "1 Civic Center Plaza", "lat": 40.7000, "lon": -74.0100},
-    {"name": "Harbor Health Club", "address": "45 Harbor Way", "lat": 40.6500, "lon": -74.0200},
-    {"name": "Summit Strength & Cardio", "address": "310 Summit Rd", "lat": 40.9000, "lon": -74.1000},
+    {"name": "Green Street Gym", "address": "12 Green St", "lat": 40.7128, "lon": -74.0060,
+     "rating": 4.6, "amenities": ["24/7 Access", "Free Weights", "Sauna"]},
+    {"name": "Pulse Fitness Center", "address": "88 Pulse Ave", "lat": 40.7357, "lon": -74.1724,
+     "rating": 4.8, "amenities": ["Personal Training", "Group Classes", "Pool"]},
+    {"name": "Riverside Athletic Club", "address": "5 Riverside Dr", "lat": 40.8000, "lon": -73.9500,
+     "rating": 4.3, "amenities": ["Tennis Courts", "Pool", "Cafe"]},
+    {"name": "Uptown CrossFit Box", "address": "200 Uptown Blvd", "lat": 40.8448, "lon": -73.8648,
+     "rating": 4.7, "amenities": ["CrossFit", "Group Classes", "Free Parking"]},
+    {"name": "Downtown YMCA", "address": "1 Civic Center Plaza", "lat": 40.7000, "lon": -74.0100,
+     "rating": 4.2, "amenities": ["Pool", "Youth Programs", "Basketball Court"]},
+    {"name": "Harbor Health Club", "address": "45 Harbor Way", "lat": 40.6500, "lon": -74.0200,
+     "rating": 4.5, "amenities": ["24/7 Access", "Sauna", "Free Parking"]},
+    {"name": "Summit Strength & Cardio", "address": "310 Summit Rd", "lat": 40.9000, "lon": -74.1000,
+     "rating": 4.9, "amenities": ["Personal Training", "Free Weights", "Group Classes"]},
 ]
 
 # A small list of sample "user location" choices, each with
@@ -525,7 +673,7 @@ with st.sidebar:
     )
     st.caption("Tip: use the same name each time so your progress is saved.")
 
-    if st.session_state.page in ("habits", "community"):
+    if st.session_state.page in ("habits", "community", "gym_finder"):
         st.markdown("---")
         if st.button("🏠 Back to Home", use_container_width=True):
             st.session_state.page = "home"
@@ -554,14 +702,15 @@ def render_home():
 
     st.write(
         "Welcome to **FitPulse**! 🎉 We help you find fitness centers near you, "
-        "so staying active is easier and more affordable. Let's find a gym close to you!"
+        "so staying active is easier and more affordable. Tap **Gym Finder** below to "
+        "open the locator."
     )
 
     # --- Feature card grid ---
     feature_cols = st.columns(3)
 
     features = [
-        ("📍", "Gym Finder", "Locate fitness centers within your chosen radius."),
+        ("📍", "Gym Finder", "Open the locator to search fitness centers near you."),
         ("🌐", "Communities", "Add friends and chat with people on FitPulse."),
         ("✅", "Habit Tracking", "Build and track healthy daily habits."),
     ]
@@ -571,8 +720,13 @@ def render_home():
     # st.button styled (via CSS in SECTION 2) to look like a feature
     # card, instead of decorative HTML with an invisible button on top
     # — that overlay approach was unreliable to click. With a single
-    # real button, clicking anywhere on the card always works.
+    # real button, clicking anywhere on the card always works. All
+    # three cards (Gym Finder, Communities, Habit Tracking) use this
+    # same pattern now, so the gym locator only opens when its card is
+    # actually clicked — there's no duplicate search tool sitting
+    # directly on the home page anymore.
     CLICKABLE_CARDS = {
+        "Gym Finder": ("gym_finder_card", "gym_finder_card_click", "gym_finder"),
         "Communities": ("community_card", "community_card_click", "community"),
         "Habit Tracking": ("habit_tracking_card", "habit_card_click", "habits"),
     }
@@ -605,67 +759,6 @@ def render_home():
     st.write("")  # small spacer
     st.divider()
 
-    # --- Location input + search ---
-    st.markdown(
-        '<div class="fitpulse-section-header">📍 Find a Fitness Center Near You</div>',
-        unsafe_allow_html=True,
-    )
-
-    search_col1, search_col2 = st.columns(2)
-
-    with search_col1:
-        location_choice = st.selectbox(
-            "Choose your location:",
-            options=list(SAMPLE_LOCATIONS.keys()),
-            help="In a future version, you'll be able to type any address.",
-        )
-
-    with search_col2:
-        radius_miles = st.slider(
-            "Search radius (miles):",
-            min_value=1,
-            max_value=25,
-            value=10,
-            help="FitPulse's Sprint 1 goal is a 10-mile search radius.",
-        )
-
-    search_clicked = st.button("🔎 Find Nearby Gyms", use_container_width=True)
-
-    # --- Search results ---
-    if search_clicked:
-        user_lat, user_lon = SAMPLE_LOCATIONS[location_choice]
-
-        nearby_gyms = []
-        for gym in FITNESS_CENTERS:
-            dist = distance_in_miles(user_lat, user_lon, gym["lat"], gym["lon"])
-            if dist <= radius_miles:
-                nearby_gyms.append((gym, dist))
-
-        nearby_gyms.sort(key=lambda pair: pair[1])
-
-        if nearby_gyms:
-            st.success(f"✅ Found {len(nearby_gyms)} fitness center(s) near {location_choice}!")
-            result_cols = st.columns(2)
-            for index, (gym, dist) in enumerate(nearby_gyms):
-                with result_cols[index % 2]:
-                    st.markdown(
-                        f"""
-                        <div class="fitpulse-card">
-                        <b>🏋️ {gym['name']}</b><br>
-                        📍 {gym['address']}<br>
-                        📏 {dist:.1f} miles away
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
-        else:
-            st.error(
-                "❌ No fitness centers found in that radius. "
-                "Try increasing your search radius or choosing a different location."
-            )
-
-    st.divider()
-
     # --- Future features ---
     st.markdown(
         '<div class="fitpulse-section-header">🚀 Coming Soon to FitPulse</div>',
@@ -683,13 +776,134 @@ def render_home():
         """
         <div class="fitpulse-cta-banner">
             <h3>Ready to make a change? 🚀</h3>
-            <p>FitPulse is free to use — start by finding a gym near you above.</p>
+            <p>FitPulse is free to use — tap the Gym Finder card to find one near you.</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
     st.caption("FitPulse — Sprint 2 Demo | Built with Python + Streamlit")
+
+
+# ------------------------------------------------------------------
+# SECTION 8A: GYM FINDER PAGE
+# This is the page users land on after clicking the Gym Finder card
+# on the home page — it's the ONLY place the locator tool lives now
+# (previously there was a second copy of it sitting directly on the
+# home page, which was redundant since the card already led here).
+#
+# It reuses the same FITNESS_CENTERS sample data and haversine
+# distance math as before, but the results are presented in a more
+# modern, "app-like" style: a gradient hero banner, a glassy toolbar
+# for the search controls, sortable results, and card-style results
+# with star ratings, amenity pills, and a "Closest" tag.
+# ------------------------------------------------------------------
+def render_gym_finder():
+    if st.button("🏠 Back to Home", key="back_home_gym_finder"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    # --- Hero banner (gym-finder themed) ---
+    st.markdown(
+        """
+        <div class="fitpulse-locator-hero">
+            <h1>📍 Gym Finder</h1>
+            <p>Search fitness centers near you, compare ratings and amenities,
+            and sort results the way that matters most to you.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # --- Glassy toolbar: location, radius, sort ---
+    with st.container():
+        st.markdown('<div class="fitpulse-locator-toolbar">', unsafe_allow_html=True)
+        tool_col1, tool_col2, tool_col3 = st.columns([1.2, 1, 1])
+
+        with tool_col1:
+            location_choice = st.selectbox(
+                "📍 Your location",
+                options=list(SAMPLE_LOCATIONS.keys()),
+                help="In a future version, you'll be able to type any address.",
+            )
+        with tool_col2:
+            radius_miles = st.slider(
+                "📏 Search radius (mi)",
+                min_value=1,
+                max_value=25,
+                value=10,
+            )
+        with tool_col3:
+            sort_choice = st.selectbox(
+                "↕️ Sort by",
+                options=["Distance", "Rating", "Name"],
+            )
+
+        search_clicked = st.button(
+            "🔎 Find Nearby Gyms", use_container_width=True, type="primary"
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # --- Search results ---
+    if search_clicked:
+        user_lat, user_lon = SAMPLE_LOCATIONS[location_choice]
+
+        nearby_gyms = []
+        for gym in FITNESS_CENTERS:
+            dist = distance_in_miles(user_lat, user_lon, gym["lat"], gym["lon"])
+            if dist <= radius_miles:
+                nearby_gyms.append((gym, dist))
+
+        if sort_choice == "Distance":
+            nearby_gyms.sort(key=lambda pair: pair[1])
+        elif sort_choice == "Rating":
+            nearby_gyms.sort(key=lambda pair: pair[0]["rating"], reverse=True)
+        else:  # Name
+            nearby_gyms.sort(key=lambda pair: pair[0]["name"])
+
+        if nearby_gyms:
+            st.success(f"✅ Found {len(nearby_gyms)} fitness center(s) near {location_choice}!")
+
+            closest_name = min(nearby_gyms, key=lambda pair: pair[1])[0]["name"]
+            result_cols = st.columns(2)
+            for index, (gym, dist) in enumerate(nearby_gyms):
+                full_stars = int(round(gym["rating"]))
+                stars = "★" * full_stars + "☆" * (5 - full_stars)
+                pills_html = "".join(
+                    f'<span class="fitpulse-pill">{tag}</span>' for tag in gym["amenities"]
+                )
+                closest_tag_html = (
+                    '<div class="fitpulse-closest-tag">Closest</div>'
+                    if gym["name"] == closest_name
+                    else ""
+                )
+
+                with result_cols[index % 2]:
+                    st.markdown(
+                        f"""
+                        <div class="fitpulse-gym-card">
+                            {closest_tag_html}
+                            <div class="gym-top-row">
+                                <div>
+                                    <h4>🏋️ {gym['name']}</h4>
+                                    <div class="gym-address">📍 {gym['address']}</div>
+                                </div>
+                                <span class="fitpulse-distance-badge">{dist:.1f} mi</span>
+                            </div>
+                            <span class="fitpulse-rating-stars">{stars}</span>
+                            <span class="fitpulse-rating-number">{gym['rating']}/5</span>
+                            <div class="fitpulse-pill-row">{pills_html}</div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+        else:
+            st.error(
+                "❌ No fitness centers found in that radius. "
+                "Try increasing your search radius or choosing a different location."
+            )
+    else:
+        st.info("Set your location and radius above, then click **Find Nearby Gyms**.")
 
 
 # ------------------------------------------------------------------
@@ -996,5 +1210,7 @@ if st.session_state.page == "habits":
     render_habit_tracker()
 elif st.session_state.page == "community":
     render_community()
+elif st.session_state.page == "gym_finder":
+    render_gym_finder()
 else:
     render_home()
