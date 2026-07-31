@@ -878,25 +878,30 @@ def render_gym_finder():
                     else ""
                 )
 
+                # Built as ONE flat string with no leading whitespace on any
+                # line. Streamlit's markdown renderer treats heavily-indented
+                # lines (like the multi-line, deeply-nested version this
+                # used to be) as a preformatted code block instead of parsing
+                # them as HTML — which is why every card after the first one
+                # was showing up as raw "<div class=...>" text instead of a
+                # styled card. A flat string has no indentation to trip on.
+                card_html = (
+                    '<div class="fitpulse-gym-card">'
+                    f'{closest_tag_html}'
+                    '<div class="gym-top-row"><div>'
+                    f'<h4>🏋️ {gym["name"]}</h4>'
+                    f'<div class="gym-address">📍 {gym["address"]}</div>'
+                    "</div>"
+                    f'<span class="fitpulse-distance-badge">{dist:.1f} mi</span>'
+                    "</div>"
+                    f'<span class="fitpulse-rating-stars">{stars}</span>'
+                    f'<span class="fitpulse-rating-number">{gym["rating"]}/5</span>'
+                    f'<div class="fitpulse-pill-row">{pills_html}</div>'
+                    "</div>"
+                )
+
                 with result_cols[index % 2]:
-                    st.markdown(
-                        f"""
-                        <div class="fitpulse-gym-card">
-                            {closest_tag_html}
-                            <div class="gym-top-row">
-                                <div>
-                                    <h4>🏋️ {gym['name']}</h4>
-                                    <div class="gym-address">📍 {gym['address']}</div>
-                                </div>
-                                <span class="fitpulse-distance-badge">{dist:.1f} mi</span>
-                            </div>
-                            <span class="fitpulse-rating-stars">{stars}</span>
-                            <span class="fitpulse-rating-number">{gym['rating']}/5</span>
-                            <div class="fitpulse-pill-row">{pills_html}</div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
+                    st.markdown(card_html, unsafe_allow_html=True)
         else:
             st.error(
                 "❌ No fitness centers found in that radius. "
