@@ -929,6 +929,147 @@ def render_community():
         st.rerun()
 
     st.divider()
+    
+    # --- GUEST USER POPUP CHECK ---
+    # If the user is a "Guest", show a modal asking them to sign up or login
+    # before they can access the community messaging features
+    if username == "Guest":
+        st.markdown(
+            """
+            <style>
+            .guest-popup-overlay {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.6);
+                justify-content: center;
+                align-items: center;
+                z-index: 999;
+            }
+            
+            .guest-popup-modal {
+                background-color: white;
+                border-radius: 16px;
+                padding: 40px;
+                max-width: 450px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                text-align: center;
+                animation: slideIn 0.3s ease-out;
+            }
+            
+            @keyframes slideIn {
+                from {
+                    transform: translateY(-50px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+            
+            .guest-popup-modal h2 {
+                color: #1565C0;
+                margin-top: 0;
+                font-size: 28px;
+            }
+            
+            .guest-popup-modal p {
+                color: #555;
+                font-size: 16px;
+                line-height: 1.6;
+                margin: 16px 0;
+            }
+            
+            .guest-popup-buttons {
+                display: flex;
+                gap: 12px;
+                margin-top: 32px;
+                justify-content: center;
+            }
+            
+            .guest-popup-btn {
+                padding: 12px 32px;
+                border: none;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                text-decoration: none;
+                display: inline-block;
+            }
+            
+            .guest-popup-btn-signup {
+                background-color: #2E7D32;
+                color: white;
+            }
+            
+            .guest-popup-btn-signup:hover {
+                background-color: #1b5e20;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+            }
+            
+            .guest-popup-btn-login {
+                background-color: #1565C0;
+                color: white;
+            }
+            
+            .guest-popup-btn-login:hover {
+                background-color: #0d47a1;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+            }
+            
+            .guest-popup-btn-continue {
+                background-color: #E0E0E0;
+                color: #555;
+                font-size: 13px;
+            }
+            
+            .guest-popup-btn-continue:hover {
+                background-color: #BDBDBD;
+            }
+            
+            .guest-popup-icon {
+                font-size: 48px;
+                margin-bottom: 16px;
+            }
+            </style>
+            
+            <div class="guest-popup-overlay">
+                <div class="guest-popup-modal">
+                    <div class="guest-popup-icon">👤</div>
+                    <h2>Sign in to Chat</h2>
+                    <p>
+                        To communicate with other FitPulse members and speak under your name,
+                        you'll need to create an account or log in.
+                    </p>
+                    <div class="guest-popup-buttons">
+                        <a href="" class="guest-popup-btn guest-popup-btn-signup" target="_blank">Sign Up</a>
+                        <a href="" class="guest-popup-btn guest-popup-btn-login" target="_blank">Log In</a>
+                    </div>
+                    <p style="margin-top: 24px; font-size: 12px; color: #999;">
+                        <em>You can continue browsing as a guest, but messaging is limited.</em>
+                    </p>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        # Show an info message below the popup
+        st.info(
+            "🔒 **Guest Mode**: To send messages and speak under your name, please create an account or log in. "
+            "Sign up or login links are shown above."
+        )
+        
+        # Stop rendering the rest of the community features
+        return
 
     friends_tab, discover_tab = st.tabs(["👥 My Friends", "🔍 Discover People"])
 
