@@ -70,7 +70,7 @@ st.markdown(
 
     /* --- HERO BANNER --- */
     .fitpulse-hero {
-        background: linear-gradient(135deg, #1565C0 0%, #2E7D32 100%);
+        background: linear-gradient(135deg, #2A2A26 0%, #7C9473 100%);
         border-radius: 18px;
         padding: 48px 40px;
         text-align: center;
@@ -105,7 +105,7 @@ st.markdown(
     .fitpulse-feature-card {
         background-color: #FFFFFF;
         border: 1px solid #E0E0E0;
-        border-top: 4px solid #2E7D32;
+        border-top: 4px solid #7C9473;
         border-radius: 14px;
         padding: 22px 18px;
         text-align: center;
@@ -117,7 +117,7 @@ st.markdown(
         margin-bottom: 8px;
     }
     .fitpulse-feature-card h4 {
-        color: #1565C0;
+        color: #2A2A26;
         margin: 6px 0;
         font-size: 17px;
     }
@@ -129,9 +129,9 @@ st.markdown(
 
     /* --- SECTION HEADERS --- */
     .fitpulse-section-header {
-        color: #1565C0;
-        background-color: #E8F1FC;
-        border-left: 5px solid #2E7D32;
+        color: #2A2A26;
+        background-color: #F4F2EC;
+        border-left: 5px solid #7C9473;
         border-radius: 6px;
         padding: 10px 16px;
         font-size: 22px;
@@ -142,8 +142,8 @@ st.markdown(
 
     /* --- RESULT CARDS --- */
     .fitpulse-card {
-        background-color: #F1F8F5;
-        border: 1px solid #2E7D32;
+        background-color: #F4F2EC;
+        border: 1px solid #7C9473;
         border-radius: 10px;
         padding: 14px 18px;
         margin-bottom: 12px;
@@ -162,7 +162,7 @@ st.markdown(
     .st-key-gym_finder_card button {
         background-color: #FFFFFF !important;
         border: 1px solid #E0E0E0 !important;
-        border-top: 4px solid #2E7D32 !important;
+        border-top: 4px solid #7C9473 !important;
         border-radius: 14px !important;
         padding: 22px 18px !important;
         width: 100%;
@@ -175,7 +175,7 @@ st.markdown(
     .st-key-gym_finder_card button:hover {
         transform: translateY(-4px);
         box-shadow: 0 10px 22px rgba(0,0,0,0.14) !important;
-        border-top-color: #1565C0 !important;
+        border-top-color: #2A2A26 !important;
     }
     .st-key-habit_tracking_card button:active,
     .st-key-community_card button:active,
@@ -199,20 +199,20 @@ st.markdown(
     .st-key-habit_tracking_card button p strong,
     .st-key-community_card button p strong,
     .st-key-gym_finder_card button p strong {
-        color: #1565C0;
+        color: #2A2A26;
         font-size: 17px;
     }
 
     /* --- COMMUNITY: chat bubbles reuse the same result-card style --- */
     .fitpulse-friend-name {
         font-weight: 700;
-        color: #1565C0;
+        color: #2A2A26;
     }
 
     /* --- HABIT TRACKER: streak badge --- */
     .fitpulse-streak-badge {
         display: inline-block;
-        background-color: #1565C0;
+        background-color: #2A2A26;
         color: white;
         border-radius: 999px;
         padding: 4px 14px;
@@ -223,7 +223,7 @@ st.markdown(
 
     /* --- BOTTOM CTA BANNER --- */
     .fitpulse-cta-banner {
-        background-color: #0D3B14;
+        background-color: #2A2A26;
         border-radius: 14px;
         padding: 32px;
         text-align: center;
@@ -243,7 +243,7 @@ st.markdown(
        amenity pills (instead of plain text lines).
        ================================================================ */
     .fitpulse-locator-hero {
-        background: linear-gradient(120deg, #0F2027 0%, #1565C0 55%, #2E7D32 100%);
+        background: linear-gradient(120deg, #1C1C1A 0%, #2A2A26 55%, #7C9473 100%);
         border-radius: 20px;
         padding: 40px 36px;
         color: white;
@@ -274,8 +274,8 @@ st.markdown(
 
     /* Glassy toolbar wrapping the location/radius/sort controls */
     .fitpulse-locator-toolbar {
-        background: rgba(21, 101, 192, 0.06);
-        border: 1px solid rgba(21, 101, 192, 0.18);
+        background: rgba(85, 112, 76, 0.06);
+        border: 1px solid rgba(85, 112, 76, 0.18);
         border-radius: 16px;
         padding: 20px 22px 6px 22px;
         margin-bottom: 20px;
@@ -299,7 +299,7 @@ st.markdown(
         top: 0; left: 0; right: 0;
         height: 5px;
         border-radius: 16px 16px 0 0;
-        background: linear-gradient(90deg, #1565C0, #2E7D32);
+        background: linear-gradient(90deg, #2A2A26, #7C9473);
     }
     .fitpulse-gym-card:hover {
         transform: translateY(-5px);
@@ -313,7 +313,7 @@ st.markdown(
     }
     .fitpulse-gym-card h4 {
         margin: 0;
-        color: #0F2027;
+        color: #1C1C1A;
         font-size: 18px;
     }
     .fitpulse-gym-card .gym-address {
@@ -323,7 +323,7 @@ st.markdown(
     }
     .fitpulse-distance-badge {
         display: inline-block;
-        background: linear-gradient(90deg, #1565C0, #2E7D32);
+        background: linear-gradient(90deg, #2A2A26, #7C9473);
         color: white;
         font-size: 12.5px;
         font-weight: 700;
@@ -348,9 +348,9 @@ st.markdown(
         gap: 6px;
     }
     .fitpulse-pill {
-        background-color: #E8F1FC;
-        color: #1565C0;
-        border: 1px solid rgba(21, 101, 192, 0.25);
+        background-color: #F4F2EC;
+        color: #2A2A26;
+        border: 1px solid rgba(85, 112, 76, 0.25);
         border-radius: 999px;
         padding: 3px 11px;
         font-size: 12px;
@@ -360,7 +360,7 @@ st.markdown(
         position: absolute;
         top: -10px;
         right: 16px;
-        background: #0D3B14;
+        background: #2A2A26;
         color: white;
         font-size: 11px;
         font-weight: 700;
