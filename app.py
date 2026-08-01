@@ -742,28 +742,35 @@ if "username" not in st.session_state:
 
 
 # ------------------------------------------------------------------
-# SECTION 7: SIDEBAR (user profile + navigation)
-# ------------------------------------------------------------------
-with st.sidebar:
-    st.markdown("### 👤 Your Profile")
-    st.session_state.username = st.text_input(
-        "Your name",
-        value=st.session_state.username,
-        help="Habits and progress are saved per name, so each person on this "
-        "computer can track their own habits separately.",
-    )
-    st.caption("Tip: use the same name each time so your progress is saved.")
-
-    if st.session_state.page in ("habits", "community", "gym_finder", "signup", "login"):
-        st.markdown("---")
-        if st.button("🏠 Back to Home", use_container_width=True):
-            st.session_state.page = "home"
-            st.rerun()
-
 username = st.session_state.username.strip() or "Guest"
 # Make sure this person shows up for others in "Discover People".
 register_user(username)
 
+# ------------------------------------------------------------------
+# SECTION 7: TOP-RIGHT HEADER (user profile + navigation)
+# ------------------------------------------------------------------
+header_col1, header_col2, header_col3 = st.columns([3, 1, 2])
+
+with header_col3:
+    st.markdown(
+        '<div style="text-align: right; font-weight: 700; color: #2A2A26; margin-bottom: 8px;">👤 Your Profile</div>',
+        unsafe_allow_html=True,
+    )
+    st.session_state.username = st.text_input(
+        "Your name",
+        value=st.session_state.username,
+        key="profile_name_input",
+        label_visibility="collapsed",
+        placeholder="Enter your name",
+    )
+    st.caption("Tip: use the same name each time", help="Habits and progress are saved per name, so each person on this computer can track their own habits separately.")
+    
+    if st.session_state.page in ("habits", "community", "gym_finder", "signup", "login"):
+        if st.button("🏠 Back to Home", use_container_width=True, key="back_to_home_header"):
+            st.session_state.page = "home"
+            st.rerun()
+
+st.divider()
 
 # ------------------------------------------------------------------
 # SECTION 8: HOME PAGE (hero, feature cards, gym finder)
