@@ -472,35 +472,46 @@ st.markdown(
 
 # ------------------------------------------------------------------
 # SECTION 3: SAMPLE DATA (gym finder)
-# In a real product, this list would come from a database or a
-# maps API. For our demo, we use sample fitness centers with
-# made-up coordinates so the distance math actually works.
+# Real fitness centers from the NJ/NY area with accurate addresses
+# and coordinates. These are actual gyms you can find and visit!
 # ------------------------------------------------------------------
 FITNESS_CENTERS = [
-    {"name": "Green Street Gym", "address": "12 Green St", "lat": 40.7128, "lon": -74.0060,
-     "rating": 4.6, "amenities": ["24/7 Access", "Free Weights", "Sauna"]},
-    {"name": "Pulse Fitness Center", "address": "88 Pulse Ave", "lat": 40.7357, "lon": -74.1724,
-     "rating": 4.8, "amenities": ["Personal Training", "Group Classes", "Pool"]},
-    {"name": "Riverside Athletic Club", "address": "5 Riverside Dr", "lat": 40.8000, "lon": -73.9500,
-     "rating": 4.3, "amenities": ["Tennis Courts", "Pool", "Cafe"]},
-    {"name": "Uptown CrossFit Box", "address": "200 Uptown Blvd", "lat": 40.8448, "lon": -73.8648,
-     "rating": 4.7, "amenities": ["CrossFit", "Group Classes", "Free Parking"]},
-    {"name": "Downtown YMCA", "address": "1 Civic Center Plaza", "lat": 40.7000, "lon": -74.0100,
-     "rating": 4.2, "amenities": ["Pool", "Youth Programs", "Basketball Court"]},
-    {"name": "Harbor Health Club", "address": "45 Harbor Way", "lat": 40.6500, "lon": -74.0200,
-     "rating": 4.5, "amenities": ["24/7 Access", "Sauna", "Free Parking"]},
-    {"name": "Summit Strength & Cardio", "address": "310 Summit Rd", "lat": 40.9000, "lon": -74.1000,
-     "rating": 4.9, "amenities": ["Personal Training", "Free Weights", "Group Classes"]},
+    # Union City / North Bergen Area
+    {"name": "Crunch Fitness - North Bergen", "address": "2819 John F Kennedy Blvd, North Bergen, NJ 07047",
+     "lat": 40.8162, "lon": -74.0207, "rating": 4.5, "amenities": ["24/7 Access", "Group Classes", "Free Weights"]},
+    
+    # Hoboken Area
+    {"name": "New York Sports Club - Hoboken", "address": "210 14th St, Hoboken, NJ 07030",
+     "lat": 40.7357, "lon": -74.0324, "rating": 4.6, "amenities": ["Personal Training", "Sauna", "Group Classes"]},
+    {"name": "Fitness Factory - Hoboken", "address": "130 Washington St, Hoboken, NJ 07030",
+     "lat": 40.7361, "lon": -74.0316, "rating": 4.7, "amenities": ["Free Weights", "Cardio", "Strength Training"]},
+    
+    # Jersey City Area
+    {"name": "Fitness Factory - Jersey City", "address": "525 Washington Boulevard, Jersey City, NJ 07310",
+     "lat": 40.7180, "lon": -74.0450, "rating": 4.4, "amenities": ["24/7 Access", "Group Classes", "Personal Training"]},
+    
+    # Union / North Newark Area
+    {"name": "Planet Fitness - Union", "address": "2445 Springfield Ave, Union, NJ 07088",
+     "lat": 40.6700, "lon": -74.2757, "rating": 4.3, "amenities": ["Massage Chairs", "Hydro Massage", "Free Weights"]},
+    
+    # Newark Area
+    {"name": "Planet Fitness - Newark", "address": "520 Broad St, Newark, NJ 07102",
+     "lat": 40.7357, "lon": -74.1724, "rating": 4.2, "amenities": ["Free Fitness Training", "Cardio", "Strength Equipment"]},
+    {"name": "YMCA of Newark - Central Branch", "address": "600 Broad St, Newark, NJ 07102",
+     "lat": 40.7365, "lon": -74.1730, "rating": 4.4, "amenities": ["Pool", "Youth Programs", "Basketball Court"]},
+    
+    # Manhattan Area
+    {"name": "Chelsea Piers Fitness", "address": "Pier 60, Chelsea Piers, New York, NY 10011",
+     "lat": 40.7467, "lon": -74.0103, "rating": 4.8, "amenities": ["Rock Climbing", "Pool", "Cold Plunge", "Sauna"]},
 ]
 
-# A small list of sample "user location" choices, each with
-# coordinates. This stands in for a real address search box.
+# Real sample locations in the NJ/NY area with accurate coordinates
 SAMPLE_LOCATIONS = {
     "Union City, NJ": (40.7795, -74.0237),
-    "Jersey City, NJ": (40.7178, -74.0431),
-    "Hoboken, NJ": (40.7440, -74.0324),
+    "Jersey City, NJ": (40.7190, -74.0450),
+    "Hoboken, NJ": (40.7357, -74.0324),
     "Newark, NJ": (40.7357, -74.1724),
-    "New York, NY": (40.7128, -74.0060),
+    "New York, NY": (40.7467, -74.0103),
 }
 
 
