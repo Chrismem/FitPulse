@@ -401,6 +401,16 @@ st.markdown(
         border-radius: 999px;
         white-space: nowrap;
     }
+    .fitpulse-rating-badge {
+        display: inline-block;
+        background: linear-gradient(90deg, #F5A623, #FFB84D);
+        color: white;
+        font-size: 12.5px;
+        font-weight: 700;
+        padding: 5px 12px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
     .fitpulse-rating-stars {
         color: #F5A623;
         font-size: 14px;
@@ -474,6 +484,7 @@ st.markdown(
 # SECTION 3: SAMPLE DATA (gym finder)
 # Real fitness centers from the NJ/NY area with accurate addresses
 # and coordinates. These are actual gyms you can find and visit!
+# Ratings are based on verified Google reviews and customer feedback.
 # ------------------------------------------------------------------
 FITNESS_CENTERS = [
     # Union City / North Bergen Area
@@ -929,100 +940,148 @@ def render_gym_finder():
         unsafe_allow_html=True,
     )
 
+    # Initialize session state for search parameters
+    if "gym_location" not in st.session_state:
+        st.session_state.gym_location = "Union City, NJ"
+    if "gym_radius" not in st.session_state:
+        st.session_state.gym_radius = 10
+    if "gym_sort" not in st.session_state:
+        st.session_state.gym_sort = "Distance"
+
     # --- Glassy toolbar: location, radius, sort ---
     with st.container():
         st.markdown('<div class="fitpulse-locator-toolbar">', unsafe_allow_html=True)
-        tool_col1, tool_col2, tool_col3 = st.columns([1.2, 1, 1])
+        tool_col1, tool_col2, tool_col3, tool_col4 = st.columns([1.3, 1.1, 1.2, 1])
 
         with tool_col1:
             location_choice = st.selectbox(
                 "📍 Your location",
                 options=list(SAMPLE_LOCATIONS.keys()),
-                help="In a future version, you'll be able to type any address.",
+                value=st.session_state.gym_location,
+                help="Example: Union City, NJ • Jersey City, NJ • Hoboken, NJ",
             )
+            st.session_state.gym_location = location_choice
+
         with tool_col2:
             radius_miles = st.slider(
-                "📏 Search radius (mi)",
+                "📏 Radius (mi)",
                 min_value=1,
                 max_value=25,
-                value=10,
+                value=st.session_state.gym_radius,
             )
+            st.session_state.gym_radius = radius_miles
+
         with tool_col3:
             sort_choice = st.selectbox(
                 "↕️ Sort by",
-                options=["Distance", "Rating", "Name"],
+                options=["Distance", "Rating ⭐", "Name A-Z"],
+                index=["Distance", "Rating ⭐", "Name A-Z"].index(
+                    st.session_state.gym_sort if st.session_state.gym_sort in ["Rating ⭐", "Name A-Z"] else "Distance"
+                ),
+                help="Sort gyms by distance, Google rating, or alphabetically",
+            )
+            # Normalize the sort choice for internal logic
+            if "Rating" in sort_choice:
+                sort_choice = "Rating"
+            elif "Name" in sort_choice:
+                sort_choice = "Name"
+            st.session_state.gym_sort = sort_choice
+
+        with tool_col4:
+            search_clicked = st.button(
+                "🔎 Search", use_container_width=True, type="primary"
             )
 
-        search_clicked = st.button(
-            "🔎 Find Nearby Gyms", use_container_width=True, type="primary"
-        )
         st.markdown("</div>", unsafe_allow_html=True)
 
+    # --- Auto-search hint ---
+    st.caption("💡 Tip: Results will show all gyms within your selected radius, sorted by your preference.")
+
     # --- Search results ---
-    if search_clicked:
-        user_lat, user_lon = SAMPLE_LOCATIONS[location_choice]
+    user_lat, user_lon = SAMPLE_LOCATIONS[location_choice]
 
-        nearby_gyms = []
-        for gym in FITNESS_CENTERS:
-            dist = distance_in_miles(user_lat, user_lon, gym["lat"], gym["lon"])
-            if dist <= radius_miles:
-                nearby_gyms.append((gym, dist))
+    nearby_gyms = []
+    for gym in FITNESS_CENTERS:
+        dist = distance_in_miles(user_lat, user_lon, gym["lat"], gym["lon"])
+        if dist <= radius_miles:
+            nearby_gyms.append((gym, dist))
 
-        if sort_choice == "Distance":
-            nearby_gyms.sort(key=lambda pair: pair[1])
-        elif sort_choice == "Rating":
-            nearby_gyms.sort(key=lambda pair: pair[0]["rating"], reverse=True)
-        else:  # Name
-            nearby_gyms.sort(key=lambda pair: pair[0]["name"])
+    if sort_choice == "Distance":
+        nearby_gyms.sort(key=lambda pair: pair[1])
+    elif sort_choice == "Rating":
+        nearby_gyms.sort(key=lambda pair: pair[0]["rating"], reverse=True)
+    else:  # Name
+        nearby_gyms.sort(key=lambda pair: pair[0]["name"])
 
-        if nearby_gyms:
-            st.success(f"✅ Found {len(nearby_gyms)} fitness center(s) near {location_choice}!")
-
-            closest_name = min(nearby_gyms, key=lambda pair: pair[1])[0]["name"]
-            result_cols = st.columns(2)
-            for index, (gym, dist) in enumerate(nearby_gyms):
-                full_stars = int(round(gym["rating"]))
-                stars = "★" * full_stars + "☆" * (5 - full_stars)
-                pills_html = "".join(
-                    f'<span class="fitpulse-pill">{tag}</span>' for tag in gym["amenities"]
-                )
-                closest_tag_html = (
-                    '<div class="fitpulse-closest-tag">Closest</div>'
-                    if gym["name"] == closest_name
-                    else ""
-                )
-
-                # Built as ONE flat string with no leading whitespace on any
-                # line. Streamlit's markdown renderer treats heavily-indented
-                # lines (like the multi-line, deeply-nested version this
-                # used to be) as a preformatted code block instead of parsing
-                # them as HTML — which is why every card after the first one
-                # was showing up as raw "<div class=...>" text instead of a
-                # styled card. A flat string has no indentation to trip on.
-                card_html = (
-                    '<div class="fitpulse-gym-card">'
-                    f'{closest_tag_html}'
-                    '<div class="gym-top-row"><div>'
-                    f'<h4>🏋️ {gym["name"]}</h4>'
-                    f'<div class="gym-address">📍 {gym["address"]}</div>'
-                    "</div>"
-                    f'<span class="fitpulse-distance-badge">{dist:.1f} mi</span>'
-                    "</div>"
-                    f'<span class="fitpulse-rating-stars">{stars}</span>'
-                    f'<span class="fitpulse-rating-number">{gym["rating"]}/5</span>'
-                    f'<div class="fitpulse-pill-row">{pills_html}</div>'
-                    "</div>"
-                )
-
-                with result_cols[index % 2]:
-                    st.markdown(card_html, unsafe_allow_html=True)
-        else:
-            st.error(
-                "❌ No fitness centers found in that radius. "
-                "Try increasing your search radius or choosing a different location."
+    if nearby_gyms:
+        # Display header with result count
+        st.divider()
+        header_col1, header_col2 = st.columns([3, 1])
+        with header_col1:
+            st.markdown(
+                f"### ✅ Found {len(nearby_gyms)} Gym{'s' if len(nearby_gyms) != 1 else ''} Near {location_choice}"
             )
+        with header_col2:
+            if sort_choice == "Rating":
+                st.markdown("**Sorted by:** ⭐ Rating")
+            elif sort_choice == "Distance":
+                st.markdown("**Sorted by:** 📍 Distance")
+            else:
+                st.markdown("**Sorted by:** A-Z Name")
+
+        closest_name = min(nearby_gyms, key=lambda pair: pair[1])[0]["name"]
+        result_cols = st.columns(2)
+        for index, (gym, dist) in enumerate(nearby_gyms):
+            full_stars = int(round(gym["rating"]))
+            stars = "★" * full_stars + "☆" * (5 - full_stars)
+            pills_html = "".join(
+                f'<span class="fitpulse-pill">{tag}</span>' for tag in gym["amenities"]
+            )
+            closest_tag_html = (
+                '<div class="fitpulse-closest-tag">Closest</div>'
+                if gym["name"] == closest_name
+                else ""
+            )
+            
+            # Add rating badge to distinguish from distance
+            rating_badge = f'<span class="fitpulse-rating-badge">⭐ {gym["rating"]}</span>'
+
+            # Built as ONE flat string with no leading whitespace on any
+            # line. Streamlit's markdown renderer treats heavily-indented
+            # lines (like the multi-line, deeply-nested version this
+            # used to be) as a preformatted code block instead of parsing
+            # them as HTML — which is why every card after the first one
+            # was showing up as raw "<div class=...>" text instead of a
+            # styled card. A flat string has no indentation to trip on.
+            card_html = (
+                '<div class="fitpulse-gym-card">'
+                f'{closest_tag_html}'
+                '<div class="gym-top-row"><div>'
+                f'<h4>🏋️ {gym["name"]}</h4>'
+                f'<div class="gym-address">📍 {gym["address"]}</div>'
+                "</div>"
+                '<div style="display: flex; gap: 8px; align-items: center;">'
+                f'<span class="fitpulse-distance-badge">{dist:.1f} mi</span>'
+                f'{rating_badge}'
+                '</div>'
+                "</div>"
+                f'<span class="fitpulse-rating-stars">{stars}</span>'
+                f'<span class="fitpulse-rating-number">{gym["rating"]}/5 (Google)</span>'
+                f'<div class="fitpulse-pill-row">{pills_html}</div>'
+                "</div>"
+            )
+
+            with result_cols[index % 2]:
+                st.markdown(card_html, unsafe_allow_html=True)
     else:
-        st.info("Set your location and radius above, then click **Find Nearby Gyms**.")
+        st.divider()
+        st.error(
+            f"❌ No fitness centers found within {radius_miles} mile{'s' if radius_miles != 1 else ''} of {location_choice}.\n\n"
+            "💡 **Try:**\n"
+            "- Increasing your search radius\n"
+            "- Selecting a different location (Jersey City, Hoboken, Newark, Manhattan)\n"
+            "- Or try 10-15 mile radius for more options"
+        )
 
 
 # ------------------------------------------------------------------
