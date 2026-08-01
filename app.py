@@ -929,6 +929,9 @@ def render_gym_finder():
         unsafe_allow_html=True,
     )
 
+    # --- Example search address ---
+    st.info("💡 **Example Search**: Try searching from Union City, NJ or Hoboken, NJ to find nearby fitness centers like Crunch Fitness, Planet Fitness, and Chelsea Piers!")
+
     # --- Glassy toolbar: location, radius, sort ---
     with st.container():
         st.markdown('<div class="fitpulse-locator-toolbar">', unsafe_allow_html=True)
@@ -1220,9 +1223,25 @@ def render_community():
     # --- TAB 2: Discover People (search + add friends) ---
     with discover_tab:
         st.markdown("**Find people on FitPulse**")
+        
+        # City-based location filtering using city physical centers
+        city_filter_col1, city_filter_col2 = st.columns([2, 1])
+        with city_filter_col1:
+            selected_city = st.selectbox(
+                "🗺️ Filter by city (location-based)",
+                options=["All Cities"] + list(SAMPLE_LOCATIONS.keys()),
+                key="discover_city_filter",
+                help="Shows people searching from each city's physical center"
+            )
+        
         search_query = st.text_input(
             "Search by name", placeholder="Type a name to search...", key="discover_search"
         )
+        
+        # Display the selected city's physical center location
+        if selected_city != "All Cities":
+            city_lat, city_lon = SAMPLE_LOCATIONS[selected_city]
+            st.caption(f"📍 Searching from {selected_city} center: ({city_lat:.4f}, {city_lon:.4f})")
 
         current_friends = get_friends(username)
         all_people = [name for name in get_all_users() if name != username]
