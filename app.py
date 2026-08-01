@@ -209,6 +209,56 @@ st.markdown(
         color: #2A2A26;
     }
 
+    /* --- FRIENDS LIST: friend card styling --- */
+    .fitpulse-friend-card {
+        background-color: #FFFFFF;
+        border: 1px solid #E0E0E0;
+        border-left: 4px solid #7C9473;
+        border-radius: 12px;
+        padding: 18px 16px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: box-shadow 0.15s ease, transform 0.15s ease;
+    }
+    .fitpulse-friend-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transform: translateY(-2px);
+    }
+    .fitpulse-friend-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+    }
+    .fitpulse-friend-avatar {
+        font-size: 32px;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #F4F2EC;
+        border-radius: 50%;
+    }
+    .fitpulse-friend-name-text {
+        font-weight: 600;
+        color: #2A2A26;
+        font-size: 16px;
+    }
+
+    /* --- EMPTY STATE --- */
+    .fitpulse-empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #8A8A80;
+    }
+    .fitpulse-empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+    }
+
     /* --- HABIT TRACKER: streak badge --- */
     .fitpulse-streak-badge {
         display: inline-block;
@@ -701,6 +751,16 @@ def add_friend(name, friend_name):
     save_community_data(data)
 
 
+def remove_friend(name, friend_name):
+    """Remove a friendship between two people (mutual, both directions)."""
+    data = load_community_data()
+    if name in data["friends"] and friend_name in data["friends"][name]:
+        data["friends"][name].remove(friend_name)
+    if friend_name in data["friends"] and name in data["friends"][friend_name]:
+        data["friends"][friend_name].remove(name)
+    save_community_data(data)
+
+
 def chat_key(name_a, name_b):
     """Build a stable, order-independent key for a pair of chatters."""
     return "::".join(sorted([name_a, name_b]))
@@ -765,7 +825,7 @@ with header_col3:
     )
     st.caption("Tip: use the same name each time", help="Habits and progress are saved per name, so each person on this computer can track their own habits separately.")
     
-    if st.session_state.page in ("habits", "community", "gym_finder", "signup", "login"):
+    if st.session_state.page in ("habits", "community", "gym_finder", "friends_list", "signup", "login"):
         if st.button("🏠 Back to Home", use_container_width=True, key="back_to_home_header"):
             st.session_state.page = "home"
             st.rerun()
@@ -794,7 +854,7 @@ def render_home():
         "open the locator."
     )
 
-    # --- Feature card grid ---
+    # --- Feature card grid (4 cards: 3 in first row, Friends List in second) ---
     feature_cols = st.columns(3)
 
     features = [
@@ -809,14 +869,14 @@ def render_home():
     # card, instead of decorative HTML with an invisible button on top
     # — that overlay approach was unreliable to click. With a single
     # real button, clicking anywhere on the card always works. All
-    # three cards (Gym Finder, Communities, Habit Tracking) use this
-    # same pattern now, so the gym locator only opens when its card is
-    # actually clicked — there's no duplicate search tool sitting
-    # directly on the home page anymore.
+    # cards (Gym Finder, Communities, Habit Tracking, Friends List) 
+    # use this same pattern now, so each opens only when its card is
+    # actually clicked — there's no duplicate content.
     CLICKABLE_CARDS = {
         "Gym Finder": ("gym_finder_card", "gym_finder_card_click", "gym_finder"),
         "Communities": ("community_card", "community_card_click", "community"),
         "Habit Tracking": ("habit_tracking_card", "habit_card_click", "habits"),
+        "Friends List": ("friends_list_card", "friends_list_card_click", "friends_list"),
     }
 
     for col, (icon, title, text) in zip(feature_cols, features):
@@ -843,6 +903,19 @@ def render_home():
                     """,
                     unsafe_allow_html=True,
                 )
+
+    # --- Friends List card (second row) ---
+    friends_list_cols = st.columns([1, 2, 1])
+    with friends_list_cols[1]:
+        with st.container(key="friends_list_card"):
+            friends_card_clicked = st.button(
+                "👥\n\n**Friends List**\n\nView and manage all your FitPulse friends.",
+                key="friends_list_card_click",
+                use_container_width=True,
+            )
+            if friends_card_clicked:
+                st.session_state.page = "friends_list"
+                st.rerun()
 
     st.write("")  # small spacer
     st.divider()
@@ -1321,6 +1394,133 @@ def render_community():
 
 
 # ------------------------------------------------------------------
+# SECTION 8B: FRIENDS LIST PAGE
+# A dedicated page to view and manage all friends with search,
+# cards, and remove functionality.
+# ------------------------------------------------------------------
+def render_friends_list():
+    st.markdown(
+        '<div class="fitpulse-section-header">👥 My Friends</div>',
+        unsafe_allow_html=True,
+    )
+    st.write(f"Manage your FitPulse friends, **{username}**.")
+
+    if st.button("🏠 Back to Home", key="back_home_friends"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    st.divider()
+
+    # --- GUEST USER CHECK ---
+    if username == "Guest":
+        st.info(
+            "👤 **Sign in to see your friends.** "
+            "Create an account or log in to view and manage your friend list."
+        )
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✏️ Sign Up", use_container_width=True, key="guest_signup_friends"):
+                st.session_state.page = "signup"
+                st.rerun()
+        with col2:
+            if st.button("🔑 Log In", use_container_width=True, key="guest_login_friends"):
+                st.session_state.page = "login"
+                st.rerun()
+        return
+
+    friends = get_friends(username)
+
+    # --- SEARCH BAR ---
+    search_query = st.text_input(
+        "🔍 Search friends by name",
+        placeholder="Type a name...",
+        key="friends_search",
+    )
+
+    # Filter friends based on search
+    if search_query.strip():
+        filtered_friends = [
+            f for f in friends
+            if search_query.strip().lower() in f.lower()
+        ]
+    else:
+        filtered_friends = friends
+
+    # --- EMPTY STATE ---
+    if not friends:
+        st.markdown(
+            """
+            <div class="fitpulse-empty-state">
+                <div class="fitpulse-empty-state-icon">👥</div>
+                <h3 style="color: #2A2A26; margin: 8px 0;">No Friends Yet</h3>
+                <p>You haven't added any friends yet. Head to the <strong>Communities</strong> 
+                section to discover and add friends!</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🌐 Go to Communities", use_container_width=True, key="go_to_community_from_friends"):
+            st.session_state.page = "community"
+            st.rerun()
+        return
+
+    # --- SEARCH NO RESULTS ---
+    if search_query.strip() and not filtered_friends:
+        st.info(f"No friends found matching '{search_query}'. Try a different search.")
+        return
+
+    # --- FRIENDS CARDS ---
+    st.markdown(f"**{len(filtered_friends)} Friend{'s' if len(filtered_friends) != 1 else ''}**")
+    
+    for friend in filtered_friends:
+        col_avatar, col_info, col_action = st.columns([0.5, 2.5, 1])
+
+        with col_avatar:
+            # Default avatar (first letter of friend's name in a circle)
+            avatar_emoji = "👤"
+            st.markdown(
+                f"""
+                <div class="fitpulse-friend-avatar" style="text-align: center;">
+                    {avatar_emoji}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col_info:
+            st.markdown(
+                f"""
+                <div class="fitpulse-friend-name-text">{friend}</div>
+                <div style="font-size: 13px; color: #8A8A80;">FitPulse Member</div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col_action:
+            if st.button(
+                "❌ Remove",
+                key=f"remove_friend_{friend}",
+                use_container_width=True,
+                help=f"Remove {friend} from your friends list",
+            ):
+                remove_friend(username, friend)
+                st.success(f"Removed {friend} from your friends list.")
+                st.rerun()
+
+    st.divider()
+    
+    # Navigation back to Communities
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🌐 Go to Communities", use_container_width=True, key="back_to_community"):
+            st.session_state.page = "community"
+            st.rerun()
+    with col2:
+        if st.button("👤 View Profile", use_container_width=True, key="view_profile_friends"):
+            st.info(f"**{username}'s Profile**\n\nFriends: {len(friends)}\n\nYour FitPulse account is all set!")
+
+
+# ------------------------------------------------------------------
 # SECTION 9: HABIT TRACKER PAGE
 # This is the new page users land on after clicking the Habit
 # Tracking card. It lets a user:
@@ -1771,6 +1971,8 @@ if st.session_state.page == "habits":
     render_habit_tracker()
 elif st.session_state.page == "community":
     render_community()
+elif st.session_state.page == "friends_list":
+    render_friends_list()
 elif st.session_state.page == "gym_finder":
     render_gym_finder()
 elif st.session_state.page == "signup":
