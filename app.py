@@ -1341,7 +1341,7 @@ def render_home():
         unsafe_allow_html=True,
     )
 
-    st.caption("FitPulse — Sprint 2 Demo | Built with Python + Streamlit")
+    st.caption("FitPulse — Sprint 3 Demo | Built with Python + Streamlit")
 
 
 # ------------------------------------------------------------------
