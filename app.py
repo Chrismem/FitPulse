@@ -929,22 +929,137 @@ def render_gym_finder():
         unsafe_allow_html=True,
     )
 
-    # --- Example search address ---
-    st.info("💡 **Example Search**: Try searching from Union City, NJ or Hoboken, NJ to find nearby fitness centers like Crunch Fitness, Planet Fitness, and Chelsea Piers!")
+    # --- Initialize location permission state ---
+    if "location_permission" not in st.session_state:
+        st.session_state.location_permission = False
+    if "user_coordinates" not in st.session_state:
+        st.session_state.user_coordinates = None
 
-    # --- Glassy toolbar: location, radius, sort ---
+    # --- iOS-style location permission popup ---
+    location_popup_html = """
+    <style>
+    .fitpulse-location-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+    .fitpulse-location-popup {
+        background-color: white;
+        border-radius: 18px;
+        padding: 28px 24px;
+        width: 90%;
+        max-width: 340px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        text-align: center;
+    }
+    .fitpulse-popup-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+    }
+    .fitpulse-popup-title {
+        color: #2A2A26;
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 8px 0;
+    }
+    .fitpulse-popup-text {
+        color: #666;
+        font-size: 14px;
+        margin: 0 0 24px 0;
+        line-height: 1.6;
+    }
+    .fitpulse-popup-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    .fitpulse-popup-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+    .fitpulse-popup-btn-secondary {
+        border: 1px solid #ddd;
+        background-color: #f8f8f8;
+        color: #333;
+    }
+    .fitpulse-popup-btn-secondary:hover {
+        background-color: #efefef;
+    }
+    .fitpulse-popup-btn-primary {
+        background-color: #7C9473;
+        color: white;
+    }
+    .fitpulse-popup-btn-primary:hover {
+        background-color: #6b8362;
+    }
+    </style>
+    <script>
+    function requestLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const coords = {
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude
+                    };
+                    localStorage.setItem("fitpulse_user_location", JSON.stringify(coords));
+                    document.querySelector(".fitpulse-location-overlay").style.display = "none";
+                    location.reload();
+                },
+                function(error) {
+                    alert("Unable to access location. Please check your browser settings.");
+                }
+            );
+        } else {
+            alert("Geolocation is not supported by your browser.");
+        }
+    }
+    
+    function declineLocation() {
+        localStorage.setItem("fitpulse_location_declined", "true");
+        document.querySelector(".fitpulse-location-overlay").style.display = "none";
+    }
+    
+    // Check on page load
+    window.addEventListener("load", function() {
+        const saved = localStorage.getItem("fitpulse_user_location");
+        const declined = localStorage.getItem("fitpulse_location_declined");
+        if (saved || declined) {
+            document.querySelector(".fitpulse-location-overlay").style.display = "none";
+        }
+    });
+    </script>
+    <div class="fitpulse-location-overlay">
+        <div class="fitpulse-location-popup">
+            <div class="fitpulse-popup-icon">📍</div>
+            <div class="fitpulse-popup-title">"FitPulse" Would Like to Access Your Location</div>
+            <div class="fitpulse-popup-text">We need your current location to find nearby fitness centers.</div>
+            <div class="fitpulse-popup-buttons">
+                <button class="fitpulse-popup-btn fitpulse-popup-btn-secondary" onclick="declineLocation()">Not Now</button>
+                <button class="fitpulse-popup-btn fitpulse-popup-btn-primary" onclick="requestLocation()">Allow</button>
+            </div>
+        </div>
+    </div>
+    """
+    st.markdown(location_popup_html, unsafe_allow_html=True)
+
+    # --- Glassy toolbar: radius and sort (no location dropdown) ---
     with st.container():
         st.markdown('<div class="fitpulse-locator-toolbar">', unsafe_allow_html=True)
-        tool_col1, tool_col2, tool_col3 = st.columns([1.2, 1, 1])
-
+        tool_col1, tool_col2 = st.columns([1, 1])
         with tool_col1:
-            location_choice = st.selectbox(
-                "📍 Your location",
-                options=list(SAMPLE_LOCATIONS.keys()),
-                key="gym_location",
-                help="Select a location to auto-search nearby gyms",
-            )
-        with tool_col2:
             radius_miles = st.slider(
                 "📏 Search radius (mi)",
                 min_value=1,
@@ -952,7 +1067,7 @@ def render_gym_finder():
                 value=10,
                 key="gym_radius",
             )
-        with tool_col3:
+        with tool_col2:
             sort_choice = st.selectbox(
                 "↕️ Sort by",
                 options=["Distance", "Rating", "Name"],
@@ -964,15 +1079,17 @@ def render_gym_finder():
         )
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- Auto-search: trigger search if location/radius changed ---
-    should_search = search_clicked or (
-        "gym_location" in st.session_state and 
-        "gym_radius" in st.session_state
-    )
+    # --- Auto-search: trigger search if button clicked ---
+    should_search = search_clicked
 
     # --- Search results ---
     if should_search:
-        user_lat, user_lon = SAMPLE_LOCATIONS[location_choice]
+        # For this demo, we use Union City, NJ as the default location
+        # In production, integrate with the browser's geolocation API result stored in localStorage
+        # The iOS-style popup above prompts the user to allow location access
+        user_lat, user_lon = 40.7795, -74.0237  # Union City, NJ (example location)
+        location_name = "Your Location"
+        st.caption(f"📍 Searching from {location_name}: ({user_lat:.4f}, {user_lon:.4f})")
 
         nearby_gyms = []
         for gym in FITNESS_CENTERS:
@@ -988,7 +1105,7 @@ def render_gym_finder():
             nearby_gyms.sort(key=lambda pair: pair[0]["name"])
 
         if nearby_gyms:
-            st.success(f"✅ Found {len(nearby_gyms)} fitness center(s) near {location_choice}!")
+            st.success(f"✅ Found {len(nearby_gyms)} fitness center(s) near you!")
 
             closest_name = min(nearby_gyms, key=lambda pair: pair[1])[0]["name"]
             result_cols = st.columns(2)
