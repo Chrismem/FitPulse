@@ -30,6 +30,7 @@ close and reopen the app (as long as it's running on the same
 machine/server).
 """
 
+import calendar
 import math
 import json
 import os
@@ -159,7 +160,8 @@ st.markdown(
        Communities use this same pattern. */
     .st-key-habit_tracking_card button,
     .st-key-community_card button,
-    .st-key-gym_finder_card button {
+    .st-key-gym_finder_card button,
+    .st-key-goal_calendar_card button {
         background-color: #FFFFFF !important;
         border: 1px solid #E0E0E0 !important;
         border-top: 4px solid #7C9473 !important;
@@ -172,19 +174,22 @@ st.markdown(
     }
     .st-key-habit_tracking_card button:hover,
     .st-key-community_card button:hover,
-    .st-key-gym_finder_card button:hover {
+    .st-key-gym_finder_card button:hover,
+    .st-key-goal_calendar_card button:hover {
         transform: translateY(-4px);
         box-shadow: 0 10px 22px rgba(0,0,0,0.14) !important;
         border-top-color: #2A2A26 !important;
     }
     .st-key-habit_tracking_card button:active,
     .st-key-community_card button:active,
-    .st-key-gym_finder_card button:active {
+    .st-key-gym_finder_card button:active,
+    .st-key-goal_calendar_card button:active {
         transform: translateY(-1px);
     }
     .st-key-habit_tracking_card button p,
     .st-key-community_card button p,
-    .st-key-gym_finder_card button p {
+    .st-key-gym_finder_card button p,
+    .st-key-goal_calendar_card button p {
         margin: 6px 0 0 0;
         color: #444;
         font-size: 14px;
@@ -192,15 +197,79 @@ st.markdown(
     }
     .st-key-habit_tracking_card button p:first-of-type,
     .st-key-community_card button p:first-of-type,
-    .st-key-gym_finder_card button p:first-of-type {
+    .st-key-gym_finder_card button p:first-of-type,
+    .st-key-goal_calendar_card button p:first-of-type {
         font-size: 34px;
         margin-top: 0;
     }
     .st-key-habit_tracking_card button p strong,
     .st-key-community_card button p strong,
-    .st-key-gym_finder_card button p strong {
+    .st-key-gym_finder_card button p strong,
+    .st-key-goal_calendar_card button p strong {
         color: #2A2A26;
         font-size: 17px;
+    }
+
+    /* --- GOAL CALENDAR --- */
+    .fitpulse-cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+        margin-bottom: 10px;
+    }
+    .fitpulse-cal-daylabel {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #767268;
+        text-transform: uppercase;
+        padding-bottom: 2px;
+    }
+    .fitpulse-cal-cell {
+        border: 1px solid #E4E1D8;
+        border-radius: 8px;
+        min-height: 62px;
+        padding: 6px;
+        background-color: #FFFFFF;
+        font-size: 12px;
+    }
+    .fitpulse-cal-cell.empty {
+        border: none;
+        background: transparent;
+    }
+    .fitpulse-cal-cell.workout-day {
+        background-color: #EAF1E7;
+        border-color: #7C9473;
+    }
+    .fitpulse-cal-cell.goal-day {
+        border-color: #C79A3B;
+        box-shadow: inset 0 0 0 1px #C79A3B;
+    }
+    .fitpulse-cal-cell.today {
+        border-width: 2px;
+        border-color: #2A2A26;
+    }
+    .fitpulse-cal-daynum {
+        font-weight: 700;
+        color: #2A2A26;
+    }
+    .fitpulse-cal-tag {
+        display: block;
+        margin-top: 3px;
+        font-size: 10.5px;
+        line-height: 1.3;
+    }
+    .fitpulse-goal-card {
+        background-color: #F4F2EC;
+        border: 1px solid #E0DCCF;
+        border-left: 4px solid #C79A3B;
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+    }
+    .fitpulse-goal-card.completed {
+        border-left-color: #7C9473;
+        opacity: 0.75;
     }
 
     /* --- COMMUNITY: chat bubbles reuse the same result-card style --- */
@@ -708,7 +777,10 @@ def save_all_data(all_data):
 def get_user_data(username):
     """Get (or create) the habit data for one user."""
     all_data = load_all_data()
-    return all_data.get(username, {"habits": {}})
+    user_data = all_data.get(username, {"habits": {}, "goals": []})
+    user_data.setdefault("habits", {})
+    user_data.setdefault("goals", [])
+    return user_data
 
 
 def save_user_data(username, user_data):
@@ -749,6 +821,69 @@ def logged_today(logs):
     """Check whether there's already a log entry for today."""
     today_str = date.today().strftime("%Y-%m-%d")
     return any(entry["date"] == today_str for entry in logs)
+
+
+# ------------------------------------------------------------------
+# SECTION 5A: WORKOUT GOAL CALENDAR HELPERS
+# Goals are separate from habits: a habit is a recurring routine you
+# log day to day, while a goal is a specific target ("Run 5 miles by
+# Aug 15") tied to a date on the calendar. Goals live alongside habits
+# in the same per-user record in habit_data.json, under the "goals"
+# key, so everything for a user stays in one file.
+#
+# Goal shape:
+#   {"id": "g_1690000000000", "title": "Run 5 miles", "habit_name":
+#    "Daily 1-Mile Run" (or "" if not linked), "target_date":
+#    "2026-08-15", "target_value": 5.0, "completed": False,
+#    "created_at": "2026-08-01"}
+# ------------------------------------------------------------------
+def get_completed_workout_days(user_data):
+    """Return the set of every date (YYYY-MM-DD) with at least one
+    logged workout across all of a user's habits — i.e. every day a
+    workout was actually completed, used to mark the calendar."""
+    days = set()
+    for habit in user_data["habits"].values():
+        for entry in habit["logs"]:
+            days.add(entry["date"])
+    return days
+
+
+def count_completed_workouts(user_data):
+    """Total number of workout logs (completed workouts) across all habits."""
+    return sum(len(habit["logs"]) for habit in user_data["habits"].values())
+
+
+def add_goal(user_data, title, target_date_str, habit_name="", target_value=None):
+    """Create a new workout goal and add it to the user's goal list."""
+    goal = {
+        "id": f"g_{int(datetime.now().timestamp() * 1000)}",
+        "title": title,
+        "habit_name": habit_name,
+        "target_date": target_date_str,
+        "target_value": target_value,
+        "completed": False,
+        "created_at": date.today().strftime("%Y-%m-%d"),
+    }
+    user_data["goals"].append(goal)
+    return goal
+
+
+def set_goal_completed(user_data, goal_id, completed):
+    """Mark a goal as completed (or not) by id."""
+    for goal in user_data["goals"]:
+        if goal["id"] == goal_id:
+            goal["completed"] = completed
+            break
+
+
+def delete_goal(user_data, goal_id):
+    """Remove a goal by id."""
+    user_data["goals"] = [g for g in user_data["goals"] if g["id"] != goal_id]
+
+
+def goals_on_date(goals, date_str):
+    """Return every goal whose target_date matches the given date string."""
+    return [g for g in goals if g["target_date"] == date_str]
 
 
 # ------------------------------------------------------------------
@@ -991,7 +1126,7 @@ with header_col3:
             st.rerun()
     
     with col_back:
-        if st.session_state.page in ("habits", "community", "gym_finder", "friends_list", "profile", "signup", "login"):
+        if st.session_state.page in ("habits", "community", "gym_finder", "friends_list", "goal_calendar", "profile", "signup", "login"):
             if st.button("🏠 Home", use_container_width=True, key="back_to_home_header"):
                 st.session_state.page = "home"
                 st.rerun()
@@ -1020,7 +1155,7 @@ def render_home():
         "open the locator."
     )
 
-    # --- Feature card grid (4 cards: 3 in first row, Friends List in second) ---
+    # --- Feature card grid (5 cards: 3 in first row, 2 in second) ---
     feature_cols = st.columns(3)
 
     features = [
@@ -1035,14 +1170,15 @@ def render_home():
     # card, instead of decorative HTML with an invisible button on top
     # — that overlay approach was unreliable to click. With a single
     # real button, clicking anywhere on the card always works. All
-    # cards (Gym Finder, Communities, Habit Tracking, Friends List) 
-    # use this same pattern now, so each opens only when its card is
-    # actually clicked — there's no duplicate content.
+    # cards (Gym Finder, Communities, Habit Tracking, Friends List,
+    # Goal Calendar) use this same pattern now, so each opens only
+    # when its card is actually clicked — there's no duplicate content.
     CLICKABLE_CARDS = {
         "Gym Finder": ("gym_finder_card", "gym_finder_card_click", "gym_finder"),
         "Communities": ("community_card", "community_card_click", "community"),
         "Habit Tracking": ("habit_tracking_card", "habit_card_click", "habits"),
         "Friends List": ("friends_list_card", "friends_list_card_click", "friends_list"),
+        "Goal Calendar": ("goal_calendar_card", "goal_calendar_card_click", "goal_calendar"),
     }
 
     for col, (icon, title, text) in zip(feature_cols, features):
@@ -1070,9 +1206,9 @@ def render_home():
                     unsafe_allow_html=True,
                 )
 
-    # --- Friends List card (second row) ---
-    friends_list_cols = st.columns([1, 2, 1])
-    with friends_list_cols[1]:
+    # --- Friends List + Goal Calendar cards (second row) ---
+    second_row_cols = st.columns(2)
+    with second_row_cols[0]:
         with st.container(key="friends_list_card"):
             friends_card_clicked = st.button(
                 "👥\n\n**Friends List**\n\nView and manage all your FitPulse friends.",
@@ -1082,21 +1218,19 @@ def render_home():
             if friends_card_clicked:
                 st.session_state.page = "friends_list"
                 st.rerun()
+    with second_row_cols[1]:
+        with st.container(key="goal_calendar_card"):
+            goal_calendar_clicked = st.button(
+                "🗓️\n\n**Goal Calendar**\n\nSet workout goals and track completed workouts.",
+                key="goal_calendar_card_click",
+                use_container_width=True,
+            )
+            if goal_calendar_clicked:
+                st.session_state.page = "goal_calendar"
+                st.rerun()
 
     st.write("")  # small spacer
     st.divider()
-
-    # --- Future features ---
-    st.markdown(
-        '<div class="fitpulse-section-header">🚀 Coming Soon to FitPulse</div>',
-        unsafe_allow_html=True,
-    )
-    st.write(
-        """
-    - 🤝 **Workout Sharing** — share your progress with friends
-    - 😴 **Sleep Tracking** — monitor your rest and recovery
-    """
-    )
 
     # --- Photo gallery: real people, working out, staying active ---
     # A handful of free-to-use (Unsplash License) photos so the page
@@ -1866,6 +2000,198 @@ def render_habit_tracker():
 
 
 # ------------------------------------------------------------------
+# SECTION 9AA: WORKOUT GOAL CALENDAR PAGE
+# A dedicated page where users set workout goals tied to a specific
+# date, see them laid out on a real month calendar alongside the
+# days they actually completed a workout (any logged habit), and
+# mark goals complete as they hit them.
+# ------------------------------------------------------------------
+def render_goal_calendar():
+    st.markdown(
+        '<div class="fitpulse-section-header">🗓️ Workout Goal Calendar</div>',
+        unsafe_allow_html=True,
+    )
+    st.write(f"Set workout goals and track your completed workouts, **{username}**.")
+
+    if st.button("🏠 Back to Home", key="back_home_goal_calendar"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    user_data = get_user_data(username)
+    habits = user_data["habits"]
+    goals = user_data["goals"]
+    workout_days = get_completed_workout_days(user_data)
+    total_completed = count_completed_workouts(user_data)
+    completed_goals = sum(1 for g in goals if g["completed"])
+
+    st.divider()
+
+    # --- Quick stats ---
+    stat_cols = st.columns(3)
+    stat_cols[0].metric("✅ Completed workouts", total_completed)
+    stat_cols[1].metric("🎯 Goals set", len(goals))
+    stat_cols[2].metric("🏆 Goals completed", f"{completed_goals}/{len(goals)}" if goals else "0/0")
+
+    st.write("")
+
+    # --- Add a new goal ---
+    with st.expander("➕ Add a Workout Goal", expanded=(len(goals) == 0)):
+        with st.form("add_goal_form", clear_on_submit=True):
+            goal_title = st.text_input(
+                "Goal", placeholder="e.g., Run 5 miles without stopping"
+            )
+            goal_col1, goal_col2, goal_col3 = st.columns(3)
+            with goal_col1:
+                goal_date = st.date_input(
+                    "Target date", value=date.today() + timedelta(days=7)
+                )
+            with goal_col2:
+                linked_habit = st.selectbox(
+                    "Link to a habit (optional)",
+                    ["None"] + list(habits.keys()),
+                )
+            with goal_col3:
+                target_value = st.number_input(
+                    "Target distance (mi, optional)",
+                    min_value=0.0,
+                    value=0.0,
+                    step=0.1,
+                )
+
+            goal_submitted = st.form_submit_button("Add Goal to Calendar")
+            if goal_submitted:
+                clean_title = goal_title.strip()
+                if not clean_title:
+                    st.warning("Please describe your goal.")
+                else:
+                    add_goal(
+                        user_data,
+                        title=clean_title,
+                        target_date_str=goal_date.strftime("%Y-%m-%d"),
+                        habit_name="" if linked_habit == "None" else linked_habit,
+                        target_value=target_value if target_value > 0 else None,
+                    )
+                    save_user_data(username, user_data)
+                    st.success(f"Goal '{clean_title}' added to your calendar!")
+                    st.rerun()
+
+    st.divider()
+
+    # --- Month navigation ---
+    if "goal_calendar_month" not in st.session_state:
+        today = date.today()
+        st.session_state.goal_calendar_month = date(today.year, today.month, 1)
+
+    nav_col1, nav_col2, nav_col3 = st.columns([1, 2, 1])
+    with nav_col1:
+        if st.button("◀ Previous", key="cal_prev_month", use_container_width=True):
+            first_of_month = st.session_state.goal_calendar_month
+            prev_last_day = first_of_month - timedelta(days=1)
+            st.session_state.goal_calendar_month = date(
+                prev_last_day.year, prev_last_day.month, 1
+            )
+            st.rerun()
+    with nav_col2:
+        st.markdown(
+            f"<h3 style='text-align:center;'>{st.session_state.goal_calendar_month.strftime('%B %Y')}</h3>",
+            unsafe_allow_html=True,
+        )
+    with nav_col3:
+        if st.button("Next ▶", key="cal_next_month", use_container_width=True):
+            first_of_month = st.session_state.goal_calendar_month
+            days_in_month = calendar.monthrange(first_of_month.year, first_of_month.month)[1]
+            next_first_day = first_of_month + timedelta(days=days_in_month)
+            st.session_state.goal_calendar_month = date(
+                next_first_day.year, next_first_day.month, 1
+            )
+            st.rerun()
+
+    # --- Build the calendar grid (Mon-Sun) ---
+    cal_month = st.session_state.goal_calendar_month
+    month_weeks = calendar.Calendar(firstweekday=0).monthdatescalendar(
+        cal_month.year, cal_month.month
+    )
+    today_str = date.today().strftime("%Y-%m-%d")
+
+    day_labels = "".join(
+        f'<div class="fitpulse-cal-daylabel">{d}</div>'
+        for d in ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    )
+
+    cell_html = ""
+    for week in month_weeks:
+        for day_obj in week:
+            if day_obj.month != cal_month.month:
+                cell_html += '<div class="fitpulse-cal-cell empty"></div>'
+                continue
+            day_str = day_obj.strftime("%Y-%m-%d")
+            day_goals = goals_on_date(goals, day_str)
+            classes = ["fitpulse-cal-cell"]
+            if day_str in workout_days:
+                classes.append("workout-day")
+            if day_goals:
+                classes.append("goal-day")
+            if day_str == today_str:
+                classes.append("today")
+
+            tags = ""
+            if day_str in workout_days:
+                tags += '<span class="fitpulse-cal-tag">✅ Workout</span>'
+            for g in day_goals:
+                mark = "☑️" if g["completed"] else "🎯"
+                short_title = g["title"] if len(g["title"]) <= 16 else g["title"][:14] + "…"
+                tags += f'<span class="fitpulse-cal-tag">{mark} {short_title}</span>'
+
+            cell_html += (
+                f'<div class="{" ".join(classes)}">'
+                f'<div class="fitpulse-cal-daynum">{day_obj.day}</div>'
+                f'{tags}</div>'
+            )
+
+    st.markdown(
+        f'<div class="fitpulse-cal-grid">{day_labels}{cell_html}</div>',
+        unsafe_allow_html=True,
+    )
+    st.caption("🟢 Green = a completed workout was logged that day &nbsp;•&nbsp; 🟡 Gold outline = a goal is due that day")
+
+    st.divider()
+
+    # --- Goals list: mark complete, or delete ---
+    st.markdown("### 🎯 Your Goals")
+    if not goals:
+        st.info("You haven't set any workout goals yet — add one above to see it on the calendar.")
+    else:
+        for goal in sorted(goals, key=lambda g: g["target_date"]):
+            card_class = "fitpulse-goal-card completed" if goal["completed"] else "fitpulse-goal-card"
+            details = f"🗓️ {goal['target_date']}"
+            if goal["habit_name"]:
+                details += f" &nbsp;•&nbsp; linked to **{goal['habit_name']}**"
+            if goal["target_value"]:
+                details += f" &nbsp;•&nbsp; target **{goal['target_value']} mi**"
+
+            g_col1, g_col2, g_col3 = st.columns([4, 1, 1])
+            with g_col1:
+                st.markdown(
+                    f'<div class="{card_class}">'
+                    f'<strong>{"✅ " if goal["completed"] else ""}{goal["title"]}</strong><br>'
+                    f'<span style="color:#5A5A52; font-size:13px;">{details}</span>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+            with g_col2:
+                toggle_label = "↩️ Undo" if goal["completed"] else "✅ Complete"
+                if st.button(toggle_label, key=f"toggle_goal_{goal['id']}", use_container_width=True):
+                    set_goal_completed(user_data, goal["id"], not goal["completed"])
+                    save_user_data(username, user_data)
+                    st.rerun()
+            with g_col3:
+                if st.button("🗑️ Delete", key=f"delete_goal_{goal['id']}", use_container_width=True):
+                    delete_goal(user_data, goal["id"])
+                    save_user_data(username, user_data)
+                    st.rerun()
+
+
+# ------------------------------------------------------------------
 # SECTION 9A: SHARED AUTH PAGE STYLE (Sign Up + Log In)
 # Both pages use the same "split card" look from the reference design:
 # a plain white form panel on one side, and a colored info panel with
@@ -2351,6 +2677,8 @@ elif st.session_state.page == "community":
     render_community()
 elif st.session_state.page == "friends_list":
     render_friends_list()
+elif st.session_state.page == "goal_calendar":
+    render_goal_calendar()
 elif st.session_state.page == "gym_finder":
     render_gym_finder()
 elif st.session_state.page == "profile":
