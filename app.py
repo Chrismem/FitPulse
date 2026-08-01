@@ -161,6 +161,7 @@ st.markdown(
     .st-key-habit_tracking_card button,
     .st-key-community_card button,
     .st-key-gym_finder_card button,
+    .st-key-friends_list_card button,
     .st-key-goal_calendar_card button {
         background-color: #FFFFFF !important;
         border: 1px solid #E0E0E0 !important;
@@ -175,6 +176,7 @@ st.markdown(
     .st-key-habit_tracking_card button:hover,
     .st-key-community_card button:hover,
     .st-key-gym_finder_card button:hover,
+    .st-key-friends_list_card button:hover,
     .st-key-goal_calendar_card button:hover {
         transform: translateY(-4px);
         box-shadow: 0 10px 22px rgba(0,0,0,0.14) !important;
@@ -183,12 +185,14 @@ st.markdown(
     .st-key-habit_tracking_card button:active,
     .st-key-community_card button:active,
     .st-key-gym_finder_card button:active,
+    .st-key-friends_list_card button:active,
     .st-key-goal_calendar_card button:active {
         transform: translateY(-1px);
     }
     .st-key-habit_tracking_card button p,
     .st-key-community_card button p,
     .st-key-gym_finder_card button p,
+    .st-key-friends_list_card button p,
     .st-key-goal_calendar_card button p {
         margin: 6px 0 0 0;
         color: #444;
@@ -198,6 +202,7 @@ st.markdown(
     .st-key-habit_tracking_card button p:first-of-type,
     .st-key-community_card button p:first-of-type,
     .st-key-gym_finder_card button p:first-of-type,
+    .st-key-friends_list_card button p:first-of-type,
     .st-key-goal_calendar_card button p:first-of-type {
         font-size: 34px;
         margin-top: 0;
@@ -205,6 +210,7 @@ st.markdown(
     .st-key-habit_tracking_card button p strong,
     .st-key-community_card button p strong,
     .st-key-gym_finder_card button p strong,
+    .st-key-friends_list_card button p strong,
     .st-key-goal_calendar_card button p strong {
         color: #2A2A26;
         font-size: 17px;
@@ -270,6 +276,38 @@ st.markdown(
     .fitpulse-goal-card.completed {
         border-left-color: #7C9473;
         opacity: 0.75;
+    }
+
+    /* --- TOP NAVIGATION BAR (feature quick-links, top-left of header) --- */
+    .st-key-top_navbar {
+        background-color: #F4F2EC;
+        border: 1px solid #E4E1D8;
+        border-radius: 999px;
+        padding: 5px 8px;
+        display: flex;
+        align-items: center;
+    }
+    .st-key-top_navbar button {
+        background-color: transparent !important;
+        border: none !important;
+        color: #4A4A42 !important;
+        font-weight: 600 !important;
+        font-size: 12.5px !important;
+        padding: 7px 4px !important;
+        border-radius: 999px !important;
+        box-shadow: none !important;
+        white-space: nowrap;
+    }
+    .st-key-top_navbar button:hover {
+        background-color: #E7E3D6 !important;
+        color: #2A2A26 !important;
+    }
+    .st-key-top_navbar button[kind="primary"] {
+        background-color: #7C9473 !important;
+        color: #FFFFFF !important;
+    }
+    .st-key-top_navbar button[kind="primary"]:hover {
+        background-color: #66805C !important;
     }
 
     /* --- COMMUNITY: chat bubbles reuse the same result-card style --- */
@@ -1111,7 +1149,34 @@ username = st.session_state.username.strip() or "Guest"
 user_profile = get_user_profile(username)
 avatar_emoji = user_profile.get("avatar_emoji", "🏋️")
 
+# Feature quick-links shown in the top navigation bar, in the same
+# order as the feature cards on the home page, so the bar and the
+# cards always point to the same set of pages.
+NAV_ITEMS = [
+    ("🏠", "Home", "home"),
+    ("📍", "Gyms", "gym_finder"),
+    ("🌐", "Community", "community"),
+    ("✅", "Habits", "habits"),
+    ("👥", "Friends", "friends_list"),
+    ("🗓️", "Goals", "goal_calendar"),
+]
+
 header_col1, header_col2, header_col3 = st.columns([2.5, 0.5, 1.5])
+
+with header_col1:
+    with st.container(key="top_navbar"):
+        nav_cols = st.columns(len(NAV_ITEMS))
+        for nav_col, (nav_icon, nav_label, nav_page) in zip(nav_cols, NAV_ITEMS):
+            with nav_col:
+                is_active_page = st.session_state.page == nav_page
+                if st.button(
+                    f"{nav_icon} {nav_label}",
+                    key=f"nav_{nav_page}",
+                    use_container_width=True,
+                    type="primary" if is_active_page else "secondary",
+                ):
+                    st.session_state.page = nav_page
+                    st.rerun()
 
 with header_col3:
     st.markdown(
