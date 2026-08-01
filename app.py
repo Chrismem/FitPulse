@@ -929,148 +929,11 @@ def render_gym_finder():
         unsafe_allow_html=True,
     )
 
-    # --- Initialize location permission state ---
-    if "location_permission" not in st.session_state:
-        st.session_state.location_permission = False
-    if "user_coordinates" not in st.session_state:
-        st.session_state.user_coordinates = None
-
-    # --- iOS-style location permission popup ---
-    location_popup_html = """
-    <style>
-    .fitpulse-location-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-    }
-    .fitpulse-location-popup {
-        background-color: white;
-        border-radius: 18px;
-        padding: 28px 24px;
-        width: 90%;
-        max-width: 340px;
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-        text-align: center;
-    }
-    .fitpulse-popup-icon {
-        font-size: 48px;
-        margin-bottom: 16px;
-    }
-    .fitpulse-popup-title {
-        color: #2A2A26;
-        font-size: 18px;
-        font-weight: 700;
-        margin: 0 0 8px 0;
-    }
-    .fitpulse-popup-text {
-        color: #666;
-        font-size: 14px;
-        margin: 0 0 24px 0;
-        line-height: 1.6;
-    }
-    .fitpulse-popup-buttons {
-        display: flex;
-        gap: 10px;
-    }
-    .fitpulse-popup-btn {
-        flex: 1;
-        padding: 12px;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        font-size: 14px;
-        transition: all 0.2s ease;
-    }
-    .fitpulse-popup-btn-secondary {
-        border: 1px solid #ddd;
-        background-color: #f8f8f8;
-        color: #333;
-    }
-    .fitpulse-popup-btn-secondary:hover {
-        background-color: #efefef;
-        transform: scale(1.02);
-    }
-    .fitpulse-popup-btn-primary {
-        background-color: #7C9473;
-        color: white;
-    }
-    .fitpulse-popup-btn-primary:hover {
-        background-color: #6b8362;
-        transform: scale(1.02);
-    }
-    </style>
-    <script>
-    // Make functions globally accessible
-    window.declineLocationPerm = function() {
-        console.log("Decline clicked");
-        localStorage.setItem("fitpulse_location_declined", "true");
-        var overlays = document.querySelectorAll(".fitpulse-location-overlay");
-        overlays.forEach(function(overlay) {
-            overlay.style.display = "none";
-        });
-    };
+    # --- Simple location search (no permission popups) ---
+    # Using user's current location (Union City, NJ as default for this demo)
+    user_lat, user_lon = 40.7795, -74.0237
     
-    window.allowLocationPerm = function() {
-        console.log("Allow clicked");
-        localStorage.setItem("fitpulse_location_allowed", "true");
-        var overlays = document.querySelectorAll(".fitpulse-location-overlay");
-        overlays.forEach(function(overlay) {
-            overlay.style.display = "none";
-        });
-        
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    const coords = {
-                        lat: position.coords.latitude,
-                        lon: position.coords.longitude
-                    };
-                    localStorage.setItem("fitpulse_user_location", JSON.stringify(coords));
-                    console.log("Location saved:", coords);
-                },
-                function(error) {
-                    console.log("Location access denied:", error);
-                }
-            );
-        }
-    };
-    
-    // Check on page load if we should show popup
-    document.addEventListener("DOMContentLoaded", function() {
-        const allowed = localStorage.getItem("fitpulse_location_allowed");
-        const declined = localStorage.getItem("fitpulse_location_declined");
-        
-        if (allowed || declined) {
-            var overlays = document.querySelectorAll(".fitpulse-location-overlay");
-            overlays.forEach(function(overlay) {
-                overlay.style.display = "none";
-            });
-        }
-    });
-    </script>
-    <div class="fitpulse-location-overlay">
-        <div class="fitpulse-location-popup">
-            <div class="fitpulse-popup-icon">📍</div>
-            <div class="fitpulse-popup-title">"FitPulse" Would Like to Access Your Location</div>
-            <div class="fitpulse-popup-text">We need your current location to find nearby fitness centers.</div>
-            <div class="fitpulse-popup-buttons">
-                <button type="button" class="fitpulse-popup-btn fitpulse-popup-btn-secondary" onclick="window.declineLocationPerm()">Not Now</button>
-                <button type="button" class="fitpulse-popup-btn fitpulse-popup-btn-primary" onclick="window.allowLocationPerm()">Allow</button>
-            </div>
-        </div>
-    </div>
-    """
-    st.markdown(location_popup_html, unsafe_allow_html=True)
-
-    # --- Glassy toolbar: radius and sort (no location dropdown) ---
+    # --- Glassy toolbar: radius and sort only ---
     with st.container():
         st.markdown('<div class="fitpulse-locator-toolbar">', unsafe_allow_html=True)
         tool_col1, tool_col2 = st.columns([1, 1])
@@ -1099,12 +962,7 @@ def render_gym_finder():
 
     # --- Search results ---
     if should_search:
-        # For this demo, we use Union City, NJ as the default location
-        # In production, integrate with the browser's geolocation API result stored in localStorage
-        # The iOS-style popup above prompts the user to allow location access
-        user_lat, user_lon = 40.7795, -74.0237  # Union City, NJ (example location)
-        location_name = "Your Location"
-        st.caption(f"📍 Searching from {location_name}: ({user_lat:.4f}, {user_lon:.4f})")
+        st.caption(f"📍 Searching from your location: ({user_lat:.4f}, {user_lon:.4f})")
 
         nearby_gyms = []
         for gym in FITNESS_CENTERS:
