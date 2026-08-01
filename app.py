@@ -1006,7 +1006,21 @@ def render_gym_finder():
     }
     </style>
     <script>
-    function requestLocation() {
+    function declineLocationPerm() {
+        localStorage.setItem("fitpulse_location_declined", "true");
+        var overlay = document.querySelector(".fitpulse-location-overlay");
+        if (overlay) {
+            overlay.style.display = "none";
+        }
+    }
+    
+    function allowLocationPerm() {
+        localStorage.setItem("fitpulse_location_allowed", "true");
+        var overlay = document.querySelector(".fitpulse-location-overlay");
+        if (overlay) {
+            overlay.style.display = "none";
+        }
+        
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 function(position) {
@@ -1015,29 +1029,22 @@ def render_gym_finder():
                         lon: position.coords.longitude
                     };
                     localStorage.setItem("fitpulse_user_location", JSON.stringify(coords));
-                    document.querySelector(".fitpulse-location-overlay").style.display = "none";
-                    location.reload();
                 },
                 function(error) {
-                    alert("Unable to access location. Please check your browser settings.");
+                    console.log("Location access denied");
                 }
             );
-        } else {
-            alert("Geolocation is not supported by your browser.");
         }
     }
     
-    function declineLocation() {
-        localStorage.setItem("fitpulse_location_declined", "true");
-        document.querySelector(".fitpulse-location-overlay").style.display = "none";
-    }
-    
-    // Check on page load
+    // Check on page load if we should show popup
     window.addEventListener("load", function() {
-        const saved = localStorage.getItem("fitpulse_user_location");
+        const allowed = localStorage.getItem("fitpulse_location_allowed");
         const declined = localStorage.getItem("fitpulse_location_declined");
-        if (saved || declined) {
-            document.querySelector(".fitpulse-location-overlay").style.display = "none";
+        var overlay = document.querySelector(".fitpulse-location-overlay");
+        
+        if ((allowed || declined) && overlay) {
+            overlay.style.display = "none";
         }
     });
     </script>
@@ -1047,8 +1054,8 @@ def render_gym_finder():
             <div class="fitpulse-popup-title">"FitPulse" Would Like to Access Your Location</div>
             <div class="fitpulse-popup-text">We need your current location to find nearby fitness centers.</div>
             <div class="fitpulse-popup-buttons">
-                <button class="fitpulse-popup-btn fitpulse-popup-btn-secondary" onclick="declineLocation()">Not Now</button>
-                <button class="fitpulse-popup-btn fitpulse-popup-btn-primary" onclick="requestLocation()">Allow</button>
+                <button class="fitpulse-popup-btn fitpulse-popup-btn-secondary" onclick="declineLocationPerm()">Not Now</button>
+                <button class="fitpulse-popup-btn fitpulse-popup-btn-primary" onclick="allowLocationPerm()">Allow</button>
             </div>
         </div>
     </div>
