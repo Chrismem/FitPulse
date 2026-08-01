@@ -1632,8 +1632,6 @@ def render_signup():
                                 st.error("❌ Please enter your name.")
                             elif not email.strip() or "@" not in email:
                                 st.error("❌ Please enter a valid email address.")
-                            elif not phone.strip():
-                                st.error("❌ Please enter your phone number.")
                             elif not password:
                                 st.error("❌ Please choose a password.")
                             elif password != confirm_password:
