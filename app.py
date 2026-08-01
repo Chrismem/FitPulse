@@ -38,6 +38,7 @@ from datetime import date, datetime, time as time_cls, timedelta
 
 import pandas as pd
 import streamlit as st
+import extra_streamlit_components as stx
 
 # ------------------------------------------------------------------
 # SECTION 1: PAGE SETUP
@@ -1119,17 +1120,66 @@ def send_message(sender, recipient, text):
 
 
 # ------------------------------------------------------------------
-# SECTION 6: SESSION STATE (controls which "view" we're on)
-# st.session_state persists across reruns of the same browser tab.
-# We use it as a simple router: "home" or "habits". Switching this
-# value + calling st.rerun() redraws the page in place — no new
-# browser tab, no page reload, just a different view of the same app.
+# SECTION 6: SESSION STATE (controls which "view" we're on) +
+# LOGIN PERSISTENCE (controls whether you stay logged in)
+#
+# st.session_state only lives in memory for as long as your browser
+# tab's connection to the app stays open — a page refresh throws it
+# away and you'd be back to "Guest". To fix that, we ALSO save the
+# logged-in username in a browser cookie. Cookies are little pieces
+# of data the browser stores on your device and hands back to the
+# app on every visit, so:
+#   - Sign up / log in  -> we save a cookie on this device.
+#   - Refresh the page  -> the cookie is still there, so we log you
+#                           right back in automatically.
+#   - Click "Log Out"   -> we delete the cookie, so you go back to
+#                           being a Guest until you log in again.
 # ------------------------------------------------------------------
+LOGIN_COOKIE_NAME = "fitpulse_username"
+
+
+def get_cookie_manager():
+    """One CookieManager per script run, talking to the browser's cookies."""
+    return stx.CookieManager(key="fitpulse_cookie_manager")
+
+
+cookie_manager = get_cookie_manager()
+# get_all() reads every cookie the browser has for this app. On the very
+# first run in a brand-new tab this can briefly come back empty while the
+# browser and the app finish their handshake — that's normal and Streamlit
+# will automatically rerun once the real cookies arrive.
+saved_cookies = cookie_manager.get_all(key="fitpulse_cookie_get_all") or {}
+
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
 if "username" not in st.session_state:
+    saved_username = (saved_cookies.get(LOGIN_COOKIE_NAME) or "").strip()
+    st.session_state.username = saved_username or "Guest"
+
+
+def login_user(name):
+    """Log a user in for real: remember them in this tab's session AND
+    write a cookie to this device so a page refresh (or closing and
+    reopening the browser) keeps them logged in automatically."""
+    name = name.strip() or "Guest"
+    st.session_state.username = name
+    cookie_manager.set(
+        LOGIN_COOKIE_NAME,
+        name,
+        expires_at=datetime.now() + timedelta(days=365),
+        key="fitpulse_cookie_set",
+    )
+
+
+def logout_user():
+    """The ONLY way a user gets signed out: clears this tab's session
+    AND deletes the saved cookie, so they won't be auto logged back in
+    on the next refresh."""
     st.session_state.username = "Guest"
+    st.session_state.page = "home"
+    if LOGIN_COOKIE_NAME in saved_cookies:
+        cookie_manager.delete(LOGIN_COOKIE_NAME, key="fitpulse_cookie_delete")
 
 
 # ------------------------------------------------------------------
@@ -1180,20 +1230,45 @@ with header_col1:
 
 with header_col3:
     st.markdown(
+        """
+        <style>
+        /* Small, square icon-only button for Log Out, sized to sit
+           neatly next to the other header buttons. */
+        .st-key-header_logout_btn button {
+            font-size: 18px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(
         f'<div style="text-align: right; font-weight: 700; color: #2A2A26; margin-bottom: 8px;">{avatar_emoji} {username}</div>',
         unsafe_allow_html=True,
     )
-    
-    col_profile, col_back = st.columns(2)
+
+    is_logged_in = username != "Guest"
+    header_cols = st.columns(3 if is_logged_in else 2)
+    col_profile = header_cols[0]
+    col_back = header_cols[1]
+    col_logout = header_cols[2] if is_logged_in else None
+
     with col_profile:
         if st.button("👤 Profile", use_container_width=True, key="header_profile_btn"):
             st.session_state.page = "profile"
             st.rerun()
-    
+
     with col_back:
         if st.session_state.page in ("habits", "community", "gym_finder", "friends_list", "goal_calendar", "profile", "signup", "login"):
             if st.button("🏠 Home", use_container_width=True, key="back_to_home_header"):
                 st.session_state.page = "home"
+                st.rerun()
+
+    # The ONLY way to sign out — clears the session AND deletes the
+    # login cookie so you won't be auto logged back in on refresh.
+    if col_logout is not None:
+        with col_logout:
+            if st.button("🚪", use_container_width=True, key="header_logout_btn", help="Log out"):
+                logout_user()
                 st.rerun()
 
 st.divider()
@@ -1341,7 +1416,7 @@ def render_home():
         unsafe_allow_html=True,
     )
 
-    st.caption("FitPulse — Sprint 3 Demo | Built with Python + Streamlit")
+    st.caption("FitPulse — Sprint 2 Demo | Built with Python + Streamlit")
 
 
 # ------------------------------------------------------------------
@@ -2459,7 +2534,7 @@ def render_signup():
                                     f"Welcome to FitPulse, **{full_name}**! 🎉\n\n"
                                     "*Redirecting you back to the app...*"
                                 )
-                                st.session_state.username = username
+                                login_user(username)
                                 st.session_state.page = "home"
                                 import time
                                 time.sleep(2)
@@ -2558,11 +2633,31 @@ def render_login():
                             elif not password:
                                 st.error("❌ Please enter your password.")
                             else:
-                                st.success("✅ Logged in! Redirecting you back to the app...")
-                                st.session_state.page = "home"
-                                import time
-                                time.sleep(1)
-                                st.rerun()
+                                # Look up which saved account this email
+                                # belongs to, so logging in actually signs
+                                # you back into YOUR account (not just
+                                # whichever guest name happened to be set).
+                                entered = phone_or_email.strip().lower()
+                                all_profiles = load_all_profiles()
+                                matched_username = None
+                                for existing_name, profile in all_profiles.items():
+                                    if profile.get("email", "").strip().lower() == entered:
+                                        matched_username = existing_name
+                                        break
+
+                                if matched_username is None:
+                                    st.error(
+                                        "❌ We couldn't find an account with that "
+                                        "email. Check the spelling, or sign up "
+                                        "below if you're new here."
+                                    )
+                                else:
+                                    st.success("✅ Logged in! Redirecting you back to the app...")
+                                    login_user(matched_username)
+                                    st.session_state.page = "home"
+                                    import time
+                                    time.sleep(1)
+                                    st.rerun()
 
                     st.markdown(
                         '<p style="text-align:center; font-size:13.5px; color:#767268; '
