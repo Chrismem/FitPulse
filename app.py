@@ -259,6 +259,78 @@ st.markdown(
         margin-bottom: 12px;
     }
 
+    /* --- USER PROFILE CARD --- */
+    .fitpulse-profile-card {
+        background: linear-gradient(135deg, #F4F2EC 0%, #FFFFFF 100%);
+        border: 1px solid #E0E0E0;
+        border-radius: 16px;
+        padding: 28px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .fitpulse-profile-header {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    .fitpulse-profile-avatar-large {
+        font-size: 64px;
+        width: 96px;
+        height: 96px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #FFFFFF;
+        border: 2px solid #7C9473;
+        border-radius: 50%;
+    }
+    .fitpulse-profile-name-section h2 {
+        margin: 0 0 4px 0;
+        color: #2A2A26;
+        font-size: 28px;
+    }
+    .fitpulse-profile-name-section p {
+        margin: 4px 0;
+        color: #8A8A80;
+        font-size: 15px;
+    }
+    .fitpulse-profile-attributes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+    }
+    .fitpulse-profile-attr-item {
+        background-color: #FFFFFF;
+        border: 1px solid #E0E0E0;
+        border-radius: 10px;
+        padding: 14px;
+        text-align: center;
+    }
+    .fitpulse-profile-attr-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #8A8A80;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+    .fitpulse-profile-attr-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2A2A26;
+    }
+
+    /* --- EDIT PROFILE FORM --- */
+    .fitpulse-edit-section {
+        background-color: #FFFFFF;
+        border: 1px solid #E0E0E0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+
     /* --- HABIT TRACKER: streak badge --- */
     .fitpulse-streak-badge {
         display: inline-block;
@@ -680,7 +752,93 @@ def logged_today(logs):
 
 
 # ------------------------------------------------------------------
-# SECTION 5B: COMMUNITY DATA HELPERS (friends + chat)
+# SECTION 5B: USER PROFILE DATA HELPERS
+# Store user profile information (username, fitness level, 
+# favorite workout, avatar emoji, bio) in a separate JSON file.
+# This allows personalization while keeping habit data separate.
+#
+# Data shape:
+# {
+#   "Alex": {
+#     "full_name": "Alexander Johnson",
+#     "email": "alex@example.com",
+#     "fitness_level": "intermediate",
+#     "favorite_workout": "running",
+#     "avatar_emoji": "🏃",
+#     "bio": "Love morning runs!",
+#     "created_at": "2026-07-28"
+#   }
+# }
+# ------------------------------------------------------------------
+PROFILE_FILE = "profile_data.json"
+
+
+def load_all_profiles():
+    """Read the whole profile_data.json file into a Python dict."""
+    if os.path.exists(PROFILE_FILE):
+        try:
+            with open(PROFILE_FILE, "r") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            return {}
+    return {}
+
+
+def save_all_profiles(all_profiles):
+    """Write the whole profile data dict back to profile_data.json."""
+    with open(PROFILE_FILE, "w") as f:
+        json.dump(all_profiles, f, indent=2)
+
+
+def get_user_profile(username):
+    """Get the profile data for one user, or return defaults if not found."""
+    all_profiles = load_all_profiles()
+    if username in all_profiles:
+        return all_profiles[username]
+    # Return default profile if user doesn't have one yet
+    return {
+        "full_name": username,
+        "email": "",
+        "fitness_level": "Beginner",
+        "favorite_workout": "General Fitness",
+        "avatar_emoji": "🏋️",
+        "bio": "FitPulse Member",
+        "created_at": date.today().strftime("%Y-%m-%d"),
+    }
+
+
+def save_user_profile(username, profile_data):
+    """Save one user's profile data back into the shared file."""
+    all_profiles = load_all_profiles()
+    all_profiles[username] = profile_data
+    save_all_profiles(all_profiles)
+
+
+def update_user_profile(username, **kwargs):
+    """Update specific fields in a user's profile."""
+    profile = get_user_profile(username)
+    profile.update(kwargs)
+    save_user_profile(username, profile)
+
+
+# Define fitness level and workout type options
+FITNESS_LEVELS = ["Beginner", "Intermediate", "Advanced"]
+WORKOUT_TYPES = [
+    "Running",
+    "Weightlifting",
+    "Yoga",
+    "Cycling",
+    "Swimming",
+    "CrossFit",
+    "Pilates",
+    "HIIT",
+    "General Fitness",
+]
+AVATAR_EMOJIS = ["🏋️", "🏃", "🚴", "🏊", "🧘", "💪", "⛹️", "🤸", "🏃‍♀️"]
+
+
+# ------------------------------------------------------------------
+# SECTION 5C: COMMUNITY DATA HELPERS (friends + chat)
 # Just like habit data, community data (who's on the app, who's
 # friends with who, and chat messages) is saved to a small JSON
 # file on disk so it's remembered between visits.
@@ -802,33 +960,41 @@ if "username" not in st.session_state:
 
 
 # ------------------------------------------------------------------
-username = st.session_state.username.strip() or "Guest"
 # Make sure this person shows up for others in "Discover People".
-register_user(username)
+# ------------------------------------------------------------------
+def init_username():
+    global username
+    username = st.session_state.username.strip() or "Guest"
+    register_user(username)
+
+init_username()
 
 # ------------------------------------------------------------------
 # SECTION 7: TOP-RIGHT HEADER (user profile + navigation)
 # ------------------------------------------------------------------
-header_col1, header_col2, header_col3 = st.columns([3, 1, 2])
+username = st.session_state.username.strip() or "Guest"
+user_profile = get_user_profile(username)
+avatar_emoji = user_profile.get("avatar_emoji", "🏋️")
+
+header_col1, header_col2, header_col3 = st.columns([2.5, 0.5, 1.5])
 
 with header_col3:
     st.markdown(
-        '<div style="text-align: right; font-weight: 700; color: #2A2A26; margin-bottom: 8px;">👤 Your Profile</div>',
+        f'<div style="text-align: right; font-weight: 700; color: #2A2A26; margin-bottom: 8px;">{avatar_emoji} {username}</div>',
         unsafe_allow_html=True,
     )
-    st.session_state.username = st.text_input(
-        "Your name",
-        value=st.session_state.username,
-        key="profile_name_input",
-        label_visibility="collapsed",
-        placeholder="Enter your name",
-    )
-    st.caption("Tip: use the same name each time", help="Habits and progress are saved per name, so each person on this computer can track their own habits separately.")
     
-    if st.session_state.page in ("habits", "community", "gym_finder", "friends_list", "signup", "login"):
-        if st.button("🏠 Back to Home", use_container_width=True, key="back_to_home_header"):
-            st.session_state.page = "home"
+    col_profile, col_back = st.columns(2)
+    with col_profile:
+        if st.button("👤 Profile", use_container_width=True, key="header_profile_btn"):
+            st.session_state.page = "profile"
             st.rerun()
+    
+    with col_back:
+        if st.session_state.page in ("habits", "community", "gym_finder", "friends_list", "profile", "signup", "login"):
+            if st.button("🏠 Home", use_container_width=True, key="back_to_home_header"):
+                st.session_state.page = "home"
+                st.rerun()
 
 st.divider()
 
@@ -1371,9 +1537,13 @@ def render_community():
             )
         else:
             for person in matches:
+                person_profile = get_user_profile(person)
+                person_avatar = person_profile.get("avatar_emoji", "🏋️")
+                person_fitness = person_profile.get("favorite_workout", "General Fitness")
+                
                 person_col, action_col = st.columns([3, 1])
                 with person_col:
-                    st.markdown(f"🧑 **{person}**")
+                    st.markdown(f"{person_avatar} **{person}** • {person_fitness}")
                 with action_col:
                     if person in current_friends:
                         st.button(
@@ -1473,15 +1643,17 @@ def render_friends_list():
     st.markdown(f"**{len(filtered_friends)} Friend{'s' if len(filtered_friends) != 1 else ''}**")
     
     for friend in filtered_friends:
+        friend_profile = get_user_profile(friend)
+        friend_avatar = friend_profile.get("avatar_emoji", "🏋️")
+        friend_fitness = friend_profile.get("fitness_level", "Beginner")
+        
         col_avatar, col_info, col_action = st.columns([0.5, 2.5, 1])
 
         with col_avatar:
-            # Default avatar (first letter of friend's name in a circle)
-            avatar_emoji = "👤"
             st.markdown(
                 f"""
                 <div class="fitpulse-friend-avatar" style="text-align: center;">
-                    {avatar_emoji}
+                    {friend_avatar}
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -1491,7 +1663,7 @@ def render_friends_list():
             st.markdown(
                 f"""
                 <div class="fitpulse-friend-name-text">{friend}</div>
-                <div style="font-size: 13px; color: #8A8A80;">FitPulse Member</div>
+                <div style="font-size: 13px; color: #8A8A80;">📊 {friend_fitness} • FitPulse Member</div>
                 """,
                 unsafe_allow_html=True,
             )
@@ -1825,6 +1997,40 @@ def render_signup():
                         full_name = st.text_input("Name", placeholder="e.g., John Doe")
                         email = st.text_input("E-mail", placeholder="e.g., john@example.com")
                         phone = st.text_input("Phone Number", placeholder="e.g., (555) 123-4567")
+                        
+                        # Profile attributes
+                        st.markdown("<hr>", unsafe_allow_html=True)
+                        st.caption("**Complete your fitness profile** (you can update this later)")
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            fitness_level = st.selectbox(
+                                "Fitness Level",
+                                FITNESS_LEVELS,
+                                key="signup_fitness",
+                            )
+                        with col2:
+                            favorite_workout = st.selectbox(
+                                "Favorite Workout",
+                                WORKOUT_TYPES,
+                                key="signup_workout",
+                            )
+                        
+                        avatar_emoji = st.selectbox(
+                            "Choose Your Avatar",
+                            AVATAR_EMOJIS,
+                            key="signup_avatar",
+                        )
+                        
+                        bio = st.text_area(
+                            "Bio (optional)",
+                            placeholder="Tell us about your fitness goals!",
+                            max_chars=150,
+                            height=60,
+                            key="signup_bio",
+                        )
+                        
+                        st.markdown("<hr>", unsafe_allow_html=True)
                         password = st.text_input("Password", type="password")
                         confirm_password = st.text_input("Confirm Password", type="password")
 
@@ -1844,12 +2050,25 @@ def render_signup():
                             elif password != confirm_password:
                                 st.error("❌ Passwords don't match.")
                             else:
+                                # Create account and save profile
+                                username = full_name.strip()
+                                profile_data = {
+                                    "full_name": full_name.strip(),
+                                    "email": email.strip(),
+                                    "fitness_level": fitness_level,
+                                    "favorite_workout": favorite_workout,
+                                    "avatar_emoji": avatar_emoji,
+                                    "bio": bio.strip() or "FitPulse Member",
+                                    "created_at": date.today().strftime("%Y-%m-%d"),
+                                }
+                                save_user_profile(username, profile_data)
+                                
                                 st.success("✅ Account created successfully!")
                                 st.info(
                                     f"Welcome to FitPulse, **{full_name}**! 🎉\n\n"
                                     "*Redirecting you back to the app...*"
                                 )
-                                st.session_state.username = full_name.strip()
+                                st.session_state.username = username
                                 st.session_state.page = "home"
                                 import time
                                 time.sleep(2)
@@ -1965,6 +2184,165 @@ def render_login():
 
 
 # ------------------------------------------------------------------
+# SECTION 9D: PROFILE PAGE
+# Display and edit user profile information including fitness level,
+# favorite workout type, avatar, and bio.
+# ------------------------------------------------------------------
+def render_profile():
+    st.markdown(
+        '<div class="fitpulse-section-header">👤 My Profile</div>',
+        unsafe_allow_html=True,
+    )
+    st.write(f"View and manage your FitPulse profile, **{username}**.")
+
+    if st.button("🏠 Back to Home", key="back_home_profile"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    st.divider()
+
+    # Load user profile
+    profile = get_user_profile(username)
+
+    # --- PROFILE VIEW MODE (DEFAULT) ---
+    if "edit_profile_mode" not in st.session_state:
+        st.session_state.edit_profile_mode = False
+
+    if not st.session_state.edit_profile_mode:
+        # Display profile card
+        st.markdown(
+            f"""
+            <div class="fitpulse-profile-card">
+                <div class="fitpulse-profile-header">
+                    <div class="fitpulse-profile-avatar-large">{profile.get('avatar_emoji', '🏋️')}</div>
+                    <div class="fitpulse-profile-name-section">
+                        <h2>{profile.get('full_name', username)}</h2>
+                        <p>📧 {profile.get('email', 'No email')}</p>
+                        <p>💬 "{profile.get('bio', 'FitPulse Member')}"</p>
+                        <p style="color: #7C9473; font-weight: 600;">Member since {profile.get('created_at', 'Recently')}</p>
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        # Profile attributes grid
+        st.markdown("### 🎯 Fitness Profile")
+        attr_col1, attr_col2, attr_col3 = st.columns(3)
+
+        with attr_col1:
+            st.markdown(
+                f"""
+                <div class="fitpulse-profile-attr-item">
+                    <div class="fitpulse-profile-attr-label">Fitness Level</div>
+                    <div class="fitpulse-profile-attr-value">{profile.get('fitness_level', 'Beginner')}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with attr_col2:
+            st.markdown(
+                f"""
+                <div class="fitpulse-profile-attr-item">
+                    <div class="fitpulse-profile-attr-label">Favorite Workout</div>
+                    <div class="fitpulse-profile-attr-value">{profile.get('favorite_workout', 'General Fitness')}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with attr_col3:
+            st.markdown(
+                f"""
+                <div class="fitpulse-profile-attr-item">
+                    <div class="fitpulse-profile-attr-label">Avatar</div>
+                    <div class="fitpulse-profile-attr-value">{profile.get('avatar_emoji', '🏋️')}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        st.divider()
+
+        # Edit button
+        if st.button("✏️ Edit Profile", use_container_width=True, key="edit_profile_btn"):
+            st.session_state.edit_profile_mode = True
+            st.rerun()
+
+    else:
+        # --- EDIT PROFILE MODE ---
+        st.markdown("### ✏️ Edit Your Profile")
+
+        with st.form("edit_profile_form"):
+            new_full_name = st.text_input(
+                "Full Name",
+                value=profile.get("full_name", username),
+                key="edit_full_name",
+            )
+            new_email = st.text_input(
+                "Email",
+                value=profile.get("email", ""),
+                key="edit_email",
+            )
+            new_bio = st.text_area(
+                "Bio",
+                value=profile.get("bio", ""),
+                max_chars=150,
+                height=80,
+                key="edit_bio",
+            )
+
+            col1, col2 = st.columns(2)
+            with col1:
+                new_fitness_level = st.selectbox(
+                    "Fitness Level",
+                    FITNESS_LEVELS,
+                    index=FITNESS_LEVELS.index(profile.get("fitness_level", "Beginner")),
+                    key="edit_fitness",
+                )
+
+            with col2:
+                new_favorite_workout = st.selectbox(
+                    "Favorite Workout",
+                    WORKOUT_TYPES,
+                    index=WORKOUT_TYPES.index(profile.get("favorite_workout", "General Fitness")),
+                    key="edit_workout",
+                )
+
+            new_avatar_emoji = st.selectbox(
+                "Avatar Emoji",
+                AVATAR_EMOJIS,
+                index=AVATAR_EMOJIS.index(profile.get("avatar_emoji", "🏋️")),
+                key="edit_avatar",
+            )
+
+            col_save, col_cancel = st.columns(2)
+            with col_save:
+                if st.form_submit_button("💾 Save Changes", use_container_width=True):
+                    # Update profile
+                    profile["full_name"] = new_full_name.strip() or username
+                    profile["email"] = new_email.strip()
+                    profile["fitness_level"] = new_fitness_level
+                    profile["favorite_workout"] = new_favorite_workout
+                    profile["avatar_emoji"] = new_avatar_emoji
+                    profile["bio"] = new_bio.strip() or "FitPulse Member"
+
+                    save_user_profile(username, profile)
+                    st.success("✅ Profile updated successfully!")
+                    st.session_state.edit_profile_mode = False
+                    import time
+                    time.sleep(1)
+                    st.rerun()
+
+            with col_cancel:
+                if st.form_submit_button("❌ Cancel", use_container_width=True):
+                    st.session_state.edit_profile_mode = False
+                    st.rerun()
+
+
+# ------------------------------------------------------------------
 # SECTION 10: ROUTER — draw whichever page we're on
 # ------------------------------------------------------------------
 if st.session_state.page == "habits":
@@ -1975,6 +2353,8 @@ elif st.session_state.page == "friends_list":
     render_friends_list()
 elif st.session_state.page == "gym_finder":
     render_gym_finder()
+elif st.session_state.page == "profile":
+    render_profile()
 elif st.session_state.page == "signup":
     render_signup()
 elif st.session_state.page == "login":
