@@ -929,11 +929,51 @@ def render_gym_finder():
         unsafe_allow_html=True,
     )
 
-    # --- Simple location search (no permission popups) ---
-    # Using user's current location (Union City, NJ as default for this demo)
-    user_lat, user_lon = 40.7795, -74.0237
+    # --- Location search options ---
+    st.markdown("**Choose your search location:**")
     
-    # --- Glassy toolbar: radius and sort only ---
+    search_method = st.radio(
+        "Search by:",
+        options=["Select from cities", "Type custom location"],
+        horizontal=True,
+        key="gym_search_method"
+    )
+    
+    user_lat = None
+    user_lon = None
+    location_name = ""
+    
+    if search_method == "Select from cities":
+        location_choice = st.selectbox(
+            "📍 Select a city",
+            options=list(SAMPLE_LOCATIONS.keys()),
+            key="gym_location",
+            help="Choose from available cities in NJ/NY area"
+        )
+        user_lat, user_lon = SAMPLE_LOCATIONS[location_choice]
+        location_name = location_choice
+    else:
+        # Custom location search (accepts city names from SAMPLE_LOCATIONS)
+        custom_location = st.text_input(
+            "📍 Type a city name",
+            placeholder="e.g., Union City, NJ or Hoboken, NJ",
+            key="gym_custom_location"
+        )
+        
+        if custom_location.strip():
+            # Check if typed location matches any in our list
+            matching_locations = [city for city in SAMPLE_LOCATIONS.keys() 
+                                 if custom_location.strip().lower() in city.lower()]
+            
+            if matching_locations:
+                user_lat, user_lon = SAMPLE_LOCATIONS[matching_locations[0]]
+                location_name = matching_locations[0]
+            else:
+                st.warning(f"Location '{custom_location}' not found. Try: {', '.join(list(SAMPLE_LOCATIONS.keys())[:3])}")
+    
+    st.divider()
+    
+    # --- Glassy toolbar: radius and sort ---
     with st.container():
         st.markdown('<div class="fitpulse-locator-toolbar">', unsafe_allow_html=True)
         tool_col1, tool_col2 = st.columns([1, 1])
@@ -958,11 +998,11 @@ def render_gym_finder():
         st.markdown("</div>", unsafe_allow_html=True)
 
     # --- Auto-search: trigger search if button clicked ---
-    should_search = search_clicked
+    should_search = search_clicked and user_lat is not None and user_lon is not None
 
     # --- Search results ---
     if should_search:
-        st.caption(f"📍 Searching from your location: ({user_lat:.4f}, {user_lon:.4f})")
+        st.caption(f"📍 Searching from {location_name}: ({user_lat:.4f}, {user_lon:.4f})")
 
         nearby_gyms = []
         for gym in FITNESS_CENTERS:
