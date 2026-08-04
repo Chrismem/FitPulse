@@ -163,7 +163,8 @@ st.markdown(
     .st-key-community_card button,
     .st-key-gym_finder_card button,
     .st-key-friends_list_card button,
-    .st-key-goal_calendar_card button {
+    .st-key-goal_calendar_card button,
+    .st-key-gym_sessions_card button {
         background-color: #FFFFFF !important;
         border: 1px solid #E0E0E0 !important;
         border-top: 4px solid #7C9473 !important;
@@ -178,7 +179,8 @@ st.markdown(
     .st-key-community_card button:hover,
     .st-key-gym_finder_card button:hover,
     .st-key-friends_list_card button:hover,
-    .st-key-goal_calendar_card button:hover {
+    .st-key-goal_calendar_card button:hover,
+    .st-key-gym_sessions_card button:hover {
         transform: translateY(-4px);
         box-shadow: 0 10px 22px rgba(0,0,0,0.14) !important;
         border-top-color: #2A2A26 !important;
@@ -187,14 +189,16 @@ st.markdown(
     .st-key-community_card button:active,
     .st-key-gym_finder_card button:active,
     .st-key-friends_list_card button:active,
-    .st-key-goal_calendar_card button:active {
+    .st-key-goal_calendar_card button:active,
+    .st-key-gym_sessions_card button:active {
         transform: translateY(-1px);
     }
     .st-key-habit_tracking_card button p,
     .st-key-community_card button p,
     .st-key-gym_finder_card button p,
     .st-key-friends_list_card button p,
-    .st-key-goal_calendar_card button p {
+    .st-key-goal_calendar_card button p,
+    .st-key-gym_sessions_card button p {
         margin: 6px 0 0 0;
         color: #444;
         font-size: 14px;
@@ -204,7 +208,8 @@ st.markdown(
     .st-key-community_card button p:first-of-type,
     .st-key-gym_finder_card button p:first-of-type,
     .st-key-friends_list_card button p:first-of-type,
-    .st-key-goal_calendar_card button p:first-of-type {
+    .st-key-goal_calendar_card button p:first-of-type,
+    .st-key-gym_sessions_card button p:first-of-type {
         font-size: 34px;
         margin-top: 0;
     }
@@ -212,7 +217,8 @@ st.markdown(
     .st-key-community_card button p strong,
     .st-key-gym_finder_card button p strong,
     .st-key-friends_list_card button p strong,
-    .st-key-goal_calendar_card button p strong {
+    .st-key-goal_calendar_card button p strong,
+    .st-key-gym_sessions_card button p strong {
         color: #2A2A26;
         font-size: 17px;
     }
@@ -1319,6 +1325,7 @@ def render_home():
         "Habit Tracking": ("habit_tracking_card", "habit_card_click", "habits"),
         "Friends List": ("friends_list_card", "friends_list_card_click", "friends_list"),
         "Goal Calendar": ("goal_calendar_card", "goal_calendar_card_click", "goal_calendar"),
+        "Gym Sessions": ("gym_sessions_card", "gym_sessions_card_click", "gym_sessions"),
     }
 
     for col, (icon, title, text) in zip(feature_cols, features):
@@ -1367,6 +1374,21 @@ def render_home():
             )
             if goal_calendar_clicked:
                 st.session_state.page = "goal_calendar"
+                st.rerun()
+
+    st.write("")  # small spacer
+
+    # --- Gym Sessions card (third row - centered) ---
+    gym_sessions_cols = st.columns([1, 2, 1])  # Center the card
+    with gym_sessions_cols[1]:
+        with st.container(key="gym_sessions_card"):
+            gym_sessions_clicked = st.button(
+                "💪\n\n**Gym Sessions**\n\nComplete workout plans for every muscle group.",
+                key="gym_sessions_card_click",
+                use_container_width=True,
+            )
+            if gym_sessions_clicked:
+                st.session_state.page = "gym_sessions"
                 st.rerun()
 
     st.write("")  # small spacer
@@ -2829,6 +2851,655 @@ def render_profile():
 
 
 # ------------------------------------------------------------------
+# SECTION 9E: GYM SESSIONS PAGE
+# Display comprehensive workout plans for all major muscle groups
+# ------------------------------------------------------------------
+def render_gym_sessions():
+    st.markdown(
+        '<div class="fitpulse-section-header">💪 Gym Sessions & Workouts</div>',
+        unsafe_allow_html=True,
+    )
+    
+    if st.button("🏠 Back to Home", key="back_home_gym_sessions"):
+        st.session_state.page = "home"
+        st.rerun()
+    
+    st.divider()
+    
+    # Display intro
+    st.markdown("""
+    ### Complete Workout Guide for Every Muscle Group
+    
+    Below is a comprehensive collection of workout plans designed to target every major muscle group in your body. 
+    Each muscle group has its own dedicated workout plan with:
+    - **Primary exercises** for maximum strength gains
+    - **Secondary exercises** for supplementary work
+    - **Isolation exercises** to target specific muscle areas
+    - **Finisher exercises** for endurance and pump
+    - **Detailed form cues** to ensure proper technique
+    - **Progression tips** to keep improving
+    """)
+    
+    # Create tabs for different muscle groups
+    tabs = st.tabs([
+        "💪 Chest", "🔙 Back", "🔱 Shoulders", 
+        "💥 Biceps", "🦾 Triceps", "✋ Forearms",
+        "⭕ Abs/Core", "↪️ Obliques", "🏔️ Lower Back",
+        "🦵 Quads", "👙 Hamstrings", "🍑 Glutes",
+        "🦶 Calves", "🤎 Adductors", "➡️ Abductors"
+    ])
+    
+    # CHEST TAB
+    with tabs[0]:
+        st.markdown("## 💪 CHEST WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Barbell Bench Press: 4 sets x 6-8 reps
+          - Rest: 2-3 minutes between sets
+          - Form: Lower bar to mid-chest, pause 1 second, drive up explosively
+          - Progression: Increase weight by 5-10 lbs each week
+        
+        **Secondary Exercise:**
+        - Incline Dumbbell Press: 3 sets x 8-10 reps
+          - Rest: 90-120 seconds
+          - Form: Set bench to 30-45 degrees, lower dumbbells to shoulders
+          - Progression: Increase dumbbell weight or add 1-2 reps
+        
+        **Isolation Exercise 1:**
+        - Barbell or Machine Chest Flyes: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Keep slight bend in elbows, bring hands together at chest
+          - Progression: Increase weight or control eccentric phase
+        
+        **Isolation Exercise 2:**
+        - Cable Crossovers: 3 sets x 12-15 reps
+          - Rest: 60 seconds
+          - Form: Stand in middle, bring cables across body
+          - Progression: Increase cable weight or reps
+        
+        **Finisher:**
+        - Push-ups: 3 sets x 15-20 reps
+          - Rest: 45-60 seconds
+          - Form: Keep core tight, lower chest to 1 inch from ground
+          - Progression: Add weight vest or decrease rest periods
+        """)
+    
+    # BACK TAB
+    with tabs[1]:
+        st.markdown("## 🔙 BACK WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Bent-Over Barbell Row: 4 sets x 6-8 reps
+          - Rest: 2-3 minutes
+          - Form: Hinge at hips, pull bar to lower chest, squeeze shoulder blades
+          - Progression: Increase weight by 5-10 lbs weekly
+        
+        **Secondary Exercise:**
+        - Weighted Pull-ups: 3 sets x 6-10 reps
+          - Rest: 2-3 minutes
+          - Form: Full range of motion, chest to bar if possible
+          - Progression: Add weight with belt or achieve more reps
+        
+        **Upper Back Isolation:**
+        - Face Pulls: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Pull rope towards face, flare elbows out
+          - Progression: Increase weight or reps
+        
+        **Lat Isolation:**
+        - Machine Lat Pulldown: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Pull bar to upper chest, control the weight up slowly
+          - Progression: Increase weight or add reps
+        
+        **Lower Back:**
+        - Hyperextensions: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Hinge at hips, extend back to neutral
+          - Progression: Add weight plate or increase reps
+        
+        **Finisher:**
+        - Inverted Rows: 3 sets x 12-15 reps
+          - Rest: 45-60 seconds
+          - Form: Hang under bar, pull chest to bar
+          - Progression: Lower bar height to increase difficulty
+        """)
+    
+    # SHOULDERS TAB
+    with tabs[2]:
+        st.markdown("## 🔱 SHOULDERS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Overhead Press (Standing): 4 sets x 6-8 reps
+          - Rest: 2-3 minutes
+          - Form: Press from shoulders to full lockout
+          - Progression: Increase weight by 2.5-5 lbs weekly
+        
+        **Secondary Exercise:**
+        - Machine Shoulder Press: 3 sets x 8-10 reps
+          - Rest: 90-120 seconds
+          - Form: Press handles forward and up, controlled descent
+          - Progression: Increase weight or reps
+        
+        **Lateral Delt Focus:**
+        - Standing Lateral Raises: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Slight bend in elbows, raise to shoulder height
+          - Progression: Increase dumbbell weight
+        
+        **Rear Delt Focus:**
+        - Reverse Pec Deck Machine: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Sit upright, pull handles back, squeeze shoulder blades
+          - Progression: Increase weight or reps
+        
+        **Rotator Cuff:**
+        - Dumbbell Lateral Raises (Light): 3 sets x 15-20 reps
+          - Rest: 45-60 seconds
+          - Form: Controlled movement, light weight
+          - Progression: Slightly increase weight while maintaining form
+        
+        **Finisher:**
+        - Upright Rows: 3 sets x 10-12 reps
+          - Rest: 60 seconds
+          - Form: Pull elbows up, raise bar to chin height
+          - Progression: Increase weight or reps
+        """)
+    
+    # BICEPS TAB
+    with tabs[3]:
+        st.markdown("## 💥 BICEPS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Barbell Curls: 4 sets x 6-8 reps
+          - Rest: 90-120 seconds
+          - Form: Keep elbows at sides, full range of motion, no swinging
+          - Progression: Increase weight by 2.5-5 lbs weekly
+        
+        **Secondary Exercise:**
+        - Dumbbell Curls (Incline Bench): 3 sets x 8-10 reps
+          - Rest: 90 seconds
+          - Form: Sit on incline bench, curl dumbbells up
+          - Progression: Increase dumbbell weight or add reps
+        
+        **Isolation Exercise 1:**
+        - Machine Bicep Curl: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Full range of motion, squeeze at the top
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 2:**
+        - Preacher Curls: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Upper arms flat on pad, curl bar to shoulders
+          - Progression: Increase weight or decrease rest
+        
+        **Drop Set Exercise:**
+        - Cable Curls: 3 sets x 12-15 reps (with drop sets)
+          - Rest: 60 seconds
+          - Form: Keep cable at chest height, curl handle up
+          - Progression: Increase cable weight or add drops
+        
+        **Finisher:**
+        - Bodyweight Chin-ups: 3 sets x max reps
+          - Rest: 60-90 seconds
+          - Form: Palms facing you, full range of motion
+          - Progression: Add more reps or weight with belt
+        """)
+    
+    # TRICEPS TAB
+    with tabs[4]:
+        st.markdown("## 🦾 TRICEPS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Close-Grip Bench Press: 4 sets x 6-8 reps
+          - Rest: 2-3 minutes
+          - Form: Hands 6-8 inches apart, lower to chest, press explosively
+          - Progression: Increase weight by 5-10 lbs weekly
+        
+        **Secondary Exercise:**
+        - Tricep Dips: 3 sets x 8-10 reps
+          - Rest: 2 minutes
+          - Form: Lower body until elbows are ~90 degrees
+          - Progression: Add weight with belt or achieve more reps
+        
+        **Isolation Exercise 1:**
+        - Rope Pushdowns: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Keep elbows fixed, push rope down and spread at bottom
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 2:**
+        - Overhead Rope Extension: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Stand with rope behind neck, extend arms up
+          - Progression: Increase weight or reps
+        
+        **Third Isolation:**
+        - Dumbbell Kickbacks: 3 sets x 12-15 reps
+          - Rest: 60 seconds
+          - Form: Hinge forward, extend arm back until straight
+          - Progression: Increase dumbbell weight
+        
+        **Finisher:**
+        - Barbell Skull Crushers: 3 sets x 12-15 reps
+          - Rest: 60 seconds
+          - Form: Lie on bench, lower bar to forehead, extend up
+          - Progression: Increase weight or reps
+        """)
+    
+    # FOREARMS TAB
+    with tabs[5]:
+        st.markdown("## ✋ FOREARMS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Barbell Wrist Curls: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Rest forearms on thighs, curl bar up using wrist
+          - Progression: Increase weight by 2.5-5 lbs weekly
+        
+        **Secondary Exercise:**
+        - Barbell Reverse Wrist Curls: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Reverse grip, extend wrists up, control descent
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 1:**
+        - Dumbbell Wrist Curls: 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: One arm at a time, full range of motion
+          - Progression: Increase dumbbell weight
+        
+        **Isolation Exercise 2:**
+        - Dumbbell Reverse Wrist Curls: 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: Palms down, extend wrists up
+          - Progression: Increase dumbbell weight
+        
+        **Rotation Exercise:**
+        - Dumbbell Pronation/Supination: 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: Hold dumbbell vertically, rotate wrist
+          - Progression: Increase dumbbell weight or reps
+        
+        **Finisher:**
+        - Farmer Carries: 3 sets x 40-60 seconds
+          - Rest: 60-90 seconds
+          - Form: Walk while holding heavy dumbbells at sides
+          - Progression: Increase weight or duration
+        """)
+    
+    # ABS TAB
+    with tabs[6]:
+        st.markdown("## ⭕ ABS/CORE WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Weighted Cable Crunches: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Kneel facing cable machine, pull rope down
+          - Progression: Increase weight by 10-20 lbs weekly
+        
+        **Secondary Exercise:**
+        - Hanging Leg Raises: 3 sets x 10-15 reps
+          - Rest: 90 seconds
+          - Form: Hang from bar, raise legs to horizontal or higher
+          - Progression: Increase reps or add weight with ankle weights
+        
+        **Core Stability:**
+        - Planks (Weighted): 3 sets x 45-60 seconds
+          - Rest: 60-90 seconds
+          - Form: Keep body rigid, engage core, neutral spine
+          - Progression: Add weight plate or increase duration
+        
+        **Ab Wheel:**
+        - Ab Wheel Rollouts: 3 sets x 10-15 reps
+          - Rest: 90 seconds
+          - Form: Full extension, controlled return, keep core tight
+          - Progression: Increase reps or perform from standing
+        
+        **Machine Exercise:**
+        - Machine Ab Crunch: 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: Adjust for range of motion, crunch forward
+          - Progression: Increase weight or reps
+        
+        **Oblique Focus:**
+        - Weighted Woodchoppers: 3 sets x 10-12 reps (each side)
+          - Rest: 60 seconds
+          - Form: Hold weight, rotate diagonally across body
+          - Progression: Increase weight or reps
+        """)
+    
+    # OBLIQUES TAB
+    with tabs[7]:
+        st.markdown("## ↪️ OBLIQUES WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Suitcase Carries: 3 sets x 40-60 seconds (each side)
+          - Rest: 60-90 seconds
+          - Form: Hold heavy dumbbell at side, walk upright
+          - Progression: Increase dumbbell weight or duration
+        
+        **Secondary Exercise:**
+        - Weighted Woodchoppers: 3 sets x 10-12 reps (each side)
+          - Rest: 60-90 seconds
+          - Form: Rotate diagonally, initiate from obliques
+          - Progression: Increase weight by 5-10 lbs
+        
+        **Isolation Exercise 1:**
+        - Cable Side Bends: 3 sets x 12-15 reps (each side)
+          - Rest: 60-90 seconds
+          - Form: Stand sideways to cable, bend laterally
+          - Progression: Increase cable weight
+        
+        **Isolation Exercise 2:**
+        - Landmine Rotations: 3 sets x 10-12 reps (each side)
+          - Rest: 60-90 seconds
+          - Form: Hold end of barbell, rotate across body explosively
+          - Progression: Increase weight or reps
+        
+        **Machine Exercise:**
+        - Machine Torso Rotation: 3 sets x 12-15 reps (each side)
+          - Rest: 60 seconds
+          - Form: Sit upright, rotate against resistance
+          - Progression: Increase weight or reps
+        
+        **Finisher:**
+        - Bicycle Crunches: 3 sets x 20-25 reps
+          - Rest: 60 seconds
+          - Form: Crunch while bringing opposite knee to elbow
+          - Progression: Add weight or increase reps
+        """)
+    
+    # LOWER BACK TAB
+    with tabs[8]:
+        st.markdown("## 🏔️ LOWER BACK/ERECTORS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Conventional Deadlifts: 3 sets x 5-6 reps
+          - Rest: 3-5 minutes
+          - Form: Shins vertical, chest up, drive through heels
+          - Progression: Increase weight by 5-10 lbs when possible
+        
+        **Secondary Exercise:**
+        - Sumo Deadlifts: 3 sets x 6-8 reps
+          - Rest: 2-3 minutes
+          - Form: Wider stance, more upright torso
+          - Progression: Increase weight by 5-10 lbs
+        
+        **Isolation Exercise 1:**
+        - Back Hyperextensions (Weighted): 3 sets x 10-12 reps
+          - Rest: 90-120 seconds
+          - Form: Hinge at hips, extend to neutral (not hyperextended)
+          - Progression: Add weight plate to chest
+        
+        **Isolation Exercise 2:**
+        - Machine Leg Press (Narrow Stance): 3 sets x 10-12 reps
+          - Rest: 90 seconds
+          - Form: Lower weight, keep lower back against pad
+          - Progression: Increase weight or reps
+        
+        **Stabilization:**
+        - Superman Holds: 3 sets x 30-45 seconds
+          - Rest: 60-90 seconds
+          - Form: Lie face down, extend arms and legs
+          - Progression: Increase duration or add weight
+        
+        **Finisher:**
+        - Good Mornings: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Bar on shoulders, hinge at hips, maintain spine
+          - Progression: Increase weight or reps
+        """)
+    
+    # QUADS TAB
+    with tabs[9]:
+        st.markdown("## 🦵 QUADRICEPS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Barbell Back Squats: 4 sets x 6-8 reps
+          - Rest: 2-3 minutes
+          - Form: Chest up, knees out, depth to below parallel
+          - Progression: Increase weight by 5-10 lbs weekly
+        
+        **Secondary Exercise:**
+        - Leg Press Machine: 3 sets x 8-10 reps
+          - Rest: 90-120 seconds
+          - Form: Lower weight until 90-degree knee bend, drive up
+          - Progression: Increase weight by 20-45 lbs
+        
+        **Isolation Exercise 1:**
+        - Leg Extensions: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Extend leg straight, pause 1 second at top
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 2:**
+        - Goblet Squats: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Hold dumbbell at chest, squat deep
+          - Progression: Increase dumbbell weight
+        
+        **Tempo Work:**
+        - Barbell Front Squats (Slow): 3 sets x 8-10 reps
+          - Rest: 90-120 seconds
+          - Form: 3 seconds down, 1 second pause, 1 second up
+          - Progression: Increase weight or reps
+        
+        **Finisher:**
+        - Bulgarian Split Squats: 3 sets x 10-12 reps (each leg)
+          - Rest: 60-90 seconds
+          - Form: Rear foot elevated, front knee to 90 degrees
+          - Progression: Increase weight or reps
+        """)
+    
+    # HAMSTRINGS TAB
+    with tabs[10]:
+        st.markdown("## 👙 HAMSTRINGS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Romanian Deadlifts: 3 sets x 8-10 reps
+          - Rest: 2-3 minutes
+          - Form: Slight knee bend, hinge at hips, lower to mid-shin
+          - Progression: Increase weight by 5-10 lbs weekly
+        
+        **Secondary Exercise:**
+        - Leg Curls (Machine): 3 sets x 10-12 reps
+          - Rest: 90-120 seconds
+          - Form: Curl weight up, squeeze hamstrings at top
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 1:**
+        - Lying Hamstring Curls: 3 sets x 10-12 reps
+          - Rest: 90 seconds
+          - Form: Lie face down, curl weight up to glutes
+          - Progression: Increase weight or decrease rest
+        
+        **Isolation Exercise 2:**
+        - Nordic Curls: 3 sets x 5-8 reps
+          - Rest: 2 minutes
+          - Form: Kneel, lower body forward while resisting
+          - Progression: Get more reps or perform with less hand assistance
+        
+        **Glute-Ham:**
+        - Glute-Ham Raise: 3 sets x 8-12 reps
+          - Rest: 90-120 seconds
+          - Form: Hips at machine edge, lower body forward, extend back
+          - Progression: Increase reps or add weight
+        
+        **Finisher:**
+        - Single-Leg Deadlifts: 3 sets x 10-12 reps (each leg)
+          - Rest: 60-90 seconds
+          - Form: Stand on one leg, hinge at hip, raise opposite leg
+          - Progression: Add dumbbell or increase reps
+        """)
+    
+    # GLUTES TAB
+    with tabs[11]:
+        st.markdown("## 🍑 GLUTES WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Barbell Hip Thrusts: 3 sets x 8-12 reps
+          - Rest: 90-120 seconds
+          - Form: Upper back on bench, drive hips up explosively
+          - Progression: Increase weight by 20-45 lbs weekly
+        
+        **Secondary Exercise:**
+        - Barbell Squats (Feet Closer): 3 sets x 8-10 reps
+          - Rest: 2-3 minutes
+          - Form: Closer stance, lean forward, emphasize glute engagement
+          - Progression: Increase weight by 5-10 lbs
+        
+        **Isolation Exercise 1:**
+        - Machine Leg Press (Wide Stance): 3 sets x 10-12 reps
+          - Rest: 90 seconds
+          - Form: Wide feet placement, press through heels
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 2:**
+        - Cable Kickbacks: 3 sets x 12-15 reps (each leg)
+          - Rest: 60-90 seconds
+          - Form: One leg at a time, extend leg back and up
+          - Progression: Increase cable weight
+        
+        **Machine Exercise:**
+        - Machine Hip Abduction: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Open legs against resistance, squeeze glutes
+          - Progression: Increase weight or reps
+        
+        **Finisher:**
+        - Single-Leg Hip Thrusts: 3 sets x 10-12 reps (each leg)
+          - Rest: 60-90 seconds
+          - Form: One leg extended, thrust upward using one glute
+          - Progression: Add weight plate or increase reps
+        """)
+    
+    # CALVES TAB
+    with tabs[12]:
+        st.markdown("## 🦶 CALVES WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Standing Calf Raises (Machine or Barbell): 4 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Full range of motion, rise up on toes, pause at top
+          - Progression: Increase weight by 10-20 lbs weekly
+        
+        **Secondary Exercise:**
+        - Seated Calf Raises: 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: Sit with weight on knees, raise up on toes
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 1:**
+        - Dumbbell Single-Leg Calf Raises: 3 sets x 12-15 reps (each leg)
+          - Rest: 60 seconds
+          - Form: Stand on one leg, hold dumbbell, raise on toes
+          - Progression: Increase dumbbell weight
+        
+        **Isolation Exercise 2:**
+        - Machine Leg Press Calf Raises: 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: Feet on bottom of leg press, raise using only ankles
+          - Progression: Increase weight or reps
+        
+        **Slow Reps:**
+        - Slow Calf Raises: 3 sets x 10-12 reps (3 sec up, 3 sec down)
+          - Rest: 90-120 seconds
+          - Form: Controlled tempo, full range, squeeze at top
+          - Progression: Maintain tempo and increase weight
+        
+        **Finisher:**
+        - Jump Rope: 3 sets x 1-2 minutes
+          - Rest: 60-90 seconds
+          - Form: Land on balls of feet, use calf action
+          - Progression: Increase duration or speed
+        """)
+    
+    # ADDUCTORS TAB
+    with tabs[13]:
+        st.markdown("## 🤎 INNER THIGHS/ADDUCTORS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Machine Leg Press (Wide Stance): 3 sets x 10-12 reps
+          - Rest: 90-120 seconds
+          - Form: Feet wide apart on platform, push through heels
+          - Progression: Increase weight by 20-45 lbs
+        
+        **Secondary Exercise:**
+        - Machine Adduction: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Bring legs together against resistance
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 1:**
+        - Copenhagen Planks: 3 sets x 30-45 seconds (each side)
+          - Rest: 60-90 seconds
+          - Form: Side plank with knee on bench, squeeze inner thigh
+          - Progression: Increase duration or add weight
+        
+        **Isolation Exercise 2:**
+        - Cable Adduction: 3 sets x 12-15 reps (each leg)
+          - Rest: 60 seconds
+          - Form: Attach ankle strap, bring leg inward against cable
+          - Progression: Increase cable weight
+        
+        **Bodyweight Exercise:**
+        - Sumo Squats: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Very wide stance, toes out, squat deep
+          - Progression: Add dumbbell weight
+        
+        **Finisher:**
+        - Goblet Squats (Wide Stance): 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: Hold dumbbell, wide stance, squat deep with control
+          - Progression: Increase dumbbell weight or reps
+        """)
+    
+    # ABDUCTORS TAB
+    with tabs[14]:
+        st.markdown("## ➡️ OUTER THIGHS/ABDUCTORS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Machine Hip Abduction: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Open legs against resistance, squeeze outer thighs
+          - Progression: Increase weight by 10-20 lbs weekly
+        
+        **Secondary Exercise:**
+        - Banded Lateral Walks: 3 sets x 15-20 steps (each direction)
+          - Rest: 60 seconds
+          - Form: Resistance band above knees, walk sideways
+          - Progression: Use stronger resistance band
+        
+        **Isolation Exercise 1:**
+        - Cable Abduction: 3 sets x 12-15 reps (each leg)
+          - Rest: 60 seconds
+          - Form: Attach ankle strap, raise leg outward and upward
+          - Progression: Increase cable weight
+        
+        **Isolation Exercise 2:**
+        - Lateral Dumbbell Raises (Standing): 3 sets x 12-15 reps (each leg)
+          - Rest: 60 seconds
+          - Form: Hold dumbbell, raise leg out to side to hip height
+          - Progression: Increase dumbbell weight
+        
+        **Glute-Medius Focus:**
+        - Clamshells (Side-Lying): 3 sets x 15-20 reps (each side)
+          - Rest: 60 seconds
+          - Form: Lie on side, open top knee while keeping feet together
+          - Progression: Add resistance band or weight
+        
+        **Finisher:**
+        - Side Plank Hip Abduction: 3 sets x 12-15 reps (each side)
+          - Rest: 60-90 seconds
+          - Form: Side plank position, raise top leg up and down
+          - Progression: Increase reps or hold plank longer
+        """)
+
+
+# ------------------------------------------------------------------
 # SECTION 10: ROUTER — draw whichever page we're on
 # ------------------------------------------------------------------
 if st.session_state.page == "habits":
@@ -2843,6 +3514,8 @@ elif st.session_state.page == "gym_finder":
     render_gym_finder()
 elif st.session_state.page == "profile":
     render_profile()
+elif st.session_state.page == "gym_sessions":
+    render_gym_sessions()
 elif st.session_state.page == "signup":
     render_signup()
 elif st.session_state.page == "login":
