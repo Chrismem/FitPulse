@@ -152,7 +152,13 @@ st.markdown(
         color: #1B1B1B;
     }
 
-    /* --- CLICKABLE FEATURE CARDS: the button itself IS the card --- */
+    /* --- CLICKABLE FEATURE CARDS: the button itself IS the card ---
+       Instead of overlaying an invisible button on top of decorative
+       HTML (which was unreliable to click), we style the real
+       st.button directly so it looks exactly like the other feature
+       cards. Since there's only one real element here, clicking
+       anywhere on it always works. Both Habit Tracking and
+       Communities use this same pattern. */
     .st-key-habit_tracking_card button,
     .st-key-community_card button,
     .st-key-gym_finder_card button,
@@ -279,7 +285,7 @@ st.markdown(
         opacity: 0.75;
     }
 
-    /* --- TOP NAVIGATION BAR --- */
+    /* --- TOP NAVIGATION BAR (feature quick-links, top-left of header) --- */
     .st-key-top_navbar {
         background-color: #F4F2EC;
         border: 1px solid #E4E1D8;
@@ -311,13 +317,13 @@ st.markdown(
         background-color: #66805C !important;
     }
 
-    /* --- COMMUNITY CHAT --- */
+    /* --- COMMUNITY: chat bubbles reuse the same result-card style --- */
     .fitpulse-friend-name {
         font-weight: 700;
         color: #2A2A26;
     }
 
-    /* --- FRIENDS LIST --- */
+    /* --- FRIENDS LIST: friend card styling --- */
     .fitpulse-friend-card {
         background-color: #FFFFFF;
         border: 1px solid #E0E0E0;
@@ -451,7 +457,9 @@ st.markdown(
         margin-left: 8px;
     }
 
-    /* --- BOTTOM CTA BANNER --- */
+    /* --- BOTTOM CTA BANNER: now a real photo instead of a flat color,
+       so the bottom of the page has some life to it. The gradient
+       overlay keeps the white text readable over any photo. --- */
     .fitpulse-cta-banner {
         background:
             linear-gradient(135deg, rgba(28,28,26,0.82), rgba(85,112,76,0.72)),
@@ -469,7 +477,13 @@ st.markdown(
         margin: 0 0 8px 0;
     }
 
-    /* --- COMMUNITY PHOTO GALLERY --- */
+    /* --- COMMUNITY PHOTO GALLERY ---
+       A few real, free-to-use photos of people working out (Unsplash,
+       free license) so the site feels less like an empty template and
+       more like an actual community of people staying active. Each
+       photo gets a subtle earthy-green duotone wash (via the ::after
+       overlay) so they all feel like they belong to the same neutral
+       palette instead of clashing with it, plus a soft caption. */
     .fitpulse-photo-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -518,6 +532,7 @@ st.markdown(
         text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
     }
 
+    /* Stack the photo grid to 2 columns on narrower screens */
     @media (max-width: 700px) {
         .fitpulse-photo-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -528,7 +543,10 @@ st.markdown(
     }
 
     /* ================================================================
-       GYM FINDER PAGE — locator experience
+       GYM FINDER PAGE — modernized, standalone locator experience.
+       A punchier gradient hero, a "glass" toolbar for the search
+       controls, and animated result cards with star ratings and
+       amenity pills (instead of plain text lines).
        ================================================================ */
     .fitpulse-locator-hero {
         background: linear-gradient(120deg, #1C1C1A 0%, #2A2A26 55%, #7C9473 100%);
@@ -560,6 +578,7 @@ st.markdown(
         max-width: 640px;
     }
 
+    /* Glassy toolbar wrapping the location/radius/sort controls */
     .fitpulse-locator-toolbar {
         background: rgba(85, 112, 76, 0.06);
         border: 1px solid rgba(85, 112, 76, 0.18);
@@ -568,6 +587,7 @@ st.markdown(
         margin-bottom: 20px;
     }
 
+    /* Modern result cards: soft shadow, gradient top accent, lift on hover */
     .fitpulse-gym-card {
         background: #FFFFFF;
         border-radius: 16px;
@@ -657,6 +677,9 @@ st.markdown(
         box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
+    /* --- Mobile responsiveness ---
+       On narrow screens (phones), shrink the hero text and
+       tighten padding so nothing feels cramped or overflows. */
     @media (max-width: 600px) {
         .fitpulse-hero {
             padding: 30px 18px;
@@ -685,26 +708,40 @@ st.markdown(
 
 # ------------------------------------------------------------------
 # SECTION 3: SAMPLE DATA (gym finder)
+# Real fitness centers from the NJ/NY area with accurate addresses
+# and coordinates. These are actual gyms you can find and visit!
 # ------------------------------------------------------------------
 FITNESS_CENTERS = [
+    # Union City / North Bergen Area
     {"name": "Crunch Fitness - North Bergen", "address": "2819 John F Kennedy Blvd, North Bergen, NJ 07047",
      "lat": 40.8162, "lon": -74.0207, "rating": 4.5, "amenities": ["24/7 Access", "Group Classes", "Free Weights"]},
+    
+    # Hoboken Area
     {"name": "New York Sports Club - Hoboken", "address": "210 14th St, Hoboken, NJ 07030",
      "lat": 40.7357, "lon": -74.0324, "rating": 4.6, "amenities": ["Personal Training", "Sauna", "Group Classes"]},
     {"name": "Fitness Factory - Hoboken", "address": "130 Washington St, Hoboken, NJ 07030",
      "lat": 40.7361, "lon": -74.0316, "rating": 4.7, "amenities": ["Free Weights", "Cardio", "Strength Training"]},
+    
+    # Jersey City Area
     {"name": "Fitness Factory - Jersey City", "address": "525 Washington Boulevard, Jersey City, NJ 07310",
      "lat": 40.7180, "lon": -74.0450, "rating": 4.4, "amenities": ["24/7 Access", "Group Classes", "Personal Training"]},
+    
+    # Union / North Newark Area
     {"name": "Planet Fitness - Union", "address": "2445 Springfield Ave, Union, NJ 07088",
      "lat": 40.6700, "lon": -74.2757, "rating": 4.3, "amenities": ["Massage Chairs", "Hydro Massage", "Free Weights"]},
+    
+    # Newark Area
     {"name": "Planet Fitness - Newark", "address": "520 Broad St, Newark, NJ 07102",
      "lat": 40.7357, "lon": -74.1724, "rating": 4.2, "amenities": ["Free Fitness Training", "Cardio", "Strength Equipment"]},
     {"name": "YMCA of Newark - Central Branch", "address": "600 Broad St, Newark, NJ 07102",
      "lat": 40.7365, "lon": -74.1730, "rating": 4.4, "amenities": ["Pool", "Youth Programs", "Basketball Court"]},
+    
+    # Manhattan Area
     {"name": "Chelsea Piers Fitness", "address": "Pier 60, Chelsea Piers, New York, NY 10011",
      "lat": 40.7467, "lon": -74.0103, "rating": 4.8, "amenities": ["Rock Climbing", "Pool", "Cold Plunge", "Sauna"]},
 ]
 
+# Real sample locations in the NJ/NY area with accurate coordinates
 SAMPLE_LOCATIONS = {
     "Union City, NJ": (40.7795, -74.0237),
     "Jersey City, NJ": (40.7190, -74.0450),
@@ -713,169 +750,12 @@ SAMPLE_LOCATIONS = {
     "New York, NY": (40.7467, -74.0103),
 }
 
-# ------------------------------------------------------------------
-# WORKOUT PLANS DATA (15 Muscle Groups)
-# ------------------------------------------------------------------
-WORKOUT_PLANS = {
-    "Chest": {
-        "icon": "🏋️‍♂️",
-        "description": "Build upper body pushing power and pectoral muscle size.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Barbell Bench Press", "details": "4 sets x 6-8 reps | Rest: 2-3 mins", "form": "Lower bar to mid-chest, pause 1 second, drive up explosively.", "progression": "Increase weight by 5-10 lbs each week."},
-            {"type": "Secondary Exercise", "name": "Incline Dumbbell Press", "details": "3 sets x 8-10 reps | Rest: 90-120 secs", "form": "Set bench to 30-45 degrees, lower dumbbells to shoulders, press up.", "progression": "Increase dumbbell weight or add 1-2 reps."},
-            {"type": "Isolation Exercise 1", "name": "Barbell or Machine Chest Flyes", "details": "3 sets x 10-12 reps | Rest: 60-90 secs", "form": "Keep slight bend in elbows, bring hands together at chest level.", "progression": "Increase weight or control the eccentric phase."},
-            {"type": "Isolation Exercise 2", "name": "Cable Crossovers", "details": "3 sets x 12-15 reps | Rest: 60 secs", "form": "Stand in middle, bring cables across body, squeeze at center.", "progression": "Increase cable weight or increase rep range."},
-            {"type": "Finisher", "name": "Push-ups", "details": "3 sets x 15-20 reps | Rest: 45-60 secs", "form": "Keep core tight, lower chest to 1 inch from ground.", "progression": "Add weight vest or decrease rest periods."}
-        ]
-    },
-    "Back": {
-        "icon": "🏋️‍♀️",
-        "description": "Develop a strong, wide back and improve posture.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Bent-Over Barbell Row", "details": "4 sets x 6-8 reps | Rest: 2-3 mins", "form": "Hinge at hips, pull bar to lower chest, squeeze shoulder blades.", "progression": "Increase weight by 5-10 lbs weekly."},
-            {"type": "Secondary Exercise", "name": "Weighted Pull-ups / Lat Pulldown", "details": "3 sets x 6-10 reps | Rest: 2-3 mins", "form": "Full range of motion, chest to bar if possible.", "progression": "Add weight with belt or achieve more reps."},
-            {"type": "Upper Back Isolation", "name": "Face Pulls", "details": "3 sets x 12-15 reps | Rest: 60-90 secs", "form": "Pull rope towards face, flare elbows out, squeeze rear delts.", "progression": "Increase weight or reps."},
-            {"type": "Lat Isolation", "name": "Machine Lat Pulldown", "details": "3 sets x 10-12 reps | Rest: 60-90 secs", "form": "Pull bar to upper chest, control the weight up slowly.", "progression": "Increase weight or add reps."},
-            {"type": "Lower Back", "name": "Hyperextensions", "details": "3 sets x 10-12 reps | Rest: 60-90 secs", "form": "Hinge at hips, extend back to neutral position.", "progression": "Add weight plate or increase reps."},
-            {"type": "Finisher", "name": "Inverted Rows", "details": "3 sets x 12-15 reps | Rest: 45-60 secs", "form": "Hang under bar, pull chest to bar, keep body rigid.", "progression": "Lower bar height to increase difficulty."}
-        ]
-    },
-    "Shoulders": {
-        "icon": "🛡️",
-        "description": "Carve 3D deltoids and build overhead power.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Standing Overhead Press (Barbell)", "details": "4 sets x 6-8 reps | Rest: 2-3 mins", "form": "Press from shoulders to full lockout, maintain core tension.", "progression": "Increase weight by 2.5-5 lbs weekly."},
-            {"type": "Secondary Exercise", "name": "Machine Shoulder Press", "details": "3 sets x 8-10 reps | Rest: 90-120 secs", "form": "Press handles forward and up, controlled descent.", "progression": "Increase weight or reps."},
-            {"type": "Lateral Delt Focus", "name": "Standing Lateral Raises", "details": "3 sets x 12-15 reps | Rest: 60-90 secs", "form": "Slight bend in elbows, raise to shoulder height, squeeze at top.", "progression": "Increase dumbbell weight or decrease rest."},
-            {"type": "Rear Delt Focus", "name": "Reverse Pec Deck Machine", "details": "3 sets x 12-15 reps | Rest: 60-90 secs", "form": "Sit upright, pull handles back, squeeze shoulder blades.", "progression": "Increase weight or reps."},
-            {"type": "Rotator Cuff & Health", "name": "Dumbbell Lateral Raises (Light)", "details": "3 sets x 15-20 reps | Rest: 45-60 secs", "form": "Controlled movement, light weight, focus on shoulder health.", "progression": "Slightly increase weight while maintaining form."},
-            {"type": "Finisher", "name": "Upright Rows", "details": "3 sets x 10-12 reps | Rest: 60 secs", "form": "Pull elbows up, raise bar to chin height.", "progression": "Increase weight or reps."}
-        ]
-    },
-    "Biceps": {
-        "icon": "💪",
-        "description": "Isolate and grow biceps peak and overall arm thickness.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Barbell Curls", "details": "4 sets x 6-8 reps | Rest: 90-120 secs", "form": "Keep elbows at sides, full range of motion, no swinging.", "progression": "Increase weight by 2.5-5 lbs weekly."},
-            {"type": "Secondary Exercise", "name": "Incline Dumbbell Curls", "details": "3 sets x 8-10 reps | Rest: 90 secs", "form": "Sit on incline bench, curl dumbbells up, avoid body momentum.", "progression": "Increase dumbbell weight or add reps."},
-            {"type": "Isolation 1", "name": "Machine Bicep Curl", "details": "3 sets x 10-12 reps | Rest: 60-90 secs", "form": "Full range of motion, squeeze at top, controlled descent.", "progression": "Increase weight or reps."},
-            {"type": "Isolation 2", "name": "Preacher Curls", "details": "3 sets x 10-12 reps | Rest: 60-90 secs", "form": "Upper arms flat on pad, curl bar to shoulders.", "progression": "Increase weight or decrease rest."},
-            {"type": "Drop Set Exercise", "name": "Cable Curls", "details": "3 sets x 12-15 reps | Rest: 60 secs", "form": "Keep cable at chest height, curl handle up.", "progression": "Increase cable weight or add drops."},
-            {"type": "Finisher", "name": "Bodyweight Chin-ups", "details": "3 sets x Max Reps | Rest: 60-90 secs", "form": "Palms facing you, full range of motion, explosive pull.", "progression": "Add more reps or weight with belt."}
-        ]
-    },
-    "Triceps": {
-        "icon": "⚡",
-        "description": "Maximize arm size with lockout power and horseshoe triceps.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Close-Grip Bench Press", "details": "4 sets x 6-8 reps | Rest: 2-3 mins", "form": "Hands 6-8 inches apart, lower to chest, press explosively.", "progression": "Increase weight by 5-10 lbs weekly."},
-            {"type": "Secondary Exercise", "name": "Tricep Dips", "details": "3 sets x 8-10 reps | Rest: 2 mins", "form": "Lower body until elbows are ~90 degrees, drive back up.", "progression": "Add weight with dipping belt or increase reps."},
-            {"type": "Isolation 1", "name": "Tricep Rope Pushdowns", "details": "3 sets x 10-12 reps | Rest: 60-90 secs", "form": "Keep elbows pinned, push rope down, spread handles at bottom.", "progression": "Increase cable weight."},
-            {"type": "Isolation 2", "name": "Skull Crushers (EZ-Bar)", "details": "3 sets x 10-12 reps | Rest: 60-90 secs", "form": "Lie on bench, lower bar to forehead, extend elbows back up.", "progression": "Increase weight or reps."},
-            {"type": "Overhead Extension", "name": "Overhead Cable Tricep Extension", "details": "3 sets x 12-15 reps | Rest: 60 secs", "form": "Extend arms forward/overhead, squeeze triceps at lockout.", "progression": "Increase weight."},
-            {"type": "Finisher", "name": "Diamond Push-ups", "details": "3 sets x 15-20 reps | Rest: 45-60 secs", "form": "Hands close together forming diamond shape under chest.", "progression": "Decrease rest time between sets."}
-        ]
-    },
-    "Quadriceps": {
-        "icon": "🦵",
-        "description": "Build strong, explosive legs and leg quad sweep.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Barbell Back Squat", "details": "4 sets x 6-8 reps | Rest: 2-3 mins", "form": "Squat below parallel, keep chest up, drive through heels.", "progression": "Increase weight by 5-10 lbs weekly."},
-            {"type": "Secondary Exercise", "name": "Leg Press Machine", "details": "3 sets x 8-10 reps | Rest: 2 mins", "form": "Feet hip-width apart, lower sled deep without lifting lower back.", "progression": "Add weight plates."},
-            {"type": "Quad Isolation 1", "name": "Leg Extensions Machine", "details": "3 sets x 12-15 reps | Rest: 60 secs", "form": "Extend legs straight out, hold contraction at top for 1 second.", "progression": "Increase machine weight."},
-            {"type": "Unilateral Exercise", "name": "Bulgarian Split Squats", "details": "3 sets x 10-12 reps per leg | Rest: 90 secs", "form": "One foot elevated behind, lower back knee toward floor.", "progression": "Hold heavier dumbbells."},
-            {"type": "Finisher", "name": "Walking Bodyweight Lunges", "details": "3 sets x 20 reps total | Rest: 45-60 secs", "form": "Step forward, drop hips straight down, maintain balance.", "progression": "Add weight or do jumping lunges."}
-        ]
-    },
-    "Hamstrings": {
-        "icon": "🏃‍♂️",
-        "description": "Target the posterior chain for athletic speed and knee stability.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Romanian Deadlift (RDL)", "details": "4 sets x 6-8 reps | Rest: 2-3 mins", "form": "Hinge hips back, lower bar along shins until hamstring stretch.", "progression": "Increase weight by 5-10 lbs weekly."},
-            {"type": "Secondary Exercise", "name": "Lying Leg Curls Machine", "details": "3 sets x 8-10 reps | Rest: 90 secs", "form": "Curl pad toward glutes, squeeze hamstrings, lower slowly.", "progression": "Increase weight or reps."},
-            {"type": "Isolation", "name": "Seated Leg Curl Machine", "details": "3 sets x 10-12 reps | Rest: 60-90 secs", "form": "Keep thighs locked down, flex knees fully.", "progression": "Increase weight."},
-            {"type": "Glute/Ham Focus", "name": "Glute-Ham Raise or Nordic Curls", "details": "3 sets x 8-10 reps | Rest: 90 secs", "form": "Lower torso under control using hamstrings to resist gravity.", "progression": "Increase reps or reduce assistance."},
-            {"type": "Finisher", "name": "Kettlebell Swings", "details": "3 sets x 15-20 reps | Rest: 60 secs", "form": "Explosive hip hinge, drive hips forward to swing bell to eye level.", "progression": "Increase kettlebell weight."}
-        ]
-    },
-    "Glutes": {
-        "icon": "🍑",
-        "description": "Develop glute strength and hip extension power.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Barbell Hip Thrusts", "details": "4 sets x 8-10 reps | Rest: 2 mins", "form": "Upper back against bench, drive hips up, squeeze glutes at top.", "progression": "Increase weight weekly."},
-            {"type": "Secondary Exercise", "name": "Cable Pull-Throughs", "details": "3 sets x 10-12 reps | Rest: 90 secs", "form": "Stand facing away from cable, hinge at hips, drive glutes forward.", "progression": "Increase cable weight."},
-            {"type": "Isolation", "name": "Glute Kickback Machine / Cable", "details": "3 sets x 12-15 reps per leg | Rest: 60 secs", "form": "Kick leg backward using glutes, keep spine neutral.", "progression": "Increase weight."},
-            {"type": "Finisher", "name": "Frog Pumps", "details": "3 sets x 20-30 reps | Rest: 45 secs", "form": "Soles of feet together, lift hips up rapidly squeezing glutes.", "progression": "Add dumbbell on hips."}
-        ]
-    },
-    "Calves": {
-        "icon": "👟",
-        "description": "Strengthen calves for jump power and lower leg definition.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Standing Calf Raises", "details": "4 sets x 10-12 reps | Rest: 60-90 secs", "form": "Full stretch at bottom, press up onto toes, hold 1s at top.", "progression": "Increase weight plate / machine weight."},
-            {"type": "Secondary Exercise", "name": "Seated Calf Raise Machine", "details": "3 sets x 12-15 reps | Rest: 60 secs", "form": "Focus on soleus muscle, smooth rhythm throughout movement.", "progression": "Increase weight."},
-            {"type": "Finisher", "name": "Single-Leg Bodyweight Calf Raise", "details": "3 sets x 20 reps per leg | Rest: 45 secs", "form": "Stand on edge of step, complete full range of motion.", "progression": "Hold dumbbell on same side."}
-        ]
-    },
-    "Abs": {
-        "icon": "🔥",
-        "description": "Strengthen core stability and sculpt abdominal muscles.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Hanging Leg / Knee Raises", "details": "4 sets x 10-12 reps | Rest: 60 secs", "form": "Hang from bar, raise knees or toes to bar without swinging.", "progression": "Keep legs straight or add ankle weights."},
-            {"type": "Secondary Exercise", "name": "Ab Wheel Rollouts", "details": "3 sets x 8-10 reps | Rest: 60 secs", "form": "Kneel down, roll wheel forward maintaining flat lower back.", "progression": "Roll out farther or perform standing."},
-            {"type": "Machine Focus", "name": "Cable Crunches", "details": "3 sets x 12-15 reps | Rest: 60 secs", "form": "Kneel beneath rope attachment, crunch ribcage down toward hips.", "progression": "Increase cable resistance."},
-            {"type": "Finisher", "name": "Plank Hold", "details": "3 sets x 45-60 seconds | Rest: 45 secs", "form": "Elbows under shoulders, keep body in flat straight line.", "progression": "Increase hold duration."}
-        ]
-    },
-    "Obliques": {
-        "icon": "🔄",
-        "description": "Build rotational power and lateral core stability.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Cable Woodchoppers", "details": "3 sets x 12-15 reps per side | Rest: 60 secs", "form": "Rotate torso from high-to-low or low-to-high, pivot back foot.", "progression": "Increase cable weight."},
-            {"type": "Secondary Exercise", "name": "Russian Twists with Weight", "details": "3 sets x 15-20 reps total | Rest: 60 secs", "form": "Sit on floor, lean back slightly, rotate weight side to side.", "progression": "Increase weight plate size."},
-            {"type": "Finisher", "name": "Side Plank Hip Dips", "details": "3 sets x 12-15 reps per side | Rest: 45 secs", "form": "Hold side plank, lower hip toward floor, drive back up.", "progression": "Increase reps or hold plank longer."}
-        ]
-    },
-    "Forearms": {
-        "icon": "✊",
-        "description": "Improve grip strength and forearm muscularity.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Barbell Wrist Curls", "details": "3 sets x 12-15 reps | Rest: 60 secs", "form": "Forearms resting on bench, curl bar up with wrists.", "progression": "Increase barbell weight."},
-            {"type": "Secondary Exercise", "name": "Reverse Barbell Curls", "details": "3 sets x 10-12 reps | Rest: 60 secs", "form": "Overhand grip on barbell, curl up toward shoulders.", "progression": "Increase weight."},
-            {"type": "Finisher", "name": "Farmer's Carries", "details": "3 sets x 45-60 seconds hold | Rest: 60 secs", "form": "Hold heavy dumbbells at sides, walk tall with tight grip.", "progression": "Increase dumbbell weight."}
-        ]
-    },
-    "Lower Back": {
-        "icon": "🪵",
-        "description": "Fortify spine stability and spinal erectors.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Barbell Deadlift", "details": "3 sets x 5 reps | Rest: 2-3 mins", "form": "Flat back, drive feet into floor, stand tall squeezing glutes.", "progression": "Increase weight by 5-10 lbs weekly."},
-            {"type": "Secondary Exercise", "name": "Good Mornings", "details": "3 sets x 8-10 reps | Rest: 90 secs", "form": "Barbell on upper back, hinge at hips while keeping back straight.", "progression": "Increase light barbell weight."},
-            {"type": "Finisher", "name": "Superman Holds", "details": "3 sets x 12-15 reps | Rest: 45 secs", "form": "Lie face down, lift chest and thighs off floor simultaneously.", "progression": "Hold top position for 3 seconds each."}
-        ]
-    },
-    "Upper Back / Traps": {
-        "icon": "🦅",
-        "description": "Build thick neck, trap, and rear-shoulder muscles.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Barbell Shrugs", "details": "4 sets x 10-12 reps | Rest: 90 secs", "form": "Shrug shoulders straight up toward ears, pause at top.", "progression": "Increase barbell weight."},
-            {"type": "Secondary Exercise", "name": "Dumbbell Shrugs", "details": "3 sets x 12-15 reps | Rest: 60 secs", "form": "Hold dumbbells at sides, shrug up and squeeze traps.", "progression": "Increase dumbbell weight."},
-            {"type": "Finisher", "name": "Rack Pulls", "details": "3 sets x 8-10 reps | Rest: 2 mins", "form": "Set bar above knee height, pull weight up locking shoulders back.", "progression": "Increase weight."}
-        ]
-    },
-    "Hip Abductors / Adductors": {
-        "icon": "↕️",
-        "description": "Strengthen inner & outer hips for athletic stability.",
-        "exercises": [
-            {"type": "Primary Exercise", "name": "Seated Hip Abductor Machine", "details": "3 sets x 12-15 reps | Rest: 60 secs", "form": "Push legs outward against pad, squeeze outer glutes.", "progression": "Increase machine stack weight."},
-            {"type": "Secondary Exercise", "name": "Seated Hip Adductor Machine", "details": "3 sets x 12-15 reps | Rest: 60 secs", "form": "Squeeze legs together targeting inner thighs.", "progression": "Increase machine weight."},
-            {"type": "Finisher", "name": "Side Plank Hip Abduction", "details": "3 sets x 12-15 reps per side | Rest: 45 secs", "form": "Side plank position, raise top leg up and down smoothly.", "progression": "Increase hold time or reps."}
-        ]
-    }
-}
 
 # ------------------------------------------------------------------
 # SECTION 4: DISTANCE CALCULATION (Haversine Formula)
+# This function calculates the distance in miles between two
+# points on Earth using their latitude and longitude.
+# We use this instead of a paid maps API.
 # ------------------------------------------------------------------
 def distance_in_miles(lat1, lon1, lat2, lon2):
     """Return the distance in miles between two lat/lon points."""
@@ -894,10 +774,33 @@ def distance_in_miles(lat1, lon1, lat2, lon2):
 
     return radius_of_earth_miles * c
 
+
 # ------------------------------------------------------------------
 # SECTION 5: HABIT TRACKER DATA HELPERS
+# We store habit data in a small JSON file on disk, keyed by
+# username, so progress is remembered between visits. This keeps
+# things simple for a class project (no external database needed).
+#
+# Data shape:
+# {
+#   "Alex": {
+#     "habits": {
+#       "Daily 1-Mile Run": {
+#         "goal_distance": 1.0,
+#         "frequency": "Daily",
+#         "reminder_time": "07:00",
+#         "logs": [
+#           {"date": "2026-07-27", "distance": 1.0,
+#            "duration_min": 9.5, "speed_mph": 6.32},
+#           ...
+#         ]
+#       }
+#     }
+#   }
+# }
 # ------------------------------------------------------------------
 DATA_FILE = "habit_data.json"
+
 
 def load_all_data():
     """Read the whole habit_data.json file into a Python dict."""
@@ -909,10 +812,12 @@ def load_all_data():
             return {}
     return {}
 
+
 def save_all_data(all_data):
     """Write the whole habit data dict back to habit_data.json."""
     with open(DATA_FILE, "w") as f:
         json.dump(all_data, f, indent=2)
+
 
 def get_user_data(username):
     """Get (or create) the habit data for one user."""
@@ -922,11 +827,13 @@ def get_user_data(username):
     user_data.setdefault("goals", [])
     return user_data
 
+
 def save_user_data(username, user_data):
     """Save one user's habit data back into the shared file."""
     all_data = load_all_data()
     all_data[username] = user_data
     save_all_data(all_data)
+
 
 def compute_streak(logs):
     """Count consecutive days (ending today) that have a log entry."""
@@ -939,6 +846,7 @@ def compute_streak(logs):
         streak += 1
         current_day -= timedelta(days=1)
     return streak
+
 
 def compute_habit_stats(logs):
     """Return total runs, total distance, and average speed for a habit."""
@@ -953,25 +861,42 @@ def compute_habit_stats(logs):
         "avg_speed": round(avg_speed, 2),
     }
 
+
 def logged_today(logs):
     """Check whether there's already a log entry for today."""
     today_str = date.today().strftime("%Y-%m-%d")
     return any(entry["date"] == today_str for entry in logs)
 
+
 # ------------------------------------------------------------------
 # SECTION 5A: WORKOUT GOAL CALENDAR HELPERS
+# Goals are separate from habits: a habit is a recurring routine you
+# log day to day, while a goal is a specific target ("Run 5 miles by
+# Aug 15") tied to a date on the calendar. Goals live alongside habits
+# in the same per-user record in habit_data.json, under the "goals"
+# key, so everything for a user stays in one file.
+#
+# Goal shape:
+#   {"id": "g_1690000000000", "title": "Run 5 miles", "habit_name":
+#    "Daily 1-Mile Run" (or "" if not linked), "target_date":
+#    "2026-08-15", "target_value": 5.0, "completed": False,
+#    "created_at": "2026-08-01"}
 # ------------------------------------------------------------------
 def get_completed_workout_days(user_data):
-    """Return the set of every date (YYYY-MM-DD) with at least one logged workout across all habits."""
+    """Return the set of every date (YYYY-MM-DD) with at least one
+    logged workout across all of a user's habits — i.e. every day a
+    workout was actually completed, used to mark the calendar."""
     days = set()
     for habit in user_data["habits"].values():
         for entry in habit["logs"]:
             days.add(entry["date"])
     return days
 
+
 def count_completed_workouts(user_data):
     """Total number of workout logs (completed workouts) across all habits."""
     return sum(len(habit["logs"]) for habit in user_data["habits"].values())
+
 
 def add_goal(user_data, title, target_date_str, habit_name="", target_value=None):
     """Create a new workout goal and add it to the user's goal list."""
@@ -987,6 +912,7 @@ def add_goal(user_data, title, target_date_str, habit_name="", target_value=None
     user_data["goals"].append(goal)
     return goal
 
+
 def set_goal_completed(user_data, goal_id, completed):
     """Mark a goal as completed (or not) by id."""
     for goal in user_data["goals"]:
@@ -994,18 +920,38 @@ def set_goal_completed(user_data, goal_id, completed):
             goal["completed"] = completed
             break
 
+
 def delete_goal(user_data, goal_id):
     """Remove a goal by id."""
     user_data["goals"] = [g for g in user_data["goals"] if g["id"] != goal_id]
+
 
 def goals_on_date(goals, date_str):
     """Return every goal whose target_date matches the given date string."""
     return [g for g in goals if g["target_date"] == date_str]
 
+
 # ------------------------------------------------------------------
 # SECTION 5B: USER PROFILE DATA HELPERS
+# Store user profile information (username, fitness level, 
+# favorite workout, avatar emoji, bio) in a separate JSON file.
+# This allows personalization while keeping habit data separate.
+#
+# Data shape:
+# {
+#   "Alex": {
+#     "full_name": "Alexander Johnson",
+#     "email": "alex@example.com",
+#     "fitness_level": "intermediate",
+#     "favorite_workout": "running",
+#     "avatar_emoji": "🏃",
+#     "bio": "Love morning runs!",
+#     "created_at": "2026-07-28"
+#   }
+# }
 # ------------------------------------------------------------------
 PROFILE_FILE = "profile_data.json"
+
 
 def load_all_profiles():
     """Read the whole profile_data.json file into a Python dict."""
@@ -1017,16 +963,19 @@ def load_all_profiles():
             return {}
     return {}
 
+
 def save_all_profiles(all_profiles):
     """Write the whole profile data dict back to profile_data.json."""
     with open(PROFILE_FILE, "w") as f:
         json.dump(all_profiles, f, indent=2)
+
 
 def get_user_profile(username):
     """Get the profile data for one user, or return defaults if not found."""
     all_profiles = load_all_profiles()
     if username in all_profiles:
         return all_profiles[username]
+    # Return default profile if user doesn't have one yet
     return {
         "full_name": username,
         "email": "",
@@ -1037,11 +986,13 @@ def get_user_profile(username):
         "created_at": date.today().strftime("%Y-%m-%d"),
     }
 
+
 def save_user_profile(username, profile_data):
     """Save one user's profile data back into the shared file."""
     all_profiles = load_all_profiles()
     all_profiles[username] = profile_data
     save_all_profiles(all_profiles)
+
 
 def update_user_profile(username, **kwargs):
     """Update specific fields in a user's profile."""
@@ -1049,17 +1000,43 @@ def update_user_profile(username, **kwargs):
     profile.update(kwargs)
     save_user_profile(username, profile)
 
+
+# Define fitness level and workout type options
 FITNESS_LEVELS = ["Beginner", "Intermediate", "Advanced"]
 WORKOUT_TYPES = [
-    "Running", "Weightlifting", "Yoga", "Cycling", "Swimming",
-    "CrossFit", "Pilates", "HIIT", "General Fitness",
+    "Running",
+    "Weightlifting",
+    "Yoga",
+    "Cycling",
+    "Swimming",
+    "CrossFit",
+    "Pilates",
+    "HIIT",
+    "General Fitness",
 ]
 AVATAR_EMOJIS = ["🏋️", "🏃", "🚴", "🏊", "🧘", "💪", "⛹️", "🤸", "🏃‍♀️"]
 
+
 # ------------------------------------------------------------------
 # SECTION 5C: COMMUNITY DATA HELPERS (friends + chat)
+# Just like habit data, community data (who's on the app, who's
+# friends with who, and chat messages) is saved to a small JSON
+# file on disk so it's remembered between visits.
+#
+# Data shape:
+# {
+#   "users": ["Alex", "Sam", ...],                 <- everyone who's opened the app
+#   "friends": {"Alex": ["Sam"], "Sam": ["Alex"]},  <- friendships are mutual
+#   "messages": {
+#     "Alex::Sam": [                                <- key is names sorted + joined
+#       {"sender": "Alex", "text": "hey!", "time": "2026-07-28 09:15"},
+#       ...
+#     ]
+#   }
+# }
 # ------------------------------------------------------------------
 COMMUNITY_FILE = "community_data.json"
+
 
 def load_community_data():
     """Read the whole community_data.json file into a Python dict."""
@@ -1075,10 +1052,12 @@ def load_community_data():
             pass
     return {"users": [], "friends": {}, "messages": {}}
 
+
 def save_community_data(data):
     """Write the whole community data dict back to community_data.json."""
     with open(COMMUNITY_FILE, "w") as f:
         json.dump(data, f, indent=2)
+
 
 def register_user(name):
     """Add a name to the discoverable users list, if it isn't already there."""
@@ -1087,13 +1066,16 @@ def register_user(name):
         data["users"].append(name)
         save_community_data(data)
 
+
 def get_all_users():
-    """Return every name that has ever used FitPulse."""
+    """Return every name that has ever used FitPulse (for Discover People)."""
     return load_community_data()["users"]
+
 
 def get_friends(name):
     """Return a person's current friends list."""
     return load_community_data()["friends"].get(name, [])
+
 
 def add_friend(name, friend_name):
     """Add a friendship between two people (mutual, both directions)."""
@@ -1106,525 +1088,2437 @@ def add_friend(name, friend_name):
         data["friends"][friend_name].append(name)
     save_community_data(data)
 
+
 def remove_friend(name, friend_name):
     """Remove a friendship between two people (mutual, both directions)."""
     data = load_community_data()
     if name in data["friends"] and friend_name in data["friends"][name]:
         data["friends"][name].remove(friend_name)
     if friend_name in data["friends"] and name in data["friends"][friend_name]:
-        data["friends"][friend_name].remove(friend_name)
+        data["friends"][friend_name].remove(name)
     save_community_data(data)
+
 
 def chat_key(name_a, name_b):
     """Build a stable, order-independent key for a pair of chatters."""
     return "::".join(sorted([name_a, name_b]))
+
 
 def get_messages(name_a, name_b):
     """Return the chat history between two people, oldest first."""
     data = load_community_data()
     return data["messages"].get(chat_key(name_a, name_b), [])
 
+
 def send_message(sender, recipient, text):
     """Append a new chat message between two people."""
-    if not text.strip():
-        return
     data = load_community_data()
     key = chat_key(sender, recipient)
     data["messages"].setdefault(key, [])
-    data["messages"][key].append({
-        "sender": sender,
-        "text": text.strip(),
-        "time": datetime.now().strftime("%I:%M %p"),
-    })
+    data["messages"][key].append(
+        {
+            "sender": sender,
+            "text": text,
+            "time": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        }
+    )
     save_community_data(data)
 
+
 # ------------------------------------------------------------------
-# SESSION STATE INITIALIZATION
+# SECTION 6: SESSION STATE (controls which "view" we're on) +
+# LOGIN PERSISTENCE (controls whether you stay logged in)
+#
+# st.session_state only lives in memory for as long as your browser
+# tab's connection to the app stays open — a page refresh throws it
+# away and you'd be back to "Guest". To fix that, we ALSO save the
+# logged-in username in a browser cookie. Cookies are little pieces
+# of data the browser stores on your device and hands back to the
+# app on every visit, so:
+#   - Sign up / log in  -> we save a cookie on this device.
+#   - Refresh the page  -> the cookie is still there, so we log you
+#                           right back in automatically.
+#   - Click "Log Out"   -> we delete the cookie, so you go back to
+#                           being a Guest until you log in again.
 # ------------------------------------------------------------------
+LOGIN_COOKIE_NAME = "fitpulse_username"
+
+
+def get_cookie_manager():
+    """One CookieManager per script run, talking to the browser's cookies."""
+    return stx.CookieManager(key="fitpulse_cookie_manager")
+
+
+cookie_manager = get_cookie_manager()
+# get_all() reads every cookie the browser has for this app. On the very
+# first run in a brand-new tab this can briefly come back empty while the
+# browser and the app finish their handshake — that's normal and Streamlit
+# will automatically rerun once the real cookies arrive.
+saved_cookies = cookie_manager.get_all(key="fitpulse_cookie_get_all") or {}
+
 if "page" not in st.session_state:
-    st.session_state.page = "gym_finder"
+    st.session_state.page = "home"
+
 if "username" not in st.session_state:
-    st.session_state.username = "Alex"
-if "active_chat" not in st.session_state:
-    st.session_state.active_chat = None
-if "selected_muscle" not in st.session_state:
-    st.session_state.selected_muscle = None
+    saved_username = (saved_cookies.get(LOGIN_COOKIE_NAME) or "").strip()
+    st.session_state.username = saved_username or "Guest"
 
-register_user(st.session_state.username)
 
-# ------------------------------------------------------------------
-# SECTION 6: NAVIGATION / HEADER
-# ------------------------------------------------------------------
-def render_header():
-    """Renders top header, nav bar, and user switcher."""
-    col1, col2 = st.columns([3, 1])
-    
-    with col1:
-        st.markdown("### ⚡ **FitPulse** Fitness Portal")
-    
-    with col2:
-        username = st.text_input("User Account:", value=st.session_state.username, key="user_account_input")
-        if username != st.session_state.username:
-            st.session_state.username = username
-            register_user(username)
-            st.rerun()
+def login_user(name):
+    """Log a user in for real: remember them in this tab's session AND
+    write a cookie to this device so a page refresh (or closing and
+    reopening the browser) keeps them logged in automatically."""
+    name = name.strip() or "Guest"
+    st.session_state.username = name
+    cookie_manager.set(
+        LOGIN_COOKIE_NAME,
+        name,
+        expires_at=datetime.now() + timedelta(days=365),
+        key="fitpulse_cookie_set",
+    )
 
-    # Nav Bar Tabs
-    nav_cols = st.columns(7)
-    pages = [
-        ("gym_finder", "📍 Gym Finder"),
-        ("gym_sessions", "🏋️ Workout Plans"),
-        ("habits", "🏃 Habit Tracker"),
-        ("goal_calendar", "📅 Goal Calendar"),
-        ("community", "💬 Chat / Community"),
-        ("friends_list", "👥 Friends List"),
-        ("profile", "👤 Profile"),
-    ]
-    
-    for idx, (p_id, label) in enumerate(pages):
-        btn_type = "primary" if st.session_state.page == p_id else "secondary"
-        if nav_cols[idx].button(label, key=f"nav_btn_{p_id}", type=btn_type, use_container_width=True):
-            st.session_state.page = p_id
-            if p_id != "gym_sessions":
-                st.session_state.selected_muscle = None
-            st.rerun()
+
+def logout_user():
+    """The ONLY way a user gets signed out: clears this tab's session
+    AND deletes the saved cookie, so they won't be auto logged back in
+    on the next refresh."""
+    st.session_state.username = "Guest"
+    st.session_state.page = "home"
+    if LOGIN_COOKIE_NAME in saved_cookies:
+        cookie_manager.delete(LOGIN_COOKIE_NAME, key="fitpulse_cookie_delete")
+
 
 # ------------------------------------------------------------------
-# SECTION 7: RENDER PAGES
+# Make sure this person shows up for others in "Discover People".
 # ------------------------------------------------------------------
+def init_username():
+    global username
+    username = st.session_state.username.strip() or "Guest"
+    register_user(username)
 
-def render_gym_finder():
-    """Renders modern Gym Finder screen."""
+init_username()
+
+# ------------------------------------------------------------------
+# SECTION 7: TOP-RIGHT HEADER (user profile + navigation)
+# ------------------------------------------------------------------
+username = st.session_state.username.strip() or "Guest"
+user_profile = get_user_profile(username)
+avatar_emoji = user_profile.get("avatar_emoji", "🏋️")
+
+# Feature quick-links shown in the top navigation bar, in the same
+# order as the feature cards on the home page, so the bar and the
+# cards always point to the same set of pages.
+NAV_ITEMS = [
+    ("🏠", "Home", "home"),
+    ("📍", "Gyms", "gym_finder"),
+    ("🌐", "Community", "community"),
+    ("✅", "Habits", "habits"),
+    ("👥", "Friends", "friends_list"),
+    ("🗓️", "Goals", "goal_calendar"),
+]
+
+header_col1, header_col2, header_col3 = st.columns([2.5, 0.5, 1.5])
+
+with header_col1:
+    with st.container(key="top_navbar"):
+        nav_cols = st.columns(len(NAV_ITEMS))
+        for nav_col, (nav_icon, nav_label, nav_page) in zip(nav_cols, NAV_ITEMS):
+            with nav_col:
+                is_active_page = st.session_state.page == nav_page
+                if st.button(
+                    f"{nav_icon} {nav_label}",
+                    key=f"nav_{nav_page}",
+                    use_container_width=True,
+                    type="primary" if is_active_page else "secondary",
+                ):
+                    st.session_state.page = nav_page
+                    st.rerun()
+
+with header_col3:
     st.markdown(
         """
-        <div class="fitpulse-locator-hero">
-            <h1>📍 FIND NEARBY GYMS & FITNESS CENTERS</h1>
-            <p>Locate the top fitness facilities around your area with real-time distance calculations and amenity lists.</p>
+        <style>
+        /* Small, square icon-only button for Log Out, sized to sit
+           neatly next to the other header buttons. */
+        .st-key-header_logout_btn button {
+            font-size: 18px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f'<div style="text-align: right; font-weight: 700; color: #2A2A26; margin-bottom: 8px;">{avatar_emoji} {username}</div>',
+        unsafe_allow_html=True,
+    )
+
+    is_logged_in = username != "Guest"
+    header_cols = st.columns(3 if is_logged_in else 2)
+    col_profile = header_cols[0]
+    col_back = header_cols[1]
+    col_logout = header_cols[2] if is_logged_in else None
+
+    with col_profile:
+        if st.button("👤 Profile", use_container_width=True, key="header_profile_btn"):
+            st.session_state.page = "profile"
+            st.rerun()
+
+    with col_back:
+        if st.session_state.page in ("habits", "community", "gym_finder", "friends_list", "goal_calendar", "profile", "signup", "login"):
+            if st.button("🏠 Home", use_container_width=True, key="back_to_home_header"):
+                st.session_state.page = "home"
+                st.rerun()
+
+    # The ONLY way to sign out — clears the session AND deletes the
+    # login cookie so you won't be auto logged back in on refresh.
+    if col_logout is not None:
+        with col_logout:
+            if st.button("🚪", use_container_width=True, key="header_logout_btn", help="Log out"):
+                logout_user()
+                st.rerun()
+
+st.divider()
+
+# ------------------------------------------------------------------
+# SECTION 8: HOME PAGE (hero, feature cards, gym finder)
+# ------------------------------------------------------------------
+def render_home():
+    # --- Hero banner ---
+    st.markdown(
+        """
+        <div class="fitpulse-hero">
+            <div class="fitpulse-hero-badge">Free &nbsp;•&nbsp; No Membership Required</div>
+            <h1>💪 FITPULSE</h1>
+            <p>Stay active. Build healthy habits. Connect with your community.</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    
-    col1, col2, col3 = st.columns([2, 1, 1])
-    with col1:
-        selected_city = st.selectbox("Select Your City/Location:", list(SAMPLE_LOCATIONS.keys()))
-    with col2:
-        max_radius = st.slider("Search Radius (Miles):", 1, 25, 10)
-    with col3:
-        sort_by = st.selectbox("Sort By:", ["Distance (Closest)", "Rating (Highest)"])
 
-    user_lat, user_lon = SAMPLE_LOCATIONS[selected_city]
-    
-    results = []
-    for gym in FITNESS_CENTERS:
-        dist = distance_in_miles(user_lat, user_lon, gym["lat"], gym["lon"])
-        if dist <= max_radius:
-            results.append({**gym, "distance": dist})
+    st.write(
+        "Welcome to **FitPulse**! 🎉 We help you find fitness centers near you, "
+        "so staying active is easier and more affordable. Tap **Gym Finder** below to "
+        "open the locator."
+    )
 
-    if sort_by == "Distance (Closest)":
-        results.sort(key=lambda x: x["distance"])
-    else:
-        results.sort(key=lambda x: x["rating"], reverse=True)
+    # --- Feature card grid (5 cards: 3 in first row, 2 in second) ---
+    feature_cols = st.columns(3)
 
-    st.markdown(f"#### Showing {len(results)} Gyms near {selected_city}")
+    features = [
+        ("📍", "Gym Finder", "Open the locator to search fitness centers near you."),
+        ("🌐", "Communities", "Add friends and chat with people on FitPulse."),
+        ("✅", "Habit Tracking", "Build and track healthy daily habits."),
+    ]
 
-    for idx, gym in enumerate(results):
-        is_closest = (idx == 0 and sort_by == "Distance (Closest)")
-        closest_badge = '<div class="fitpulse-closest-tag">Closest Choice</div>' if is_closest else ''
-        
-        pills_html = "".join([f'<span class="fitpulse-pill">{a}</span>' for a in gym["amenities"]])
-        
-        st.markdown(
-            f"""
-            <div class="fitpulse-gym-card">
-                {closest_badge}
-                <div class="gym-top-row">
-                    <div>
-                        <h4>{gym['name']}</h4>
-                        <div class="gym-address">{gym['address']}</div>
+    # Cards that actually navigate somewhere: title -> (container key,
+    # button key, page to switch to). Each is rendered as ONE real
+    # st.button styled (via CSS in SECTION 2) to look like a feature
+    # card, instead of decorative HTML with an invisible button on top
+    # — that overlay approach was unreliable to click. With a single
+    # real button, clicking anywhere on the card always works. All
+    # cards (Gym Finder, Communities, Habit Tracking, Friends List,
+    # Goal Calendar) use this same pattern now, so each opens only
+    # when its card is actually clicked — there's no duplicate content.
+    CLICKABLE_CARDS = {
+        "Gym Finder": ("gym_finder_card", "gym_finder_card_click", "gym_finder"),
+        "Communities": ("community_card", "community_card_click", "community"),
+        "Habit Tracking": ("habit_tracking_card", "habit_card_click", "habits"),
+        "Friends List": ("friends_list_card", "friends_list_card_click", "friends_list"),
+        "Goal Calendar": ("goal_calendar_card", "goal_calendar_card_click", "goal_calendar"),
+        "Gym Sessions": ("gym_sessions_card", "gym_sessions_card_click", "gym_sessions"),
+    }
+
+    for col, (icon, title, text) in zip(feature_cols, features):
+        with col:
+            if title in CLICKABLE_CARDS:
+                container_key, button_key, target_page = CLICKABLE_CARDS[title]
+                with st.container(key=container_key):
+                    card_clicked = st.button(
+                        f"{icon}\n\n**{title}**\n\n{text}",
+                        key=button_key,
+                        use_container_width=True,
+                    )
+                    if card_clicked:
+                        st.session_state.page = target_page
+                        st.rerun()
+            else:
+                st.markdown(
+                    f"""
+                    <div class="fitpulse-feature-card">
+                        <div class="icon">{icon}</div>
+                        <h4>{title}</h4>
+                        <p>{text}</p>
                     </div>
-                    <span class="fitpulse-distance-badge">{gym['distance']:.1f} Miles</span>
-                </div>
-                <div>
-                    <span class="fitpulse-rating-stars">★ {gym['rating']}</span>
-                    <span class="fitpulse-rating-number">/ 5.0</span>
-                </div>
-                <div class="fitpulse-pill-row">
-                    {pills_html}
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+                    """,
+                    unsafe_allow_html=True,
+                )
 
-def render_gym_sessions():
-    """Renders the Gym Sessions workout selection screen and muscle detail page."""
+    # --- Friends List + Goal Calendar cards (second row) ---
+    second_row_cols = st.columns(2)
+    with second_row_cols[0]:
+        with st.container(key="friends_list_card"):
+            friends_card_clicked = st.button(
+                "👥\n\n**Friends List**\n\nView and manage all your FitPulse friends.",
+                key="friends_list_card_click",
+                use_container_width=True,
+            )
+            if friends_card_clicked:
+                st.session_state.page = "friends_list"
+                st.rerun()
+    with second_row_cols[1]:
+        with st.container(key="goal_calendar_card"):
+            goal_calendar_clicked = st.button(
+                "🗓️\n\n**Goal Calendar**\n\nSet workout goals and track completed workouts.",
+                key="goal_calendar_card_click",
+                use_container_width=True,
+            )
+            if goal_calendar_clicked:
+                st.session_state.page = "goal_calendar"
+                st.rerun()
+
+    st.write("")  # small spacer
+
+    # --- Gym Sessions card (third row - centered) ---
+    gym_sessions_cols = st.columns([1, 2, 1])  # Center the card
+    with gym_sessions_cols[1]:
+        with st.container(key="gym_sessions_card"):
+            gym_sessions_clicked = st.button(
+                "💪\n\n**Gym Sessions**\n\nComplete workout plans for every muscle group.",
+                key="gym_sessions_card_click",
+                use_container_width=True,
+            )
+            if gym_sessions_clicked:
+                st.session_state.page = "gym_sessions"
+                st.rerun()
+
+    st.write("")  # small spacer
+    st.divider()
+
+    # --- Photo gallery: real people, working out, staying active ---
+    # A handful of free-to-use (Unsplash License) photos so the page
+    # feels lived-in instead of just icons and text — a little glimpse
+    # of the kind of community FitPulse is for.
+    st.markdown(
+        '<div class="fitpulse-section-header">📸 Our Community in Motion</div>',
+        unsafe_allow_html=True,
+    )
+    gallery_photos = [
+        (
+            "https://images.unsplash.com/photo-1547226238-e53e98a8e59d?w=700&q=70&auto=format&fit=crop",
+            "Gym Sessions",
+        ),
+        (
+            "https://images.unsplash.com/photo-1518644961665-ed172691aaa1?w=700&q=70&auto=format&fit=crop",
+            "Wellness & Stretching",
+        ),
+        (
+            "https://images.unsplash.com/photo-1577221084712-45b0445d2b00?w=700&q=70&auto=format&fit=crop",
+            "Strength Training",
+        ),
+        (
+            "https://images.unsplash.com/photo-1590333748338-d629e4564ad9?w=700&q=70&auto=format&fit=crop",
+            "Cardio & Running",
+        ),
+    ]
+    gallery_html = '<div class="fitpulse-photo-grid">' + "".join(
+        f'<div class="fitpulse-photo-card"><img src="{url}" alt="{caption}">'
+        f'<div class="fitpulse-photo-caption">{caption}</div></div>'
+        for url, caption in gallery_photos
+    ) + "</div>"
+    st.markdown(gallery_html, unsafe_allow_html=True)
+
+    # --- Bottom CTA banner ---
+    st.markdown(
+        """
+        <div class="fitpulse-cta-banner">
+            <h3>Ready to make a change? 🚀</h3>
+            <p>FitPulse is free to use — tap the Gym Finder card to find one near you.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.caption("FitPulse — Sprint 2 Demo | Built with Python + Streamlit")
+
+
+# ------------------------------------------------------------------
+# SECTION 8A: GYM FINDER PAGE
+# This is the page users land on after clicking the Gym Finder card
+# on the home page — it's the ONLY place the locator tool lives now
+# (previously there was a second copy of it sitting directly on the
+# home page, which was redundant since the card already led here).
+#
+# It reuses the same FITNESS_CENTERS sample data and haversine
+# distance math as before, but the results are presented in a more
+# modern, "app-like" style: a gradient hero banner, a glassy toolbar
+# for the search controls, sortable results, and card-style results
+# with star ratings, amenity pills, and a "Closest" tag.
+# ------------------------------------------------------------------
+def render_gym_finder():
+    if st.button("🏠 Back to Home", key="back_home_gym_finder"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    # --- Hero banner (gym-finder themed) ---
+    st.markdown(
+        """
+        <div class="fitpulse-locator-hero">
+            <h1>📍 Gym Finder</h1>
+            <p>Search fitness centers near you, compare ratings and amenities,
+            and sort results the way that matters most to you.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # --- Location search options ---
+    st.markdown("**Choose your search location:**")
     
-    if st.session_state.get("selected_muscle") and st.session_state.selected_muscle in WORKOUT_PLANS:
-        muscle_key = st.session_state.selected_muscle
-        data = WORKOUT_PLANS[muscle_key]
-        
-        if st.button("⬅ Back to All Muscle Groups", key="back_to_muscles"):
-            st.session_state.selected_muscle = None
-            st.rerun()
-            
-        st.markdown(
-            f"""
-            <div class="fitpulse-hero" style="background: linear-gradient(135deg, #1C1C1A 0%, #3A4D39 100%);">
-                <h1 style="font-size: 42px; color: #E8F5E9;">{data['icon']} {muscle_key.upper()} WORKOUT PLAN</h1>
-                <p style="font-size: 18px; color: #C8E6C9;">{data['description']}</p>
-            </div>
-            """,
-            unsafe_allow_html=True
+    search_method = st.radio(
+        "Search by:",
+        options=["Select from cities", "Type custom location"],
+        horizontal=True,
+        key="gym_search_method"
+    )
+    
+    user_lat = None
+    user_lon = None
+    location_name = ""
+    
+    if search_method == "Select from cities":
+        location_choice = st.selectbox(
+            "📍 Select a city",
+            options=list(SAMPLE_LOCATIONS.keys()),
+            key="gym_location",
+            help="Choose from available cities in NJ/NY area"
+        )
+        user_lat, user_lon = SAMPLE_LOCATIONS[location_choice]
+        location_name = location_choice
+    else:
+        # Custom location search (accepts city names from SAMPLE_LOCATIONS)
+        custom_location = st.text_input(
+            "📍 Type a city name",
+            placeholder="e.g., Union City, NJ or Hoboken, NJ",
+            key="gym_custom_location"
         )
         
-        st.markdown('<div class="fitpulse-section-header">📋 Exercises, Reps & Form Guidelines</div>', unsafe_allow_html=True)
-        
-        for idx, ex in enumerate(data["exercises"], 1):
-            st.markdown(
-                f"""
-                <div style="background-color: #FFFFFF; border: 1px solid #E0E0E0; border-left: 5px solid #7C9473; border-radius: 12px; padding: 20px; margin-bottom: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
-                    <span style="display: inline-block; background-color: #EAF1E7; color: #2A2A26; font-weight: bold; padding: 4px 10px; border-radius: 6px; font-size: 13px; margin-bottom: 8px;">{ex['type'].upper()}</span>
-                    <h3 style="margin-top: 0; color: #2A2A26; font-size: 20px;">{idx}. {ex['name']}</h3>
-                    <p style="margin: 4px 0;"><strong>📊 Details:</strong> {ex['details']}</p>
-                    <p style="margin: 4px 0;"><strong>💡 Form:</strong> {ex['form']}</p>
-                    <p style="margin: 4px 0;"><strong>📈 Progression:</strong> {ex['progression']}</p>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+        if custom_location.strip():
+            # Check if typed location matches any in our list
+            matching_locations = [city for city in SAMPLE_LOCATIONS.keys() 
+                                 if custom_location.strip().lower() in city.lower()]
             
+            if matching_locations:
+                user_lat, user_lon = SAMPLE_LOCATIONS[matching_locations[0]]
+                location_name = matching_locations[0]
+            else:
+                st.warning(f"Location '{custom_location}' not found. Try: {', '.join(list(SAMPLE_LOCATIONS.keys())[:3])}")
+    
+    st.divider()
+    
+    # --- Glassy toolbar: radius and sort ---
+    with st.container():
+        st.markdown('<div class="fitpulse-locator-toolbar">', unsafe_allow_html=True)
+        tool_col1, tool_col2 = st.columns([1, 1])
+        with tool_col1:
+            radius_miles = st.slider(
+                "📏 Search radius (mi)",
+                min_value=1,
+                max_value=25,
+                value=10,
+                key="gym_radius",
+            )
+        with tool_col2:
+            sort_choice = st.selectbox(
+                "↕️ Sort by",
+                options=["Distance", "Rating", "Name"],
+                key="gym_sort",
+            )
+
+        search_clicked = st.button(
+            "🔎 Find Nearby Gyms", use_container_width=True, type="primary", key="search_gyms"
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # --- Auto-search: trigger search if button clicked ---
+    should_search = search_clicked and user_lat is not None and user_lon is not None
+
+    # --- Search results ---
+    if should_search:
+        st.caption(f"📍 Searching from {location_name}: ({user_lat:.4f}, {user_lon:.4f})")
+
+        nearby_gyms = []
+        for gym in FITNESS_CENTERS:
+            dist = distance_in_miles(user_lat, user_lon, gym["lat"], gym["lon"])
+            if dist <= radius_miles:
+                nearby_gyms.append((gym, dist))
+
+        if sort_choice == "Distance":
+            nearby_gyms.sort(key=lambda pair: pair[1])
+        elif sort_choice == "Rating":
+            nearby_gyms.sort(key=lambda pair: pair[0]["rating"], reverse=True)
+        else:  # Name
+            nearby_gyms.sort(key=lambda pair: pair[0]["name"])
+
+        if nearby_gyms:
+            st.success(f"✅ Found {len(nearby_gyms)} fitness center(s) near you!")
+
+            closest_name = min(nearby_gyms, key=lambda pair: pair[1])[0]["name"]
+            result_cols = st.columns(2)
+            for index, (gym, dist) in enumerate(nearby_gyms):
+                full_stars = int(round(gym["rating"]))
+                stars = "★" * full_stars + "☆" * (5 - full_stars)
+                pills_html = "".join(
+                    f'<span class="fitpulse-pill">{tag}</span>' for tag in gym["amenities"]
+                )
+                closest_tag_html = (
+                    '<div class="fitpulse-closest-tag">Closest</div>'
+                    if gym["name"] == closest_name
+                    else ""
+                )
+
+                # Built as ONE flat string with no leading whitespace on any
+                # line. Streamlit's markdown renderer treats heavily-indented
+                # lines (like the multi-line, deeply-nested version this
+                # used to be) as a preformatted code block instead of parsing
+                # them as HTML — which is why every card after the first one
+                # was showing up as raw "<div class=...>" text instead of a
+                # styled card. A flat string has no indentation to trip on.
+                card_html = (
+                    '<div class="fitpulse-gym-card">'
+                    f'{closest_tag_html}'
+                    '<div class="gym-top-row"><div>'
+                    f'<h4>🏋️ {gym["name"]}</h4>'
+                    f'<div class="gym-address">📍 {gym["address"]}</div>'
+                    "</div>"
+                    f'<span class="fitpulse-distance-badge">{dist:.1f} mi</span>'
+                    "</div>"
+                    f'<span class="fitpulse-rating-stars">{stars}</span>'
+                    f'<span class="fitpulse-rating-number">{gym["rating"]}/5</span>'
+                    f'<div class="fitpulse-pill-row">{pills_html}</div>'
+                    "</div>"
+                )
+
+                with result_cols[index % 2]:
+                    st.markdown(card_html, unsafe_allow_html=True)
+        else:
+            st.error(
+                "❌ No fitness centers found in that radius. "
+                "Try increasing your search radius or choosing a different location."
+            )
     else:
+        st.info("Set your location and radius above, then click **Find Nearby Gyms**.")
+
+
+# ------------------------------------------------------------------
+# SECTION 8B: COMMUNITY PAGE
+# This is the page users land on after clicking the Communities card.
+# It has two tabs:
+#   1. "My Friends"      — pick a friend and chat with them
+#   2. "Discover People"  — search everyone who's used FitPulse and
+#                           add them as a friend
+# Friends and chat messages are saved to community_data.json, so
+# they're remembered between visits (as long as the app runs on the
+# same machine/server).
+# ------------------------------------------------------------------
+def render_community():
+    st.markdown(
+        '<div class="fitpulse-section-header">🌐 Community</div>',
+        unsafe_allow_html=True,
+    )
+    st.write(f"Connect with other FitPulse members, **{username}**.")
+
+    if st.button("🏠 Back to Home", key="back_home_community"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    st.divider()
+    
+    # --- GUEST USER POPUP CHECK ---
+    # If the user is a "Guest", show a card asking them to sign up or log in
+    # before they can access the community messaging features.
+    #
+    # NOTE: the old version of this used a position:fixed full-screen
+    # overlay for the "modal" look. That overlay floated on top of
+    # everything else on the page, including the real Sign Up / Log In
+    # buttons underneath it — so the buttons were basically unclickable.
+    # This version keeps the same "popup card" idea, but builds it as a
+    # normal in-page card (using the same real-button-styled-as-a-card
+    # trick used elsewhere in this file), so the two buttons are always
+    # visible and always clickable.
+    if username == "Guest":
         st.markdown(
             """
-            <div class="fitpulse-hero" style="background: linear-gradient(135deg, #1C1C1A 0%, #3A4D39 100%); padding: 36px 28px;">
-                <h1 style="font-size: 40px; color: #E8F5E9;">🔥 WHAT DO YOU WANT TO WORK OUT TODAY? 🔥</h1>
-                <p style="font-size: 18px; color: #C8E6C9;">Pick a muscle group below to unlock full exercise plans and rep guides!</p>
-            </div>
+            <style>
+            .st-key-guest_gate_card {
+                background-color: #F7F5EF;
+                border: 1px solid #D9D4C7;
+                border-radius: 16px;
+                padding: 40px 40px 28px 40px;
+                text-align: center;
+                box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+            }
+            .guest-gate-icon {
+                font-size: 48px;
+                margin-bottom: 10px;
+            }
+            .guest-gate-title {
+                color: #2E2E2A;
+                font-size: 26px;
+                font-weight: 700;
+                margin: 0 0 12px 0;
+            }
+            .guest-gate-text {
+                color: #5A5A52;
+                font-size: 15.5px;
+                line-height: 1.6;
+                margin: 0 auto 8px auto;
+                max-width: 420px;
+            }
+
+            /* Sign Up button: earthy, muted green */
+            .st-key-guest_signup_btn button {
+                background-color: #7C9473 !important;
+                border: 1px solid #7C9473 !important;
+                color: white !important;
+                font-weight: 700 !important;
+            }
+            .st-key-guest_signup_btn button:hover {
+                background-color: #66805C !important;
+                border-color: #66805C !important;
+            }
+
+            /* Log In button: earthy, warm gray */
+            .st-key-guest_login_btn button {
+                background-color: #8C887E !important;
+                border: 1px solid #8C887E !important;
+                color: white !important;
+                font-weight: 700 !important;
+            }
+            .st-key-guest_login_btn button:hover {
+                background-color: #75716A !important;
+                border-color: #75716A !important;
+            }
+            </style>
             """,
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
-        
-        muscle_names = list(WORKOUT_PLANS.keys())
-        cols = st.columns(3)
-        for i, m_name in enumerate(muscle_names):
-            col = cols[i % 3]
-            m_data = WORKOUT_PLANS[m_name]
-            with col:
-                btn_label = f"{m_data['icon']} {m_name}\n\n{m_data['description']}"
-                if st.button(btn_label, key=f"muscle_btn_{m_name}", use_container_width=True):
-                    st.session_state.selected_muscle = m_name
-                    st.rerun()
 
-def render_habit_tracker():
-    """Renders Habit Tracker view."""
-    user = st.session_state.username
-    user_data = get_user_data(user)
-    habits = user_data["habits"]
+        gate_col1, gate_col2, gate_col3 = st.columns([1, 2, 1])
+        with gate_col2:
+            with st.container(key="guest_gate_card"):
+                st.markdown(
+                    """
+                    <div class="guest-gate-icon">👤</div>
+                    <div class="guest-gate-title">Sign in to Chat</div>
+                    <p class="guest-gate-text">
+                        To communicate with other FitPulse members and speak
+                        under your name, you'll need to create an account or
+                        log in.
+                    </p>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
-    st.markdown(
-        f"""
-        <div class="fitpulse-hero">
-            <h1>🏃 HABIT TRACKER</h1>
-            <p>Welcome back, <strong>{user}</strong>! Log your routines and keep your streaks active.</p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+                btn_col1, btn_col2 = st.columns(2)
+                with btn_col1:
+                    if st.button("✏️ Sign Up", use_container_width=True, key="guest_signup_btn"):
+                        st.session_state.page = "signup"
+                        st.rerun()
+                with btn_col2:
+                    if st.button("🔑 Log In", use_container_width=True, key="guest_login_btn"):
+                        st.session_state.page = "login"
+                        st.rerun()
 
-    col1, col2 = st.columns([1, 2])
-    
-    with col1:
-        st.markdown('<div class="fitpulse-section-header">➕ Add New Habit</div>', unsafe_allow_html=True)
-        with st.form("new_habit_form"):
-            h_name = st.text_input("Habit Name:")
-            h_dist = st.number_input("Target Distance (Miles):", min_value=0.1, value=1.0, step=0.5)
-            h_freq = st.selectbox("Frequency:", ["Daily", "Weekly", "Custom"])
-            submit = st.form_submit_button("Save Habit")
-            
-            if submit and h_name:
-                habits[h_name] = {
-                    "goal_distance": h_dist,
-                    "frequency": h_freq,
-                    "logs": []
-                }
-                save_user_data(user, user_data)
-                st.success(f"Habit '{h_name}' created!")
-                st.rerun()
+                st.markdown(
+                    '<p style="margin-top: 20px; font-size: 13px; color: #8A8A80;">'
+                    "<em>You can continue browsing as a guest, but messaging is limited.</em>"
+                    "</p>",
+                    unsafe_allow_html=True,
+                )
 
-    with col2:
-        st.markdown('<div class="fitpulse-section-header">📊 Your Active Habits</div>', unsafe_allow_html=True)
-        if not habits:
-            st.info("No habits logged yet. Create one using the form on the left!")
-            return
-
-        for name, h_info in habits.items():
-            logs = h_info["logs"]
-            streak = compute_streak(logs)
-            stats = compute_habit_stats(logs)
-            
-            with st.expander(f"📌 {name} (Streak: {streak} Days 🔥)", expanded=True):
-                c1, c2, c3 = st.columns(3)
-                c1.metric("Total Workouts", stats["total_runs"])
-                c2.metric("Total Distance", f"{stats['total_distance']} mi")
-                c3.metric("Avg Speed", f"{stats['avg_speed']} mph")
-                
-                if not logged_today(logs):
-                    st.markdown("##### Log Today's Session:")
-                    with st.form(f"log_form_{name}"):
-                        lc1, lc2 = st.columns(2)
-                        l_dist = lc1.number_input("Distance (mi):", value=float(h_info["goal_distance"]), key=f"d_{name}")
-                        l_dur = lc2.number_input("Duration (mins):", value=10.0, key=f"dur_{name}")
-                        if st.form_submit_button("Record Session"):
-                            speed = (l_dist / (l_dur / 60.0)) if l_dur > 0 else 0.0
-                            logs.append({
-                                "date": date.today().strftime("%Y-%m-%d"),
-                                "distance": l_dist,
-                                "duration_min": l_dur,
-                                "speed_mph": round(speed, 2)
-                            })
-                            save_user_data(user, user_data)
-                            st.success("Session logged!")
-                            st.rerun()
-                else:
-                    st.success("✅ Logged for today!")
-
-def render_goal_calendar():
-    """Renders Goal Calendar view."""
-    user = st.session_state.username
-    user_data = get_user_data(user)
-    
-    st.markdown(
-        """
-        <div class="fitpulse-hero">
-            <h1>📅 WORKOUT GOAL CALENDAR</h1>
-            <p>Set targets and monitor workout completion across the month.</p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    c1, c2 = st.columns([1, 2])
-    with c1:
-        st.markdown('<div class="fitpulse-section-header">🎯 Set Target Goal</div>', unsafe_allow_html=True)
-        g_title = st.text_input("Goal Title:")
-        g_date = st.date_input("Target Date:", value=date.today())
-        if st.button("Add Goal to Calendar"):
-            if g_title:
-                add_goal(user_data, g_title, g_date.strftime("%Y-%m-%d"))
-                save_user_data(user, user_data)
-                st.success("Goal added!")
-                st.rerun()
-
-    with c2:
-        st.markdown('<div class="fitpulse-section-header">🗓 Calendar Overview</div>', unsafe_allow_html=True)
-        completed_days = get_completed_workout_days(user_data)
-        
-        today = date.today()
-        cal = calendar.Calendar()
-        month_days = cal.monthdatescalendar(today.year, today.month)
-        
-        st.write(f"### {today.strftime('%B %Y')}")
-        
-        for week in month_days:
-            cols = st.columns(7)
-            for i, d in enumerate(week):
-                d_str = d.strftime("%Y-%m-%d")
-                is_workout = d_str in completed_days
-                day_goals = goals_on_date(user_data["goals"], d_str)
-                
-                bg = "#EAF1E7" if is_workout else "#FFFFFF"
-                border = "#7C9473" if is_workout else "#E0E0E0"
-                
-                with cols[i]:
-                    st.markdown(
-                        f"""
-                        <div style="background:{bg}; border:1px solid {border}; border-radius:8px; padding:6px; min-height:60px;">
-                            <strong>{d.day}</strong>
-                            {'<br>✅ Worked Out' if is_workout else ''}
-                            {'<br>🎯 ' + str(len(day_goals)) + ' Goal(s)' if day_goals else ''}
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-
-def render_community():
-    """Renders Community Chat view."""
-    user = st.session_state.username
-    friends = get_friends(user)
-
-    st.markdown(
-        """
-        <div class="fitpulse-hero">
-            <h1>💬 COMMUNITY CHAT</h1>
-            <p>Connect and chat directly with your fitness friends.</p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    if not friends:
-        st.warning("You haven't added any friends yet. Visit the Friends List tab to add people!")
+        # Stop rendering the rest of the community features
         return
 
-    c1, c2 = st.columns([1, 2])
-    with c1:
-        st.markdown('<div class="fitpulse-section-header">👥 Select Friend</div>', unsafe_allow_html=True)
-        active = st.radio("Friends:", friends, key="chat_friend_radio")
-        st.session_state.active_chat = active
+    friends_tab, discover_tab = st.tabs(["👥 My Friends", "🔍 Discover People"])
 
-    with c2:
-        if st.session_state.active_chat:
-            recipient = st.session_state.active_chat
-            st.markdown(f'<div class="fitpulse-section-header">Chat with {recipient}</div>', unsafe_allow_html=True)
-            
-            messages = get_messages(user, recipient)
-            chat_container = st.container()
-            
-            with chat_container:
-                for msg in messages:
-                    is_me = msg["sender"] == user
-                    align = "right" if is_me else "left"
-                    bg = "#EAF1E7" if is_me else "#F4F2EC"
-                    st.markdown(
-                        f"""
-                        <div style="text-align: {align}; margin-bottom: 8px;">
-                            <div style="display: inline-block; background: {bg}; padding: 8px 14px; border-radius: 12px; max-width: 70%;">
-                                <strong>{msg['sender']}</strong> <small>({msg['time']})</small><br>
-                                {msg['text']}
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+    # --- TAB 1: My Friends (pick a friend, chat with them) ---
+    with friends_tab:
+        friends = get_friends(username)
 
-            with st.form("send_msg_form", clear_on_submit=True):
-                txt = st.text_input("Type message:")
-                if st.form_submit_button("Send") and txt:
-                    send_message(user, recipient, txt)
+        if not friends:
+            st.info(
+                "You haven't added any friends yet. Head over to **Discover People** "
+                "to search for someone and add them."
+            )
+        else:
+            if (
+                "chat_partner" not in st.session_state
+                or st.session_state.chat_partner not in friends
+            ):
+                st.session_state.chat_partner = friends[0]
+
+            list_col, chat_col = st.columns([1, 2])
+
+            with list_col:
+                st.markdown("**Your friends**")
+                for friend in friends:
+                    is_active = friend == st.session_state.chat_partner
+                    label = f"{'💬 ' if is_active else '👤 '}{friend}"
+                    if st.button(
+                        label,
+                        key=f"select_friend_{friend}",
+                        use_container_width=True,
+                        type="primary" if is_active else "secondary",
+                    ):
+                        st.session_state.chat_partner = friend
+                        st.rerun()
+
+            with chat_col:
+                partner = st.session_state.chat_partner
+                st.markdown(f"**Chat with <span class='fitpulse-friend-name'>{partner}</span>**", unsafe_allow_html=True)
+
+                messages = get_messages(username, partner)
+                with st.container(height=320, border=True):
+                    if not messages:
+                        st.caption("No messages yet — say hi! 👋")
+                    for msg in messages:
+                        role = "user" if msg["sender"] == username else "assistant"
+                        with st.chat_message(role):
+                            st.write(msg["text"])
+                            st.caption(msg["time"])
+
+                new_message = st.chat_input(f"Message {partner}...")
+                if new_message:
+                    send_message(username, partner, new_message)
                     st.rerun()
 
+    # --- TAB 2: Discover People (search + add friends) ---
+    with discover_tab:
+        st.markdown("**Find people on FitPulse**")
+        
+        # City-based location filtering using city physical centers
+        city_filter_col1, city_filter_col2 = st.columns([2, 1])
+        with city_filter_col1:
+            selected_city = st.selectbox(
+                "🗺️ Filter by city (location-based)",
+                options=["All Cities"] + list(SAMPLE_LOCATIONS.keys()),
+                key="discover_city_filter",
+                help="Shows people searching from each city's physical center"
+            )
+        
+        search_query = st.text_input(
+            "Search by name", placeholder="Type a name to search...", key="discover_search"
+        )
+        
+        # Display the selected city's physical center location
+        if selected_city != "All Cities":
+            city_lat, city_lon = SAMPLE_LOCATIONS[selected_city]
+            st.caption(f"📍 Searching from {selected_city} center: ({city_lat:.4f}, {city_lon:.4f})")
+
+        current_friends = get_friends(username)
+        all_people = [name for name in get_all_users() if name != username]
+
+        if search_query.strip():
+            matches = [
+                name for name in all_people
+                if search_query.strip().lower() in name.lower()
+            ]
+        else:
+            matches = all_people
+
+        if not matches:
+            st.info(
+                "No one found yet. Try a different search, or have a friend open "
+                "FitPulse and set their name so you can find them here."
+            )
+        else:
+            for person in matches:
+                person_profile = get_user_profile(person)
+                person_avatar = person_profile.get("avatar_emoji", "🏋️")
+                person_fitness = person_profile.get("favorite_workout", "General Fitness")
+                
+                person_col, action_col = st.columns([3, 1])
+                with person_col:
+                    st.markdown(f"{person_avatar} **{person}** • {person_fitness}")
+                with action_col:
+                    if person in current_friends:
+                        st.button(
+                            "✅ Friends",
+                            key=f"already_friend_{person}",
+                            disabled=True,
+                            use_container_width=True,
+                        )
+                    else:
+                        if st.button(
+                            "➕ Add",
+                            key=f"add_friend_{person}",
+                            use_container_width=True,
+                        ):
+                            add_friend(username, person)
+                            st.success(f"You and {person} are now friends! 🎉")
+                            st.rerun()
+
+
+# ------------------------------------------------------------------
+# SECTION 8B: FRIENDS LIST PAGE
+# A dedicated page to view and manage all friends with search,
+# cards, and remove functionality.
+# ------------------------------------------------------------------
 def render_friends_list():
-    """Renders Friends List management view."""
-    user = st.session_state.username
-    all_users = get_all_users()
-    friends = get_friends(user)
-
     st.markdown(
-        """
-        <div class="fitpulse-hero">
-            <h1>👥 FRIENDS & NETWORK</h1>
-            <p>Find new fitness partners and manage your existing network.</p>
-        </div>
-        """,
-        unsafe_allow_html=True
+        '<div class="fitpulse-section-header">👥 My Friends</div>',
+        unsafe_allow_html=True,
+    )
+    st.write(f"Manage your FitPulse friends, **{username}**.")
+
+    if st.button("🏠 Back to Home", key="back_home_friends"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    st.divider()
+
+    # --- GUEST USER CHECK ---
+    if username == "Guest":
+        st.info(
+            "👤 **Sign in to see your friends.** "
+            "Create an account or log in to view and manage your friend list."
+        )
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✏️ Sign Up", use_container_width=True, key="guest_signup_friends"):
+                st.session_state.page = "signup"
+                st.rerun()
+        with col2:
+            if st.button("🔑 Log In", use_container_width=True, key="guest_login_friends"):
+                st.session_state.page = "login"
+                st.rerun()
+        return
+
+    friends = get_friends(username)
+
+    # --- SEARCH BAR ---
+    search_query = st.text_input(
+        "🔍 Search friends by name",
+        placeholder="Type a name...",
+        key="friends_search",
     )
 
-    c1, c2 = st.columns(2)
-    with c1:
-        st.markdown('<div class="fitpulse-section-header">🔍 Discover People</div>', unsafe_allow_html=True)
-        others = [u for u in all_users if u != user and u not in friends]
-        if not others:
-            st.info("No new users to discover.")
-        for ot in others:
-            col_a, col_b = st.columns([3, 1])
-            col_a.write(f"👤 **{ot}**")
-            if col_b.button("Add Friend", key=f"add_{ot}"):
-                add_friend(user, ot)
-                st.success(f"Added {ot}!")
+    # Filter friends based on search
+    if search_query.strip():
+        filtered_friends = [
+            f for f in friends
+            if search_query.strip().lower() in f.lower()
+        ]
+    else:
+        filtered_friends = friends
+
+    # --- EMPTY STATE ---
+    if not friends:
+        st.markdown(
+            """
+            <div class="fitpulse-empty-state">
+                <div class="fitpulse-empty-state-icon">👥</div>
+                <h3 style="color: #2A2A26; margin: 8px 0;">No Friends Yet</h3>
+                <p>You haven't added any friends yet. Head to the <strong>Communities</strong> 
+                section to discover and add friends!</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🌐 Go to Communities", use_container_width=True, key="go_to_community_from_friends"):
+            st.session_state.page = "community"
+            st.rerun()
+        return
+
+    # --- SEARCH NO RESULTS ---
+    if search_query.strip() and not filtered_friends:
+        st.info(f"No friends found matching '{search_query}'. Try a different search.")
+        return
+
+    # --- FRIENDS CARDS ---
+    st.markdown(f"**{len(filtered_friends)} Friend{'s' if len(filtered_friends) != 1 else ''}**")
+    
+    for friend in filtered_friends:
+        friend_profile = get_user_profile(friend)
+        friend_avatar = friend_profile.get("avatar_emoji", "🏋️")
+        friend_fitness = friend_profile.get("fitness_level", "Beginner")
+        
+        col_avatar, col_info, col_action = st.columns([0.5, 2.5, 1])
+
+        with col_avatar:
+            st.markdown(
+                f"""
+                <div class="fitpulse-friend-avatar" style="text-align: center;">
+                    {friend_avatar}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col_info:
+            st.markdown(
+                f"""
+                <div class="fitpulse-friend-name-text">{friend}</div>
+                <div style="font-size: 13px; color: #8A8A80;">📊 {friend_fitness} • FitPulse Member</div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col_action:
+            if st.button(
+                "❌ Remove",
+                key=f"remove_friend_{friend}",
+                use_container_width=True,
+                help=f"Remove {friend} from your friends list",
+            ):
+                remove_friend(username, friend)
+                st.success(f"Removed {friend} from your friends list.")
                 st.rerun()
 
-    with c2:
-        st.markdown('<div class="fitpulse-section-header">💚 Your Friends</div>', unsafe_allow_html=True)
-        if not friends:
-            st.info("No friends added yet.")
-        for fr in friends:
-            col_a, col_b = st.columns([3, 1])
-            col_a.write(f"🤝 **{fr}**")
-            if col_b.button("Remove", key=f"rem_{fr}"):
-                remove_friend(user, fr)
+    st.divider()
+    
+    # Navigation back to Communities
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🌐 Go to Communities", use_container_width=True, key="back_to_community"):
+            st.session_state.page = "community"
+            st.rerun()
+    with col2:
+        if st.button("👤 View Profile", use_container_width=True, key="view_profile_friends"):
+            st.info(f"**{username}'s Profile**\n\nFriends: {len(friends)}\n\nYour FitPulse account is all set!")
+
+
+# ------------------------------------------------------------------
+# SECTION 9: HABIT TRACKER PAGE
+# This is the new page users land on after clicking the Habit
+# Tracking card. It lets a user:
+#   1. Create a habit (e.g. "Daily 1-Mile Run") with a goal + reminder
+#   2. Log each day's run (distance + time), and see speed calculated
+#   3. See progress: current streak, totals, and charts over time
+# ------------------------------------------------------------------
+def render_habit_tracker():
+    st.markdown(
+        '<div class="fitpulse-section-header">🏋️ Habit Tracker</div>',
+        unsafe_allow_html=True,
+    )
+    st.write(f"Tracking healthy habits for **{username}**. Every log is saved automatically.")
+
+    if st.button("🏠 Back to Home", key="back_home_top"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    user_data = get_user_data(username)
+    habits = user_data["habits"]
+
+    # --- Add a new habit ---
+    with st.expander("➕ Add a New Habit", expanded=(len(habits) == 0)):
+        with st.form("add_habit_form", clear_on_submit=True):
+            habit_name = st.text_input(
+                "Habit name", placeholder="e.g., Daily 1-Mile Run"
+            )
+            col_a, col_b, col_c = st.columns(3)
+            with col_a:
+                goal_distance = st.number_input(
+                    "Goal distance (miles)", min_value=0.0, value=1.0, step=0.1
+                )
+            with col_b:
+                frequency = st.selectbox("Frequency", ["Daily", "Weekdays", "Weekly"])
+            with col_c:
+                reminder_time = st.time_input("Reminder time", value=time_cls(7, 0))
+
+            submitted = st.form_submit_button("Create Habit")
+            if submitted:
+                clean_name = habit_name.strip()
+                if not clean_name:
+                    st.warning("Please enter a habit name.")
+                elif clean_name in habits:
+                    st.warning("You already have a habit with that name.")
+                else:
+                    habits[clean_name] = {
+                        "goal_distance": goal_distance,
+                        "frequency": frequency,
+                        "reminder_time": reminder_time.strftime("%H:%M"),
+                        "logs": [],
+                    }
+                    save_user_data(username, user_data)
+                    st.success(f"Habit '{clean_name}' created! Scroll down to log your first entry.")
+                    st.rerun()
+
+    if not habits:
+        st.info("You don't have any habits yet — add one above to get started, "
+                 "for example **Daily 1-Mile Run**.")
+        return
+
+    st.divider()
+
+    # --- Show every habit ---
+    for habit_name, habit in habits.items():
+        logs = habit["logs"]
+        stats = compute_habit_stats(logs)
+        streak = compute_streak(logs)
+        already_logged = logged_today(logs)
+
+        st.markdown(f"### 🏃 {habit_name}")
+        st.markdown(
+            f'Goal: **{habit["goal_distance"]} mi**, {habit["frequency"].lower()} '
+            f'&nbsp; <span class="fitpulse-streak-badge">🔥 {streak}-day streak</span>',
+            unsafe_allow_html=True,
+        )
+
+        # Reminder banner: only nag if today's entry is missing and
+        # the reminder time has already passed.
+        reminder_hour, reminder_minute = (int(x) for x in habit["reminder_time"].split(":"))
+        reminder_dt = time_cls(reminder_hour, reminder_minute)
+        if not already_logged and datetime.now().time() >= reminder_dt:
+            st.warning(
+                f"⏰ Reminder: you haven't logged **{habit_name}** yet today "
+                f"(reminder set for {habit['reminder_time']})."
+            )
+        elif not already_logged:
+            st.info(f"⏰ Today's reminder is set for {habit['reminder_time']}. No log yet today.")
+        else:
+            st.success("✅ Already logged today. Nice work!")
+
+        # Quick stats
+        stat_cols = st.columns(4)
+        stat_cols[0].metric("Total runs", stats["total_runs"])
+        stat_cols[1].metric("Total distance", f"{stats['total_distance']} mi")
+        stat_cols[2].metric("Avg speed", f"{stats['avg_speed']} mph")
+        stat_cols[3].metric("Current streak", f"{streak} days")
+
+        # Log today's run
+        with st.form(f"log_form_{habit_name}"):
+            log_col1, log_col2 = st.columns(2)
+            with log_col1:
+                run_distance = st.number_input(
+                    "Distance run today (miles)",
+                    min_value=0.0,
+                    value=float(habit["goal_distance"]),
+                    step=0.1,
+                    key=f"dist_{habit_name}",
+                )
+            with log_col2:
+                run_duration = st.number_input(
+                    "Time it took (minutes)",
+                    min_value=0.1,
+                    value=9.0,
+                    step=0.5,
+                    key=f"dur_{habit_name}",
+                )
+            log_submitted = st.form_submit_button("✅ Log Today's Run")
+            if log_submitted:
+                speed_mph = run_distance / (run_duration / 60)
+                today_str = date.today().strftime("%Y-%m-%d")
+                # Replace any existing entry for today so re-logging updates it
+                logs[:] = [entry for entry in logs if entry["date"] != today_str]
+                logs.append(
+                    {
+                        "date": today_str,
+                        "distance": round(run_distance, 2),
+                        "duration_min": round(run_duration, 2),
+                        "speed_mph": round(speed_mph, 2),
+                    }
+                )
+                save_user_data(username, user_data)
+                st.success(
+                    f"Logged {run_distance} mi in {run_duration} min "
+                    f"({speed_mph:.1f} mph). Great job! 💪"
+                )
                 st.rerun()
 
+        # Progress charts + history table
+        if logs:
+            df = pd.DataFrame(logs).sort_values("date")
+            df_indexed = df.set_index("date")
+
+            chart_col1, chart_col2 = st.columns(2)
+            with chart_col1:
+                st.caption("Distance per day (miles)")
+                st.line_chart(df_indexed[["distance"]])
+            with chart_col2:
+                st.caption("Speed per day (mph)")
+                st.line_chart(df_indexed[["speed_mph"]])
+
+            with st.expander("📜 View full log history"):
+                st.dataframe(
+                    df.rename(
+                        columns={
+                            "date": "Date",
+                            "distance": "Distance (mi)",
+                            "duration_min": "Duration (min)",
+                            "speed_mph": "Speed (mph)",
+                        }
+                    ).sort_values("Date", ascending=False),
+                    use_container_width=True,
+                    hide_index=True,
+                )
+
+        if st.button(f"🗑️ Delete '{habit_name}'", key=f"delete_{habit_name}"):
+            del habits[habit_name]
+            save_user_data(username, user_data)
+            st.rerun()
+
+        st.divider()
+
+
+# ------------------------------------------------------------------
+# SECTION 9AA: WORKOUT GOAL CALENDAR PAGE
+# A dedicated page where users set workout goals tied to a specific
+# date, see them laid out on a real month calendar alongside the
+# days they actually completed a workout (any logged habit), and
+# mark goals complete as they hit them.
+# ------------------------------------------------------------------
+def render_goal_calendar():
+    st.markdown(
+        '<div class="fitpulse-section-header">🗓️ Workout Goal Calendar</div>',
+        unsafe_allow_html=True,
+    )
+    st.write(f"Set workout goals and track your completed workouts, **{username}**.")
+
+    if st.button("🏠 Back to Home", key="back_home_goal_calendar"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    user_data = get_user_data(username)
+    habits = user_data["habits"]
+    goals = user_data["goals"]
+    workout_days = get_completed_workout_days(user_data)
+    total_completed = count_completed_workouts(user_data)
+    completed_goals = sum(1 for g in goals if g["completed"])
+
+    st.divider()
+
+    # --- Quick stats ---
+    stat_cols = st.columns(3)
+    stat_cols[0].metric("✅ Completed workouts", total_completed)
+    stat_cols[1].metric("🎯 Goals set", len(goals))
+    stat_cols[2].metric("🏆 Goals completed", f"{completed_goals}/{len(goals)}" if goals else "0/0")
+
+    st.write("")
+
+    # --- Add a new goal ---
+    with st.expander("➕ Add a Workout Goal", expanded=(len(goals) == 0)):
+        with st.form("add_goal_form", clear_on_submit=True):
+            goal_title = st.text_input(
+                "Goal", placeholder="e.g., Run 5 miles without stopping"
+            )
+            goal_col1, goal_col2, goal_col3 = st.columns(3)
+            with goal_col1:
+                goal_date = st.date_input(
+                    "Target date", value=date.today() + timedelta(days=7)
+                )
+            with goal_col2:
+                linked_habit = st.selectbox(
+                    "Link to a habit (optional)",
+                    ["None"] + list(habits.keys()),
+                )
+            with goal_col3:
+                target_value = st.number_input(
+                    "Target distance (mi, optional)",
+                    min_value=0.0,
+                    value=0.0,
+                    step=0.1,
+                )
+
+            goal_submitted = st.form_submit_button("Add Goal to Calendar")
+            if goal_submitted:
+                clean_title = goal_title.strip()
+                if not clean_title:
+                    st.warning("Please describe your goal.")
+                else:
+                    add_goal(
+                        user_data,
+                        title=clean_title,
+                        target_date_str=goal_date.strftime("%Y-%m-%d"),
+                        habit_name="" if linked_habit == "None" else linked_habit,
+                        target_value=target_value if target_value > 0 else None,
+                    )
+                    save_user_data(username, user_data)
+                    st.success(f"Goal '{clean_title}' added to your calendar!")
+                    st.rerun()
+
+    st.divider()
+
+    # --- Month navigation ---
+    if "goal_calendar_month" not in st.session_state:
+        today = date.today()
+        st.session_state.goal_calendar_month = date(today.year, today.month, 1)
+
+    nav_col1, nav_col2, nav_col3 = st.columns([1, 2, 1])
+    with nav_col1:
+        if st.button("◀ Previous", key="cal_prev_month", use_container_width=True):
+            first_of_month = st.session_state.goal_calendar_month
+            prev_last_day = first_of_month - timedelta(days=1)
+            st.session_state.goal_calendar_month = date(
+                prev_last_day.year, prev_last_day.month, 1
+            )
+            st.rerun()
+    with nav_col2:
+        st.markdown(
+            f"<h3 style='text-align:center;'>{st.session_state.goal_calendar_month.strftime('%B %Y')}</h3>",
+            unsafe_allow_html=True,
+        )
+    with nav_col3:
+        if st.button("Next ▶", key="cal_next_month", use_container_width=True):
+            first_of_month = st.session_state.goal_calendar_month
+            days_in_month = calendar.monthrange(first_of_month.year, first_of_month.month)[1]
+            next_first_day = first_of_month + timedelta(days=days_in_month)
+            st.session_state.goal_calendar_month = date(
+                next_first_day.year, next_first_day.month, 1
+            )
+            st.rerun()
+
+    # --- Build the calendar grid (Mon-Sun) ---
+    cal_month = st.session_state.goal_calendar_month
+    month_weeks = calendar.Calendar(firstweekday=0).monthdatescalendar(
+        cal_month.year, cal_month.month
+    )
+    today_str = date.today().strftime("%Y-%m-%d")
+
+    day_labels = "".join(
+        f'<div class="fitpulse-cal-daylabel">{d}</div>'
+        for d in ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    )
+
+    cell_html = ""
+    for week in month_weeks:
+        for day_obj in week:
+            if day_obj.month != cal_month.month:
+                cell_html += '<div class="fitpulse-cal-cell empty"></div>'
+                continue
+            day_str = day_obj.strftime("%Y-%m-%d")
+            day_goals = goals_on_date(goals, day_str)
+            classes = ["fitpulse-cal-cell"]
+            if day_str in workout_days:
+                classes.append("workout-day")
+            if day_goals:
+                classes.append("goal-day")
+            if day_str == today_str:
+                classes.append("today")
+
+            tags = ""
+            if day_str in workout_days:
+                tags += '<span class="fitpulse-cal-tag">✅ Workout</span>'
+            for g in day_goals:
+                mark = "☑️" if g["completed"] else "🎯"
+                short_title = g["title"] if len(g["title"]) <= 16 else g["title"][:14] + "…"
+                tags += f'<span class="fitpulse-cal-tag">{mark} {short_title}</span>'
+
+            cell_html += (
+                f'<div class="{" ".join(classes)}">'
+                f'<div class="fitpulse-cal-daynum">{day_obj.day}</div>'
+                f'{tags}</div>'
+            )
+
+    st.markdown(
+        f'<div class="fitpulse-cal-grid">{day_labels}{cell_html}</div>',
+        unsafe_allow_html=True,
+    )
+    st.caption("🟢 Green = a completed workout was logged that day &nbsp;•&nbsp; 🟡 Gold outline = a goal is due that day")
+
+    st.divider()
+
+    # --- Goals list: mark complete, or delete ---
+    st.markdown("### 🎯 Your Goals")
+    if not goals:
+        st.info("You haven't set any workout goals yet — add one above to see it on the calendar.")
+    else:
+        for goal in sorted(goals, key=lambda g: g["target_date"]):
+            card_class = "fitpulse-goal-card completed" if goal["completed"] else "fitpulse-goal-card"
+            details = f"🗓️ {goal['target_date']}"
+            if goal["habit_name"]:
+                details += f" &nbsp;•&nbsp; linked to **{goal['habit_name']}**"
+            if goal["target_value"]:
+                details += f" &nbsp;•&nbsp; target **{goal['target_value']} mi**"
+
+            g_col1, g_col2, g_col3 = st.columns([4, 1, 1])
+            with g_col1:
+                st.markdown(
+                    f'<div class="{card_class}">'
+                    f'<strong>{"✅ " if goal["completed"] else ""}{goal["title"]}</strong><br>'
+                    f'<span style="color:#5A5A52; font-size:13px;">{details}</span>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
+            with g_col2:
+                toggle_label = "↩️ Undo" if goal["completed"] else "✅ Complete"
+                if st.button(toggle_label, key=f"toggle_goal_{goal['id']}", use_container_width=True):
+                    set_goal_completed(user_data, goal["id"], not goal["completed"])
+                    save_user_data(username, user_data)
+                    st.rerun()
+            with g_col3:
+                if st.button("🗑️ Delete", key=f"delete_goal_{goal['id']}", use_container_width=True):
+                    delete_goal(user_data, goal["id"])
+                    save_user_data(username, user_data)
+                    st.rerun()
+
+
+# ------------------------------------------------------------------
+# SECTION 9A: SHARED AUTH PAGE STYLE (Sign Up + Log In)
+# Both pages use the same "split card" look from the reference design:
+# a plain white form panel on one side, and a colored info panel with
+# a "Welcome" message on the other. Instead of orange, this version
+# uses a neutral, earthy green so it fits FitPulse's outdoorsy/fitness
+# feel without shouting for attention. Each panel is a real
+# st.container(key=...), styled via the same "real element, styled
+# with CSS" trick used for the feature cards earlier in this file.
+# ------------------------------------------------------------------
+def render_auth_style():
+    st.markdown(
+        """
+        <style>
+        /* Remove the gap between the two columns and wrap them in one
+           rounded, shadowed card so the two halves look like a single
+           connected panel instead of two separate boxes. */
+        .st-key-auth_card_outer [data-testid="stHorizontalBlock"] {
+            gap: 0rem !important;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 34px rgba(0, 0, 0, 0.10);
+            border: 1px solid #D9D4C7;
+        }
+        .st-key-auth_form_panel {
+            background-color: #FFFFFF;
+            padding: 44px 40px;
+            min-height: 480px;
+        }
+        .st-key-auth_info_panel {
+            background: linear-gradient(150deg, #93AC86 0%, #55704C 100%);
+            padding: 44px 40px;
+            min-height: 480px;
+            display: flex;
+            align-items: center;
+        }
+        .auth-info-inner h2 {
+            color: white;
+            font-size: 30px;
+            font-weight: 800;
+            margin: 0 0 14px 0;
+        }
+        .auth-info-inner p {
+            color: white;
+            font-size: 15px;
+            line-height: 1.7;
+            opacity: 0.95;
+            margin: 0;
+        }
+        .auth-form-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #2E2E2A;
+            margin: 0 0 22px 0;
+        }
+
+        /* Sign Up submit button: earthy, muted green */
+        .st-key-signup_submit_btn button {
+            background-color: #7C9473 !important;
+            border-color: #7C9473 !important;
+            color: white !important;
+            font-weight: 700 !important;
+        }
+        .st-key-signup_submit_btn button:hover {
+            background-color: #66805C !important;
+            border-color: #66805C !important;
+        }
+
+        /* Log In submit button: earthy, warm gray */
+        .st-key-login_submit_btn button {
+            background-color: #8C887E !important;
+            border-color: #8C887E !important;
+            color: white !important;
+            font-weight: 700 !important;
+        }
+        .st-key-login_submit_btn button:hover {
+            background-color: #75716A !important;
+            border-color: #75716A !important;
+        }
+
+        /* The small "switch to the other page" buttons underneath
+           each form, styled to look like plain text links. */
+        .st-key-goto_login_btn button,
+        .st-key-goto_signup_btn button {
+            background: none !important;
+            border: none !important;
+            color: #55704C !important;
+            font-weight: 700 !important;
+            text-decoration: underline;
+            box-shadow: none !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ------------------------------------------------------------------
+# SECTION 9B: SIGNUP PAGE
+# This page appears when a guest user clicks "Sign Up" from the
+# community popup. They enter their name, email, phone number, and
+# a password.
+# ------------------------------------------------------------------
+def render_signup():
+    st.markdown(
+        '<div class="fitpulse-section-header">📝 Create Your Account</div>',
+        unsafe_allow_html=True,
+    )
+
+    if st.button("🏠 Back to Home", key="back_home_signup"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    st.divider()
+    render_auth_style()
+
+    outer_left, outer_mid, outer_right = st.columns([1, 5, 1])
+    with outer_mid:
+        with st.container(key="auth_card_outer"):
+            form_col, info_col = st.columns([3, 2])
+
+            with form_col:
+                with st.container(key="auth_form_panel"):
+                    st.markdown(
+                        '<div class="auth-form-title">Sign Up</div>',
+                        unsafe_allow_html=True,
+                    )
+
+                    with st.form("signup_form", clear_on_submit=True):
+                        full_name = st.text_input("Name", placeholder="e.g., John Doe")
+                        email = st.text_input("E-mail", placeholder="e.g., john@example.com")
+                        phone = st.text_input("Phone Number", placeholder="e.g., (555) 123-4567")
+                        
+                        # Profile attributes
+                        st.markdown("<hr>", unsafe_allow_html=True)
+                        st.caption("**Complete your fitness profile** (you can update this later)")
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            fitness_level = st.selectbox(
+                                "Fitness Level",
+                                FITNESS_LEVELS,
+                                key="signup_fitness",
+                            )
+                        with col2:
+                            favorite_workout = st.selectbox(
+                                "Favorite Workout",
+                                WORKOUT_TYPES,
+                                key="signup_workout",
+                            )
+                        
+                        avatar_emoji = st.selectbox(
+                            "Choose Your Avatar",
+                            AVATAR_EMOJIS,
+                            key="signup_avatar",
+                        )
+                        
+                        bio = st.text_area(
+                            "Bio (optional)",
+                            placeholder="Tell us about your fitness goals!",
+                            max_chars=150,
+                            height=60,
+                            key="signup_bio",
+                        )
+                        
+                        st.markdown("<hr>", unsafe_allow_html=True)
+                        password = st.text_input("Password", type="password")
+                        confirm_password = st.text_input("Confirm Password", type="password")
+
+                        submitted = st.form_submit_button(
+                            "Create Account",
+                            use_container_width=True,
+                            key="signup_submit_btn",
+                        )
+
+                        if submitted:
+                            if not full_name.strip():
+                                st.error("❌ Please enter your name.")
+                            elif not email.strip() or "@" not in email:
+                                st.error("❌ Please enter a valid email address.")
+                            elif not password:
+                                st.error("❌ Please choose a password.")
+                            elif password != confirm_password:
+                                st.error("❌ Passwords don't match.")
+                            else:
+                                # Create account and save profile
+                                username = full_name.strip()
+                                profile_data = {
+                                    "full_name": full_name.strip(),
+                                    "email": email.strip(),
+                                    "fitness_level": fitness_level,
+                                    "favorite_workout": favorite_workout,
+                                    "avatar_emoji": avatar_emoji,
+                                    "bio": bio.strip() or "FitPulse Member",
+                                    "created_at": date.today().strftime("%Y-%m-%d"),
+                                }
+                                save_user_profile(username, profile_data)
+                                
+                                st.success("✅ Account created successfully!")
+                                st.info(
+                                    f"Welcome to FitPulse, **{full_name}**! 🎉\n\n"
+                                    "*Redirecting you back to the app...*"
+                                )
+                                login_user(username)
+                                st.session_state.page = "home"
+                                import time
+                                time.sleep(2)
+                                st.rerun()
+
+                    st.markdown(
+                        '<p style="text-align:center; font-size:13.5px; color:#767268; '
+                        'margin: 10px 0 4px 0;">Already have an account?</p>',
+                        unsafe_allow_html=True,
+                    )
+                    if st.button("Log In Instead", key="goto_login_btn", use_container_width=True):
+                        st.session_state.page = "login"
+                        st.rerun()
+
+            with info_col:
+                with st.container(key="auth_info_panel"):
+                    st.markdown(
+                        """
+                        <div class="auth-info-inner">
+                            <h2>Welcome!</h2>
+                            <p>
+                                Join FitPulse to track your fitness habits,
+                                find gyms nearby, and connect with friends
+                                who are working toward the same goals.
+                            </p>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+
+# ------------------------------------------------------------------
+# SECTION 9C: LOGIN PAGE
+# This page appears when a guest user clicks "Log In" from the
+# community popup, or from the "Log In Instead" link on the signup
+# page. This is a beginner demo project with no real account
+# database, so logging in simply takes you back to the app.
+# ------------------------------------------------------------------
+def render_login():
+    st.markdown(
+        '<div class="fitpulse-section-header">🔑 Log In</div>',
+        unsafe_allow_html=True,
+    )
+
+    if st.button("🏠 Back to Home", key="back_home_login"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    st.divider()
+    render_auth_style()
+
+    outer_left, outer_mid, outer_right = st.columns([1, 5, 1])
+    with outer_mid:
+        with st.container(key="auth_card_outer"):
+            info_col, form_col = st.columns([2, 3])
+
+            with info_col:
+                with st.container(key="auth_info_panel"):
+                    st.markdown(
+                        """
+                        <div class="auth-info-inner">
+                            <h2>Welcome Back!</h2>
+                            <p>
+                                Log in to pick up where you left off — your
+                                habits, gym searches, and friends are all
+                                waiting for you.
+                            </p>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+            with form_col:
+                with st.container(key="auth_form_panel"):
+                    st.markdown(
+                        '<div class="auth-form-title">Log In</div>',
+                        unsafe_allow_html=True,
+                    )
+
+                    with st.form("login_form", clear_on_submit=False):
+                        phone_or_email = st.text_input(
+                            "Phone Number or E-mail",
+                            placeholder="e.g., (555) 123-4567 or john@example.com",
+                        )
+                        password = st.text_input("Password", type="password")
+
+                        submitted = st.form_submit_button(
+                            "Log In",
+                            use_container_width=True,
+                            key="login_submit_btn",
+                        )
+
+                        if submitted:
+                            if not phone_or_email.strip():
+                                st.error("❌ Please enter your phone number or email.")
+                            elif not password:
+                                st.error("❌ Please enter your password.")
+                            else:
+                                # Look up which saved account this email
+                                # belongs to, so logging in actually signs
+                                # you back into YOUR account (not just
+                                # whichever guest name happened to be set).
+                                entered = phone_or_email.strip().lower()
+                                all_profiles = load_all_profiles()
+                                matched_username = None
+                                for existing_name, profile in all_profiles.items():
+                                    if profile.get("email", "").strip().lower() == entered:
+                                        matched_username = existing_name
+                                        break
+
+                                if matched_username is None:
+                                    st.error(
+                                        "❌ We couldn't find an account with that "
+                                        "email. Check the spelling, or sign up "
+                                        "below if you're new here."
+                                    )
+                                else:
+                                    st.success("✅ Logged in! Redirecting you back to the app...")
+                                    login_user(matched_username)
+                                    st.session_state.page = "home"
+                                    import time
+                                    time.sleep(1)
+                                    st.rerun()
+
+                    st.markdown(
+                        '<p style="text-align:center; font-size:13.5px; color:#767268; '
+                        'margin: 10px 0 4px 0;">Don\'t have an account?</p>',
+                        unsafe_allow_html=True,
+                    )
+                    if st.button("Sign Up Instead", key="goto_signup_btn", use_container_width=True):
+                        st.session_state.page = "signup"
+                        st.rerun()
+
+
+# ------------------------------------------------------------------
+# SECTION 9D: PROFILE PAGE
+# Display and edit user profile information including fitness level,
+# favorite workout type, avatar, and bio.
+# ------------------------------------------------------------------
 def render_profile():
-    """Renders User Profile view."""
-    user = st.session_state.username
-    prof = get_user_profile(user)
-
     st.markdown(
-        """
-        <div class="fitpulse-hero">
-            <h1>👤 USER PROFILE</h1>
-            <p>Manage your account info and fitness preferences.</p>
-        </div>
-        """,
-        unsafe_allow_html=True
+        '<div class="fitpulse-section-header">👤 My Profile</div>',
+        unsafe_allow_html=True,
     )
+    st.write(f"View and manage your FitPulse profile, **{username}**.")
 
-    st.markdown(
-        f"""
-        <div class="fitpulse-profile-card">
-            <div class="fitpulse-profile-header">
-                <div class="fitpulse-profile-avatar-large">{prof.get('avatar_emoji', '🏋️')}</div>
-                <div class="fitpulse-profile-name-section">
-                    <h2>{prof.get('full_name', user)}</h2>
-                    <p>@{user} • Member since {prof.get('created_at', '2026')}</p>
-                    <p><em>"{prof.get('bio', 'Staying active!')}"</em></p>
+    if st.button("🏠 Back to Home", key="back_home_profile"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    st.divider()
+
+    # Load user profile
+    profile = get_user_profile(username)
+
+    # --- PROFILE VIEW MODE (DEFAULT) ---
+    if "edit_profile_mode" not in st.session_state:
+        st.session_state.edit_profile_mode = False
+
+    if not st.session_state.edit_profile_mode:
+        # Display profile card
+        st.markdown(
+            f"""
+            <div class="fitpulse-profile-card">
+                <div class="fitpulse-profile-header">
+                    <div class="fitpulse-profile-avatar-large">{profile.get('avatar_emoji', '🏋️')}</div>
+                    <div class="fitpulse-profile-name-section">
+                        <h2>{profile.get('full_name', username)}</h2>
+                        <p>📧 {profile.get('email', 'No email')}</p>
+                        <p>💬 "{profile.get('bio', 'FitPulse Member')}"</p>
+                        <p style="color: #7C9473; font-weight: 600;">Member since {profile.get('created_at', 'Recently')}</p>
+                    </div>
                 </div>
             </div>
-            <div class="fitpulse-profile-attributes">
+            """,
+            unsafe_allow_html=True,
+        )
+
+        # Profile attributes grid
+        st.markdown("### 🎯 Fitness Profile")
+        attr_col1, attr_col2, attr_col3 = st.columns(3)
+
+        with attr_col1:
+            st.markdown(
+                f"""
                 <div class="fitpulse-profile-attr-item">
                     <div class="fitpulse-profile-attr-label">Fitness Level</div>
-                    <div class="fitpulse-profile-attr-value">{prof.get('fitness_level', 'Beginner')}</div>
+                    <div class="fitpulse-profile-attr-value">{profile.get('fitness_level', 'Beginner')}</div>
                 </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with attr_col2:
+            st.markdown(
+                f"""
                 <div class="fitpulse-profile-attr-item">
-                    <div class="fitpulse-profile-attr-label">Favorite Focus</div>
-                    <div class="fitpulse-profile-attr-value">{prof.get('favorite_workout', 'General')}</div>
+                    <div class="fitpulse-profile-attr-label">Favorite Workout</div>
+                    <div class="fitpulse-profile-attr-value">{profile.get('favorite_workout', 'General Fitness')}</div>
                 </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+                """,
+                unsafe_allow_html=True,
+            )
 
-    with st.expander("✏️ Edit Profile Info"):
+        with attr_col3:
+            st.markdown(
+                f"""
+                <div class="fitpulse-profile-attr-item">
+                    <div class="fitpulse-profile-attr-label">Avatar</div>
+                    <div class="fitpulse-profile-attr-value">{profile.get('avatar_emoji', '🏋️')}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        st.divider()
+
+        # Edit button
+        if st.button("✏️ Edit Profile", use_container_width=True, key="edit_profile_btn"):
+            st.session_state.edit_profile_mode = True
+            st.rerun()
+
+    else:
+        # --- EDIT PROFILE MODE ---
+        st.markdown("### ✏️ Edit Your Profile")
+
         with st.form("edit_profile_form"):
-            fn = st.text_input("Full Name:", value=prof.get("full_name", user))
-            bio = st.text_area("Bio:", value=prof.get("bio", ""))
-            lvl = st.selectbox("Fitness Level:", FITNESS_LEVELS, index=FITNESS_LEVELS.index(prof.get("fitness_level", "Beginner")))
-            fav = st.selectbox("Favorite Workout:", WORKOUT_TYPES, index=WORKOUT_TYPES.index(prof.get("favorite_workout", "General Fitness")))
-            emoji = st.selectbox("Avatar Emoji:", AVATAR_EMOJIS, index=AVATAR_EMOJIS.index(prof.get("avatar_emoji", "🏋️")))
-            
-            if st.form_submit_button("Save Profile"):
-                update_user_profile(user, full_name=fn, bio=bio, fitness_level=lvl, favorite_workout=fav, avatar_emoji=emoji)
-                st.success("Profile updated!")
-                st.rerun()
+            new_full_name = st.text_input(
+                "Full Name",
+                value=profile.get("full_name", username),
+                key="edit_full_name",
+            )
+            new_email = st.text_input(
+                "Email",
+                value=profile.get("email", ""),
+                key="edit_email",
+            )
+            new_bio = st.text_area(
+                "Bio",
+                value=profile.get("bio", ""),
+                max_chars=150,
+                height=80,
+                key="edit_bio",
+            )
+
+            col1, col2 = st.columns(2)
+            with col1:
+                new_fitness_level = st.selectbox(
+                    "Fitness Level",
+                    FITNESS_LEVELS,
+                    index=FITNESS_LEVELS.index(profile.get("fitness_level", "Beginner")),
+                    key="edit_fitness",
+                )
+
+            with col2:
+                new_favorite_workout = st.selectbox(
+                    "Favorite Workout",
+                    WORKOUT_TYPES,
+                    index=WORKOUT_TYPES.index(profile.get("favorite_workout", "General Fitness")),
+                    key="edit_workout",
+                )
+
+            new_avatar_emoji = st.selectbox(
+                "Avatar Emoji",
+                AVATAR_EMOJIS,
+                index=AVATAR_EMOJIS.index(profile.get("avatar_emoji", "🏋️")),
+                key="edit_avatar",
+            )
+
+            col_save, col_cancel = st.columns(2)
+            with col_save:
+                if st.form_submit_button("💾 Save Changes", use_container_width=True):
+                    # Update profile
+                    profile["full_name"] = new_full_name.strip() or username
+                    profile["email"] = new_email.strip()
+                    profile["fitness_level"] = new_fitness_level
+                    profile["favorite_workout"] = new_favorite_workout
+                    profile["avatar_emoji"] = new_avatar_emoji
+                    profile["bio"] = new_bio.strip() or "FitPulse Member"
+
+                    save_user_profile(username, profile)
+                    st.success("✅ Profile updated successfully!")
+                    st.session_state.edit_profile_mode = False
+                    import time
+                    time.sleep(1)
+                    st.rerun()
+
+            with col_cancel:
+                if st.form_submit_button("❌ Cancel", use_container_width=True):
+                    st.session_state.edit_profile_mode = False
+                    st.rerun()
+
 
 # ------------------------------------------------------------------
-# SECTION 8: APP ENTRY POINT / ROUTER
+# SECTION 9E: GYM SESSIONS PAGE
+# Display comprehensive workout plans for all major muscle groups
 # ------------------------------------------------------------------
-render_header()
+def render_gym_sessions():
+    st.markdown(
+        '<div class="fitpulse-section-header">💪 Gym Sessions & Workouts</div>',
+        unsafe_allow_html=True,
+    )
+    
+    if st.button("🏠 Back to Home", key="back_home_gym_sessions"):
+        st.session_state.page = "home"
+        st.rerun()
+    
+    st.divider()
+    
+    # Display intro
+    st.markdown("""
+    ### Complete Workout Guide for Every Muscle Group
+    
+    Below is a comprehensive collection of workout plans designed to target every major muscle group in your body. 
+    Each muscle group has its own dedicated workout plan with:
+    - **Primary exercises** for maximum strength gains
+    - **Secondary exercises** for supplementary work
+    - **Isolation exercises** to target specific muscle areas
+    - **Finisher exercises** for endurance and pump
+    - **Detailed form cues** to ensure proper technique
+    - **Progression tips** to keep improving
+    """)
+    
+    # Create tabs for different muscle groups
+    tabs = st.tabs([
+        "💪 Chest", "🔙 Back", "🔱 Shoulders", 
+        "💥 Biceps", "🦾 Triceps", "✋ Forearms",
+        "⭕ Abs/Core", "↪️ Obliques", "🏔️ Lower Back",
+        "🦵 Quads", "👙 Hamstrings", "🍑 Glutes",
+        "🦶 Calves", "🤎 Adductors", "➡️ Abductors"
+    ])
+    
+    # CHEST TAB
+    with tabs[0]:
+        st.markdown("## 💪 CHEST WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Barbell Bench Press: 4 sets x 6-8 reps
+          - Rest: 2-3 minutes between sets
+          - Form: Lower bar to mid-chest, pause 1 second, drive up explosively
+          - Progression: Increase weight by 5-10 lbs each week
+        
+        **Secondary Exercise:**
+        - Incline Dumbbell Press: 3 sets x 8-10 reps
+          - Rest: 90-120 seconds
+          - Form: Set bench to 30-45 degrees, lower dumbbells to shoulders
+          - Progression: Increase dumbbell weight or add 1-2 reps
+        
+        **Isolation Exercise 1:**
+        - Barbell or Machine Chest Flyes: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Keep slight bend in elbows, bring hands together at chest
+          - Progression: Increase weight or control eccentric phase
+        
+        **Isolation Exercise 2:**
+        - Cable Crossovers: 3 sets x 12-15 reps
+          - Rest: 60 seconds
+          - Form: Stand in middle, bring cables across body
+          - Progression: Increase cable weight or reps
+        
+        **Finisher:**
+        - Push-ups: 3 sets x 15-20 reps
+          - Rest: 45-60 seconds
+          - Form: Keep core tight, lower chest to 1 inch from ground
+          - Progression: Add weight vest or decrease rest periods
+        """)
+    
+    # BACK TAB
+    with tabs[1]:
+        st.markdown("## 🔙 BACK WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Bent-Over Barbell Row: 4 sets x 6-8 reps
+          - Rest: 2-3 minutes
+          - Form: Hinge at hips, pull bar to lower chest, squeeze shoulder blades
+          - Progression: Increase weight by 5-10 lbs weekly
+        
+        **Secondary Exercise:**
+        - Weighted Pull-ups: 3 sets x 6-10 reps
+          - Rest: 2-3 minutes
+          - Form: Full range of motion, chest to bar if possible
+          - Progression: Add weight with belt or achieve more reps
+        
+        **Upper Back Isolation:**
+        - Face Pulls: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Pull rope towards face, flare elbows out
+          - Progression: Increase weight or reps
+        
+        **Lat Isolation:**
+        - Machine Lat Pulldown: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Pull bar to upper chest, control the weight up slowly
+          - Progression: Increase weight or add reps
+        
+        **Lower Back:**
+        - Hyperextensions: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Hinge at hips, extend back to neutral
+          - Progression: Add weight plate or increase reps
+        
+        **Finisher:**
+        - Inverted Rows: 3 sets x 12-15 reps
+          - Rest: 45-60 seconds
+          - Form: Hang under bar, pull chest to bar
+          - Progression: Lower bar height to increase difficulty
+        """)
+    
+    # SHOULDERS TAB
+    with tabs[2]:
+        st.markdown("## 🔱 SHOULDERS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Overhead Press (Standing): 4 sets x 6-8 reps
+          - Rest: 2-3 minutes
+          - Form: Press from shoulders to full lockout
+          - Progression: Increase weight by 2.5-5 lbs weekly
+        
+        **Secondary Exercise:**
+        - Machine Shoulder Press: 3 sets x 8-10 reps
+          - Rest: 90-120 seconds
+          - Form: Press handles forward and up, controlled descent
+          - Progression: Increase weight or reps
+        
+        **Lateral Delt Focus:**
+        - Standing Lateral Raises: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Slight bend in elbows, raise to shoulder height
+          - Progression: Increase dumbbell weight
+        
+        **Rear Delt Focus:**
+        - Reverse Pec Deck Machine: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Sit upright, pull handles back, squeeze shoulder blades
+          - Progression: Increase weight or reps
+        
+        **Rotator Cuff:**
+        - Dumbbell Lateral Raises (Light): 3 sets x 15-20 reps
+          - Rest: 45-60 seconds
+          - Form: Controlled movement, light weight
+          - Progression: Slightly increase weight while maintaining form
+        
+        **Finisher:**
+        - Upright Rows: 3 sets x 10-12 reps
+          - Rest: 60 seconds
+          - Form: Pull elbows up, raise bar to chin height
+          - Progression: Increase weight or reps
+        """)
+    
+    # BICEPS TAB
+    with tabs[3]:
+        st.markdown("## 💥 BICEPS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Barbell Curls: 4 sets x 6-8 reps
+          - Rest: 90-120 seconds
+          - Form: Keep elbows at sides, full range of motion, no swinging
+          - Progression: Increase weight by 2.5-5 lbs weekly
+        
+        **Secondary Exercise:**
+        - Dumbbell Curls (Incline Bench): 3 sets x 8-10 reps
+          - Rest: 90 seconds
+          - Form: Sit on incline bench, curl dumbbells up
+          - Progression: Increase dumbbell weight or add reps
+        
+        **Isolation Exercise 1:**
+        - Machine Bicep Curl: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Full range of motion, squeeze at the top
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 2:**
+        - Preacher Curls: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Upper arms flat on pad, curl bar to shoulders
+          - Progression: Increase weight or decrease rest
+        
+        **Drop Set Exercise:**
+        - Cable Curls: 3 sets x 12-15 reps (with drop sets)
+          - Rest: 60 seconds
+          - Form: Keep cable at chest height, curl handle up
+          - Progression: Increase cable weight or add drops
+        
+        **Finisher:**
+        - Bodyweight Chin-ups: 3 sets x max reps
+          - Rest: 60-90 seconds
+          - Form: Palms facing you, full range of motion
+          - Progression: Add more reps or weight with belt
+        """)
+    
+    # TRICEPS TAB
+    with tabs[4]:
+        st.markdown("## 🦾 TRICEPS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Close-Grip Bench Press: 4 sets x 6-8 reps
+          - Rest: 2-3 minutes
+          - Form: Hands 6-8 inches apart, lower to chest, press explosively
+          - Progression: Increase weight by 5-10 lbs weekly
+        
+        **Secondary Exercise:**
+        - Tricep Dips: 3 sets x 8-10 reps
+          - Rest: 2 minutes
+          - Form: Lower body until elbows are ~90 degrees
+          - Progression: Add weight with belt or achieve more reps
+        
+        **Isolation Exercise 1:**
+        - Rope Pushdowns: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Keep elbows fixed, push rope down and spread at bottom
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 2:**
+        - Overhead Rope Extension: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Stand with rope behind neck, extend arms up
+          - Progression: Increase weight or reps
+        
+        **Third Isolation:**
+        - Dumbbell Kickbacks: 3 sets x 12-15 reps
+          - Rest: 60 seconds
+          - Form: Hinge forward, extend arm back until straight
+          - Progression: Increase dumbbell weight
+        
+        **Finisher:**
+        - Barbell Skull Crushers: 3 sets x 12-15 reps
+          - Rest: 60 seconds
+          - Form: Lie on bench, lower bar to forehead, extend up
+          - Progression: Increase weight or reps
+        """)
+    
+    # FOREARMS TAB
+    with tabs[5]:
+        st.markdown("## ✋ FOREARMS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Barbell Wrist Curls: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Rest forearms on thighs, curl bar up using wrist
+          - Progression: Increase weight by 2.5-5 lbs weekly
+        
+        **Secondary Exercise:**
+        - Barbell Reverse Wrist Curls: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Reverse grip, extend wrists up, control descent
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 1:**
+        - Dumbbell Wrist Curls: 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: One arm at a time, full range of motion
+          - Progression: Increase dumbbell weight
+        
+        **Isolation Exercise 2:**
+        - Dumbbell Reverse Wrist Curls: 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: Palms down, extend wrists up
+          - Progression: Increase dumbbell weight
+        
+        **Rotation Exercise:**
+        - Dumbbell Pronation/Supination: 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: Hold dumbbell vertically, rotate wrist
+          - Progression: Increase dumbbell weight or reps
+        
+        **Finisher:**
+        - Farmer Carries: 3 sets x 40-60 seconds
+          - Rest: 60-90 seconds
+          - Form: Walk while holding heavy dumbbells at sides
+          - Progression: Increase weight or duration
+        """)
+    
+    # ABS TAB
+    with tabs[6]:
+        st.markdown("## ⭕ ABS/CORE WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Weighted Cable Crunches: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Kneel facing cable machine, pull rope down
+          - Progression: Increase weight by 10-20 lbs weekly
+        
+        **Secondary Exercise:**
+        - Hanging Leg Raises: 3 sets x 10-15 reps
+          - Rest: 90 seconds
+          - Form: Hang from bar, raise legs to horizontal or higher
+          - Progression: Increase reps or add weight with ankle weights
+        
+        **Core Stability:**
+        - Planks (Weighted): 3 sets x 45-60 seconds
+          - Rest: 60-90 seconds
+          - Form: Keep body rigid, engage core, neutral spine
+          - Progression: Add weight plate or increase duration
+        
+        **Ab Wheel:**
+        - Ab Wheel Rollouts: 3 sets x 10-15 reps
+          - Rest: 90 seconds
+          - Form: Full extension, controlled return, keep core tight
+          - Progression: Increase reps or perform from standing
+        
+        **Machine Exercise:**
+        - Machine Ab Crunch: 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: Adjust for range of motion, crunch forward
+          - Progression: Increase weight or reps
+        
+        **Oblique Focus:**
+        - Weighted Woodchoppers: 3 sets x 10-12 reps (each side)
+          - Rest: 60 seconds
+          - Form: Hold weight, rotate diagonally across body
+          - Progression: Increase weight or reps
+        """)
+    
+    # OBLIQUES TAB
+    with tabs[7]:
+        st.markdown("## ↪️ OBLIQUES WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Suitcase Carries: 3 sets x 40-60 seconds (each side)
+          - Rest: 60-90 seconds
+          - Form: Hold heavy dumbbell at side, walk upright
+          - Progression: Increase dumbbell weight or duration
+        
+        **Secondary Exercise:**
+        - Weighted Woodchoppers: 3 sets x 10-12 reps (each side)
+          - Rest: 60-90 seconds
+          - Form: Rotate diagonally, initiate from obliques
+          - Progression: Increase weight by 5-10 lbs
+        
+        **Isolation Exercise 1:**
+        - Cable Side Bends: 3 sets x 12-15 reps (each side)
+          - Rest: 60-90 seconds
+          - Form: Stand sideways to cable, bend laterally
+          - Progression: Increase cable weight
+        
+        **Isolation Exercise 2:**
+        - Landmine Rotations: 3 sets x 10-12 reps (each side)
+          - Rest: 60-90 seconds
+          - Form: Hold end of barbell, rotate across body explosively
+          - Progression: Increase weight or reps
+        
+        **Machine Exercise:**
+        - Machine Torso Rotation: 3 sets x 12-15 reps (each side)
+          - Rest: 60 seconds
+          - Form: Sit upright, rotate against resistance
+          - Progression: Increase weight or reps
+        
+        **Finisher:**
+        - Bicycle Crunches: 3 sets x 20-25 reps
+          - Rest: 60 seconds
+          - Form: Crunch while bringing opposite knee to elbow
+          - Progression: Add weight or increase reps
+        """)
+    
+    # LOWER BACK TAB
+    with tabs[8]:
+        st.markdown("## 🏔️ LOWER BACK/ERECTORS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Conventional Deadlifts: 3 sets x 5-6 reps
+          - Rest: 3-5 minutes
+          - Form: Shins vertical, chest up, drive through heels
+          - Progression: Increase weight by 5-10 lbs when possible
+        
+        **Secondary Exercise:**
+        - Sumo Deadlifts: 3 sets x 6-8 reps
+          - Rest: 2-3 minutes
+          - Form: Wider stance, more upright torso
+          - Progression: Increase weight by 5-10 lbs
+        
+        **Isolation Exercise 1:**
+        - Back Hyperextensions (Weighted): 3 sets x 10-12 reps
+          - Rest: 90-120 seconds
+          - Form: Hinge at hips, extend to neutral (not hyperextended)
+          - Progression: Add weight plate to chest
+        
+        **Isolation Exercise 2:**
+        - Machine Leg Press (Narrow Stance): 3 sets x 10-12 reps
+          - Rest: 90 seconds
+          - Form: Lower weight, keep lower back against pad
+          - Progression: Increase weight or reps
+        
+        **Stabilization:**
+        - Superman Holds: 3 sets x 30-45 seconds
+          - Rest: 60-90 seconds
+          - Form: Lie face down, extend arms and legs
+          - Progression: Increase duration or add weight
+        
+        **Finisher:**
+        - Good Mornings: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Bar on shoulders, hinge at hips, maintain spine
+          - Progression: Increase weight or reps
+        """)
+    
+    # QUADS TAB
+    with tabs[9]:
+        st.markdown("## 🦵 QUADRICEPS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Barbell Back Squats: 4 sets x 6-8 reps
+          - Rest: 2-3 minutes
+          - Form: Chest up, knees out, depth to below parallel
+          - Progression: Increase weight by 5-10 lbs weekly
+        
+        **Secondary Exercise:**
+        - Leg Press Machine: 3 sets x 8-10 reps
+          - Rest: 90-120 seconds
+          - Form: Lower weight until 90-degree knee bend, drive up
+          - Progression: Increase weight by 20-45 lbs
+        
+        **Isolation Exercise 1:**
+        - Leg Extensions: 3 sets x 10-12 reps
+          - Rest: 60-90 seconds
+          - Form: Extend leg straight, pause 1 second at top
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 2:**
+        - Goblet Squats: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Hold dumbbell at chest, squat deep
+          - Progression: Increase dumbbell weight
+        
+        **Tempo Work:**
+        - Barbell Front Squats (Slow): 3 sets x 8-10 reps
+          - Rest: 90-120 seconds
+          - Form: 3 seconds down, 1 second pause, 1 second up
+          - Progression: Increase weight or reps
+        
+        **Finisher:**
+        - Bulgarian Split Squats: 3 sets x 10-12 reps (each leg)
+          - Rest: 60-90 seconds
+          - Form: Rear foot elevated, front knee to 90 degrees
+          - Progression: Increase weight or reps
+        """)
+    
+    # HAMSTRINGS TAB
+    with tabs[10]:
+        st.markdown("## 👙 HAMSTRINGS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Romanian Deadlifts: 3 sets x 8-10 reps
+          - Rest: 2-3 minutes
+          - Form: Slight knee bend, hinge at hips, lower to mid-shin
+          - Progression: Increase weight by 5-10 lbs weekly
+        
+        **Secondary Exercise:**
+        - Leg Curls (Machine): 3 sets x 10-12 reps
+          - Rest: 90-120 seconds
+          - Form: Curl weight up, squeeze hamstrings at top
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 1:**
+        - Lying Hamstring Curls: 3 sets x 10-12 reps
+          - Rest: 90 seconds
+          - Form: Lie face down, curl weight up to glutes
+          - Progression: Increase weight or decrease rest
+        
+        **Isolation Exercise 2:**
+        - Nordic Curls: 3 sets x 5-8 reps
+          - Rest: 2 minutes
+          - Form: Kneel, lower body forward while resisting
+          - Progression: Get more reps or perform with less hand assistance
+        
+        **Glute-Ham:**
+        - Glute-Ham Raise: 3 sets x 8-12 reps
+          - Rest: 90-120 seconds
+          - Form: Hips at machine edge, lower body forward, extend back
+          - Progression: Increase reps or add weight
+        
+        **Finisher:**
+        - Single-Leg Deadlifts: 3 sets x 10-12 reps (each leg)
+          - Rest: 60-90 seconds
+          - Form: Stand on one leg, hinge at hip, raise opposite leg
+          - Progression: Add dumbbell or increase reps
+        """)
+    
+    # GLUTES TAB
+    with tabs[11]:
+        st.markdown("## 🍑 GLUTES WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Barbell Hip Thrusts: 3 sets x 8-12 reps
+          - Rest: 90-120 seconds
+          - Form: Upper back on bench, drive hips up explosively
+          - Progression: Increase weight by 20-45 lbs weekly
+        
+        **Secondary Exercise:**
+        - Barbell Squats (Feet Closer): 3 sets x 8-10 reps
+          - Rest: 2-3 minutes
+          - Form: Closer stance, lean forward, emphasize glute engagement
+          - Progression: Increase weight by 5-10 lbs
+        
+        **Isolation Exercise 1:**
+        - Machine Leg Press (Wide Stance): 3 sets x 10-12 reps
+          - Rest: 90 seconds
+          - Form: Wide feet placement, press through heels
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 2:**
+        - Cable Kickbacks: 3 sets x 12-15 reps (each leg)
+          - Rest: 60-90 seconds
+          - Form: One leg at a time, extend leg back and up
+          - Progression: Increase cable weight
+        
+        **Machine Exercise:**
+        - Machine Hip Abduction: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Open legs against resistance, squeeze glutes
+          - Progression: Increase weight or reps
+        
+        **Finisher:**
+        - Single-Leg Hip Thrusts: 3 sets x 10-12 reps (each leg)
+          - Rest: 60-90 seconds
+          - Form: One leg extended, thrust upward using one glute
+          - Progression: Add weight plate or increase reps
+        """)
+    
+    # CALVES TAB
+    with tabs[12]:
+        st.markdown("## 🦶 CALVES WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Standing Calf Raises (Machine or Barbell): 4 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Full range of motion, rise up on toes, pause at top
+          - Progression: Increase weight by 10-20 lbs weekly
+        
+        **Secondary Exercise:**
+        - Seated Calf Raises: 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: Sit with weight on knees, raise up on toes
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 1:**
+        - Dumbbell Single-Leg Calf Raises: 3 sets x 12-15 reps (each leg)
+          - Rest: 60 seconds
+          - Form: Stand on one leg, hold dumbbell, raise on toes
+          - Progression: Increase dumbbell weight
+        
+        **Isolation Exercise 2:**
+        - Machine Leg Press Calf Raises: 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: Feet on bottom of leg press, raise using only ankles
+          - Progression: Increase weight or reps
+        
+        **Slow Reps:**
+        - Slow Calf Raises: 3 sets x 10-12 reps (3 sec up, 3 sec down)
+          - Rest: 90-120 seconds
+          - Form: Controlled tempo, full range, squeeze at top
+          - Progression: Maintain tempo and increase weight
+        
+        **Finisher:**
+        - Jump Rope: 3 sets x 1-2 minutes
+          - Rest: 60-90 seconds
+          - Form: Land on balls of feet, use calf action
+          - Progression: Increase duration or speed
+        """)
+    
+    # ADDUCTORS TAB
+    with tabs[13]:
+        st.markdown("## 🤎 INNER THIGHS/ADDUCTORS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Machine Leg Press (Wide Stance): 3 sets x 10-12 reps
+          - Rest: 90-120 seconds
+          - Form: Feet wide apart on platform, push through heels
+          - Progression: Increase weight by 20-45 lbs
+        
+        **Secondary Exercise:**
+        - Machine Adduction: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Bring legs together against resistance
+          - Progression: Increase weight or reps
+        
+        **Isolation Exercise 1:**
+        - Copenhagen Planks: 3 sets x 30-45 seconds (each side)
+          - Rest: 60-90 seconds
+          - Form: Side plank with knee on bench, squeeze inner thigh
+          - Progression: Increase duration or add weight
+        
+        **Isolation Exercise 2:**
+        - Cable Adduction: 3 sets x 12-15 reps (each leg)
+          - Rest: 60 seconds
+          - Form: Attach ankle strap, bring leg inward against cable
+          - Progression: Increase cable weight
+        
+        **Bodyweight Exercise:**
+        - Sumo Squats: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Very wide stance, toes out, squat deep
+          - Progression: Add dumbbell weight
+        
+        **Finisher:**
+        - Goblet Squats (Wide Stance): 3 sets x 15-20 reps
+          - Rest: 60 seconds
+          - Form: Hold dumbbell, wide stance, squat deep with control
+          - Progression: Increase dumbbell weight or reps
+        """)
+    
+    # ABDUCTORS TAB
+    with tabs[14]:
+        st.markdown("## ➡️ OUTER THIGHS/ABDUCTORS WORKOUT PLAN")
+        st.markdown("""
+        **Primary Exercise:**
+        - Machine Hip Abduction: 3 sets x 12-15 reps
+          - Rest: 60-90 seconds
+          - Form: Open legs against resistance, squeeze outer thighs
+          - Progression: Increase weight by 10-20 lbs weekly
+        
+        **Secondary Exercise:**
+        - Banded Lateral Walks: 3 sets x 15-20 steps (each direction)
+          - Rest: 60 seconds
+          - Form: Resistance band above knees, walk sideways
+          - Progression: Use stronger resistance band
+        
+        **Isolation Exercise 1:**
+        - Cable Abduction: 3 sets x 12-15 reps (each leg)
+          - Rest: 60 seconds
+          - Form: Attach ankle strap, raise leg outward and upward
+          - Progression: Increase cable weight
+        
+        **Isolation Exercise 2:**
+        - Lateral Dumbbell Raises (Standing): 3 sets x 12-15 reps (each leg)
+          - Rest: 60 seconds
+          - Form: Hold dumbbell, raise leg out to side to hip height
+          - Progression: Increase dumbbell weight
+        
+        **Glute-Medius Focus:**
+        - Clamshells (Side-Lying): 3 sets x 15-20 reps (each side)
+          - Rest: 60 seconds
+          - Form: Lie on side, open top knee while keeping feet together
+          - Progression: Add resistance band or weight
+        
+        **Finisher:**
+        - Side Plank Hip Abduction: 3 sets x 12-15 reps (each side)
+          - Rest: 60-90 seconds
+          - Form: Side plank position, raise top leg up and down
+          - Progression: Increase reps or hold plank longer
+        """)
 
-if st.session_state.page == "gym_finder":
-    render_gym_finder()
-elif st.session_state.page == "gym_sessions":
-    render_gym_sessions()
-elif st.session_state.page == "habits":
+
+# ------------------------------------------------------------------
+# SECTION 10: ROUTER — draw whichever page we're on
+# ------------------------------------------------------------------
+if st.session_state.page == "habits":
     render_habit_tracker()
-elif st.session_state.page == "goal_calendar":
-    render_goal_calendar()
 elif st.session_state.page == "community":
     render_community()
 elif st.session_state.page == "friends_list":
     render_friends_list()
+elif st.session_state.page == "goal_calendar":
+    render_goal_calendar()
+elif st.session_state.page == "gym_finder":
+    render_gym_finder()
 elif st.session_state.page == "profile":
     render_profile()
-
-st.markdown(
-    """
-    <div class="fitpulse-cta-banner">
-        <h3>READY TO PUSH YOUR LIMITS?</h3>
-        <p>Track your daily habits, explore gyms near you, and crush your fitness targets every single day.</p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+elif st.session_state.page == "gym_sessions":
+    render_gym_sessions()
+elif st.session_state.page == "signup":
+    render_signup()
+elif st.session_state.page == "login":
+    render_login()
+else:
+    render_home()
