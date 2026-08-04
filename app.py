@@ -163,8 +163,7 @@ st.markdown(
     .st-key-community_card button,
     .st-key-gym_finder_card button,
     .st-key-friends_list_card button,
-    .st-key-goal_calendar_card button,
-    .st-key-gym_sessions_card button {
+    .st-key-goal_calendar_card button {
         background-color: #FFFFFF !important;
         border: 1px solid #E0E0E0 !important;
         border-top: 4px solid #7C9473 !important;
@@ -179,8 +178,7 @@ st.markdown(
     .st-key-community_card button:hover,
     .st-key-gym_finder_card button:hover,
     .st-key-friends_list_card button:hover,
-    .st-key-goal_calendar_card button:hover,
-    .st-key-gym_sessions_card button:hover {
+    .st-key-goal_calendar_card button:hover {
         transform: translateY(-4px);
         box-shadow: 0 10px 22px rgba(0,0,0,0.14) !important;
         border-top-color: #2A2A26 !important;
@@ -189,16 +187,14 @@ st.markdown(
     .st-key-community_card button:active,
     .st-key-gym_finder_card button:active,
     .st-key-friends_list_card button:active,
-    .st-key-goal_calendar_card button:active,
-    .st-key-gym_sessions_card button:active {
+    .st-key-goal_calendar_card button:active {
         transform: translateY(-1px);
     }
     .st-key-habit_tracking_card button p,
     .st-key-community_card button p,
     .st-key-gym_finder_card button p,
     .st-key-friends_list_card button p,
-    .st-key-goal_calendar_card button p,
-    .st-key-gym_sessions_card button p {
+    .st-key-goal_calendar_card button p {
         margin: 6px 0 0 0;
         color: #444;
         font-size: 14px;
@@ -208,8 +204,7 @@ st.markdown(
     .st-key-community_card button p:first-of-type,
     .st-key-gym_finder_card button p:first-of-type,
     .st-key-friends_list_card button p:first-of-type,
-    .st-key-goal_calendar_card button p:first-of-type,
-    .st-key-gym_sessions_card button p:first-of-type {
+    .st-key-goal_calendar_card button p:first-of-type {
         font-size: 34px;
         margin-top: 0;
     }
@@ -217,8 +212,7 @@ st.markdown(
     .st-key-community_card button p strong,
     .st-key-gym_finder_card button p strong,
     .st-key-friends_list_card button p strong,
-    .st-key-goal_calendar_card button p strong,
-    .st-key-gym_sessions_card button p strong {
+    .st-key-goal_calendar_card button p strong {
         color: #2A2A26;
         font-size: 17px;
     }
@@ -577,6 +571,50 @@ st.markdown(
             grid-template-columns: repeat(2, 1fr);
         }
         .fitpulse-photo-card {
+            height: 150px;
+        }
+    }
+
+    /* --- GYM SESSIONS PHOTO TILE: the photo itself is the button ---
+       Same look as the other .fitpulse-photo-card tiles (photo,
+       dark-to-green gradient wash, bottom-left caption), but this one
+       is a real st.button so clicking the photo actually navigates —
+       no separate button anywhere else. */
+    .st-key-gym_sessions_photo_card button {
+        position: relative;
+        background:
+            linear-gradient(to top, rgba(42,42,38,0.75) 0%, rgba(42,42,38,0.05) 55%, rgba(124,148,115,0.18) 100%),
+            url("https://images.unsplash.com/photo-1547226238-e53e98a8e59d?w=700&q=70&auto=format&fit=crop")
+            center / cover no-repeat !important;
+        border: none !important;
+        border-radius: 14px !important;
+        height: 190px;
+        width: 100%;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10) !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex !important;
+        align-items: flex-end !important;
+        justify-content: flex-start !important;
+        padding: 14px !important;
+    }
+    .st-key-gym_sessions_photo_card button:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18) !important;
+    }
+    .st-key-gym_sessions_photo_card button:active {
+        transform: translateY(-1px);
+    }
+    .st-key-gym_sessions_photo_card button p {
+        margin: 0;
+        color: white;
+        font-weight: 700;
+        font-size: 14.5px;
+        letter-spacing: 0.3px;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+        text-align: left;
+    }
+    @media (max-width: 700px) {
+        .st-key-gym_sessions_photo_card button {
             height: 150px;
         }
     }
@@ -1364,7 +1402,6 @@ def render_home():
         "Habit Tracking": ("habit_tracking_card", "habit_card_click", "habits"),
         "Friends List": ("friends_list_card", "friends_list_card_click", "friends_list"),
         "Goal Calendar": ("goal_calendar_card", "goal_calendar_card_click", "goal_calendar"),
-        "Gym Sessions": ("gym_sessions_card", "gym_sessions_card_click", "gym_sessions"),
     }
 
     for col, (icon, title, text) in zip(feature_cols, features):
@@ -1416,37 +1453,25 @@ def render_home():
                 st.rerun()
 
     st.write("")  # small spacer
-
-    # --- Gym Sessions card (third row - centered) ---
-    gym_sessions_cols = st.columns([1, 2, 1])  # Center the card
-    with gym_sessions_cols[1]:
-        with st.container(key="gym_sessions_card"):
-            gym_sessions_clicked = st.button(
-                "💪\n\n**Gym Sessions**\n\nComplete workout plans for every muscle group.",
-                key="gym_sessions_card_click",
-                use_container_width=True,
-            )
-            if gym_sessions_clicked:
-                st.session_state.page = "gym_sessions"
-                st.session_state.gym_session_view = "picker"
-                st.rerun()
-
-    st.write("")  # small spacer
     st.divider()
 
     # --- Photo gallery: real people, working out, staying active ---
     # A handful of free-to-use (Unsplash License) photos so the page
     # feels lived-in instead of just icons and text — a little glimpse
     # of the kind of community FitPulse is for.
+    #
+    # The "Gym Sessions" tile is the ONE and ONLY way into the muscle
+    # workout plans — the photo itself IS the button (a real st.button
+    # styled with the photo as its background, via the
+    # .st-key-gym_sessions_photo_card CSS rule below). There is no
+    # separate "Gym Sessions" button anywhere else on the page. The
+    # other three photos stay as plain, non-clickable decorative tiles.
     st.markdown(
         '<div class="fitpulse-section-header">📸 Our Community in Motion</div>',
         unsafe_allow_html=True,
     )
-    gallery_photos = [
-        (
-            "https://images.unsplash.com/photo-1547226238-e53e98a8e59d?w=700&q=70&auto=format&fit=crop",
-            "Gym Sessions",
-        ),
+
+    other_gallery_photos = [
         (
             "https://images.unsplash.com/photo-1518644961665-ed172691aaa1?w=700&q=70&auto=format&fit=crop",
             "Wellness & Stretching",
@@ -1460,12 +1485,28 @@ def render_home():
             "Cardio & Running",
         ),
     ]
-    gallery_html = '<div class="fitpulse-photo-grid">' + "".join(
-        f'<div class="fitpulse-photo-card"><img src="{url}" alt="{caption}">'
-        f'<div class="fitpulse-photo-caption">{caption}</div></div>'
-        for url, caption in gallery_photos
-    ) + "</div>"
-    st.markdown(gallery_html, unsafe_allow_html=True)
+
+    gallery_cols = st.columns(4)
+
+    with gallery_cols[0]:
+        with st.container(key="gym_sessions_photo_card"):
+            gym_sessions_photo_clicked = st.button(
+                "Gym Sessions",
+                key="gym_sessions_photo_click",
+                use_container_width=True,
+            )
+            if gym_sessions_photo_clicked:
+                st.session_state.page = "gym_sessions"
+                st.session_state.gym_session_view = "picker"
+                st.rerun()
+
+    for col, (url, caption) in zip(gallery_cols[1:], other_gallery_photos):
+        with col:
+            st.markdown(
+                f'<div class="fitpulse-photo-card"><img src="{url}" alt="{caption}">'
+                f'<div class="fitpulse-photo-caption">{caption}</div></div>',
+                unsafe_allow_html=True,
+            )
 
     # --- Bottom CTA banner ---
     st.markdown(
